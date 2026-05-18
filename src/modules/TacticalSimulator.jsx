@@ -230,7 +230,7 @@ export default function TacticalSimulator({ onComplete }) {
                     color: TEXT2, cursor: selected ? 'default' : 'pointer', transition: 'all 0.12s', fontFamily: F,
                     boxShadow: isBest && showImpact ? `inset 0 0 20px rgba(0,255,65,0.03)` : 'none'
                   }}
-                  onMouseEnter={e => { if (!selected) { e.currentTarget.style.borderColor = `${ACCENT}55`; e.currentTarget.style.background = 'rgba(0,255,65,0.04)'; e.currentTarget.style.color = ACCENT } }}
+                  onMouseEnter={e => { if (!selected) { e.currentTarget.style.borderColor = '#ffaa0055'; e.currentTarget.style.background = 'rgba(255,170,0,0.04)'; e.currentTarget.style.color = '#ffaa00' } }}
                   onMouseLeave={e => { if (!selected) { e.currentTarget.style.borderColor = BORDER; e.currentTarget.style.background = '#070707'; e.currentTarget.style.color = TEXT2 } }}
                 >
                   <span style={{ color: ACCENT, fontSize: '24px', minWidth: '24px', marginTop: '1px' }}>[{String.fromCharCode(65+i)}]</span>

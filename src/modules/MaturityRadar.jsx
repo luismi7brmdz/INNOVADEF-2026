@@ -162,7 +162,7 @@ export default function MaturityRadar({ onComplete }) {
                       color: TEXT2, cursor: 'pointer', transition: 'all 0.18s',
                       fontFamily: FONT, fontSize: '11px', letterSpacing: '0.5px'
                     }}
-                    onMouseEnter={e => { e.currentTarget.style.borderColor = `${ACCENT}55`; e.currentTarget.style.background = 'rgba(0,255,65,0.04)'; e.currentTarget.style.color = ACCENT }}
+                    onMouseEnter={e => { e.currentTarget.style.borderColor = '#ffaa0055'; e.currentTarget.style.background = 'rgba(255,170,0,0.04)'; e.currentTarget.style.color = '#ffaa00' }}
                     onMouseLeave={e => { e.currentTarget.style.borderColor = BORDER; e.currentTarget.style.background = '#070707'; e.currentTarget.style.color = TEXT2 }}
                   >
                     <span style={{ color: ACCENT, minWidth: '24px', fontSize: '15px' }}>[{i}]</span>

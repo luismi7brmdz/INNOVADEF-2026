@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { useNavigate, useLocation, Routes, Route } from 'react-router-dom'
 import { Send, Cpu, CheckCircle, ChevronRight, Mail, Target, BarChart2, AlertTriangle, Activity, FileText } from 'lucide-react'
 import { QRCodeSVG as QRCode } from 'qrcode.react'
 import MilitaryBackground from './MilitaryBackground'
@@ -9,7 +10,7 @@ import MaturityRadar from './modules/MaturityRadar'
 import ThreatClassifier from './modules/ThreatClassifier'
 import PulseSurvey from './modules/PulseSurvey'
 import { ACCENT, ACCENT2, AMBER, RED, DIM, DIMLO, BORDER, BG, TEXT, TEXT2, FONT, CARD, S } from './theme'
-import { sfxBootHeader, sfxHudScan, sfxCardAppear, sfxModuleSelect, sfxHover, sfxReset, sfxRadarPing, sfxIntroWipe } from './sfx'
+import { sfxBootHeader, sfxHudScan, sfxCardAppear, sfxModuleSelect, sfxHover, sfxReset, sfxRadarPing, sfxIntroWipe, startAmbient, stopAmbient } from './sfx'
 
 // ─── CONSTANTS ───────────────────────────────────────────────────────────────
 
@@ -309,9 +310,9 @@ function CapacityTest({ onComplete }) {
               fontFamily: FONT, fontSize: '24.75px', letterSpacing: '1.5px'
             }}
             onMouseEnter={e => {
-              e.currentTarget.style.background = 'rgba(0,255,65,0.05)'
-              e.currentTarget.style.borderColor = `${ACCENT}66`
-              e.currentTarget.style.color = ACCENT
+              e.currentTarget.style.background = 'rgba(255,170,0,0.05)'
+              e.currentTarget.style.borderColor = '#ffaa0066'
+              e.currentTarget.style.color = '#ffaa00'
               e.currentTarget.style.boxShadow = `inset 0 0 30px rgba(0,255,65,0.04)`
             }}
             onMouseLeave={e => {
@@ -373,7 +374,7 @@ function EmailScreen({ sessionId, onReset }) {
         </div>
       </Panel>
       <button onClick={onReset} style={{ background: 'none', border: 'none', color: TEXT2, cursor: 'pointer', fontFamily: FONT, fontSize: '22.5px', letterSpacing: '3px', textTransform: 'uppercase', display: 'block', margin: '0 auto' }}
-        onMouseEnter={e => e.currentTarget.style.color = ACCENT}
+        onMouseEnter={e => e.currentTarget.style.color = '#ffaa00'}
         onMouseLeave={e => e.currentTarget.style.color = TEXT2}>
         [ NUEVA EVALUACIÓN ]
       </button>
@@ -490,34 +491,34 @@ function ModuleSelector({ onSelect, bootStage = 4 }) {
                 onMouseLeave={() => setHovered(null)}
                 style={{
                   display: 'flex', flexDirection: 'column', padding: '0', width: '100%',
-                  background: isH ? `rgba(0,255,65,0.03)` : '#070707',
-                  border: `1.5px solid ${isH ? `${ACCENT}55` : BORDER}`,
+                  background: isH ? `rgba(255,170,0,0.03)` : '#070707',
+                  border: `1.5px solid ${isH ? `#ffaa0055` : BORDER}`,
                   color: ACCENT, cursor: 'pointer', textAlign: 'left',
                   transition: 'all 0.18s',
-                  boxShadow: isH ? `0 0 0 1.5px ${ACCENT}22, inset 0 0 45px rgba(0,255,65,0.02)` : 'none'
+                  boxShadow: isH ? `0 0 0 1.5px #ffaa0022, inset 0 0 45px rgba(255,170,0,0.02)` : 'none'
                 }}
               >
                 {/* Module header bar */}
                 <div style={{
                   display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                   padding: '12px 21px',
-                  borderBottom: `1.5px solid ${isH ? `${ACCENT}33` : BORDER}`,
-                  background: isH ? 'rgba(0,255,65,0.04)' : '#0a0a0a'
+                  borderBottom: `1.5px solid ${isH ? `#ffaa0033` : BORDER}`,
+                  background: isH ? 'rgba(255,170,0,0.04)' : '#0a0a0a'
                 }}>
                   <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
-                    <Icon size={21} color={isH ? ACCENT : TEXT2} />
+                    <Icon size={21} color={isH ? '#ffaa00' : TEXT2} />
                     <span style={{ fontFamily: FONT, fontSize: '20.25px', color: TEXT2, letterSpacing: '3px' }}>{mod.code}</span>
                   </div>
                   <div style={{ display: 'flex', gap: '18px', alignItems: 'center' }}>
-                    <span style={{ fontFamily: FONT, fontSize: '18px', letterSpacing: '3px', color: isH ? ACCENT : TEXT2, padding: '3px 9px', border: `1.5px solid ${isH ? `${ACCENT}44` : BORDER}` }}>
+                    <span style={{ fontFamily: FONT, fontSize: '18px', letterSpacing: '3px', color: isH ? '#ffaa00' : TEXT2, padding: '3px 9px', border: `1.5px solid ${isH ? `#ffaa0044` : BORDER}` }}>
                       {mod.tag}
                     </span>
-                    <span style={{ width: '9px', height: '9px', background: ACCENT, display: 'inline-block', boxShadow: isH ? `0 0 12px ${ACCENT}` : 'none', animation: 'blink 3s infinite' }} />
+                    <span style={{ width: '9px', height: '9px', background: isH ? '#ffaa00' : ACCENT, display: 'inline-block', boxShadow: isH ? `0 0 12px #ffaa00` : `0 0 12px ${ACCENT}`, animation: 'blink 3s infinite' }} />
                   </div>
                 </div>
                 {/* Body */}
                 <div style={{ padding: '24px 21px' }}>
-                  <div style={{ fontFamily: FONT, fontSize: '19.5px', letterSpacing: '1.5px', color: isH ? ACCENT : TEXT2, marginBottom: '15px', lineHeight: 1.3 }}>
+                  <div style={{ fontFamily: FONT, fontSize: '19.5px', letterSpacing: '1.5px', color: isH ? '#ffaa00' : TEXT2, marginBottom: '15px', lineHeight: 1.3 }}>
                     {mod.label}
                   </div>
                   <div style={{ fontFamily: FONT, fontSize: '22.5px', color: 'rgba(0,255,65,0.3)', lineHeight: 1.7, letterSpacing: '0.75px', marginBottom: '21px' }}>
@@ -525,7 +526,7 @@ function ModuleSelector({ onSelect, bootStage = 4 }) {
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span style={{ fontFamily: FONT, fontSize: '20.25px', color: 'rgba(0,255,65,0.25)', letterSpacing: '1.5px' }}>DURACIÓN: {mod.duration}</span>
-                    <span style={{ fontFamily: FONT, fontSize: '22.5px', color: isH ? ACCENT : TEXT2, letterSpacing: '1.5px' }}>{isH ? '[EJECUTAR ▶]' : '[──────]'}</span>
+                    <span style={{ fontFamily: FONT, fontSize: '22.5px', color: isH ? '#ffaa00' : TEXT2, letterSpacing: '1.5px' }}>{isH ? '[EJECUTAR ▶]' : '[──────]'}</span>
                   </div>
                 </div>
               </button>
@@ -615,6 +616,8 @@ function useScreenTransition(duration = 630) {
 }
 
 export default function App() {
+  const navigate = useNavigate()
+  const location = useLocation()
   const [screen, setScreen] = useState('sleep')
   const [activeModule, setActiveModule] = useState(null)
   const [moduleResult, setModuleResult] = useState(null)
@@ -624,6 +627,69 @@ export default function App() {
   const [transitioning, setTransitioning] = useState(false)
   const [pendingModule, setPendingModule] = useState(null)
   const { overlay, go } = useScreenTransition(750)
+
+  // Sync screen with URL
+  useEffect(() => {
+    const path = location.pathname
+    if (path === '/') setScreen('sleep')
+    else if (path === '/intro') setScreen('intro')
+    else if (path === '/selector') setScreen('selector')
+    else if (path === '/email') setScreen('email')
+    else if (path.startsWith('/module/')) setScreen('module')
+  }, [location.pathname])
+
+  // Sync URL with screen
+  useEffect(() => {
+    if (screen === 'sleep') navigate('/', { replace: true })
+    else if (screen === 'intro') navigate('/intro', { replace: true })
+    else if (screen === 'selector') navigate('/selector', { replace: true })
+    else if (screen === 'module' && activeModule) navigate(`/module/${activeModule}`, { replace: true })
+    else if (screen === 'email') navigate('/email', { replace: true })
+  }, [screen, activeModule, navigate])
+
+  // Ambient background sound
+  useEffect(() => {
+    if (screen !== 'sleep') {
+      startAmbient()
+    } else {
+      stopAmbient()
+    }
+    return () => stopAmbient()
+  }, [screen])
+
+  // Inactivity timeout - return to sleep after 60 seconds
+  useEffect(() => {
+    let timeoutId
+
+    const resetTimeout = () => {
+      clearTimeout(timeoutId)
+      if (screen !== 'sleep') {
+        timeoutId = setTimeout(() => {
+          navigate('/')
+        }, 60000) // 60 seconds
+      }
+    }
+
+    const handleActivity = () => {
+      resetTimeout()
+    }
+
+    // Add event listeners for user activity
+    window.addEventListener('mousemove', handleActivity)
+    window.addEventListener('keydown', handleActivity)
+    window.addEventListener('click', handleActivity)
+    window.addEventListener('touchstart', handleActivity)
+
+    resetTimeout()
+
+    return () => {
+      clearTimeout(timeoutId)
+      window.removeEventListener('mousemove', handleActivity)
+      window.removeEventListener('keydown', handleActivity)
+      window.removeEventListener('click', handleActivity)
+      window.removeEventListener('touchstart', handleActivity)
+    }
+  }, [screen, navigate])
 
   const enterDashboard = () => {
     sfxIntroWipe()
@@ -692,7 +758,7 @@ export default function App() {
           background: 'none', border: 'none', borderRight: `1.5px solid ${BORDER}`,
           padding: '0 54px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '27px'
         }}>
-          <img src="/logoinnovadef.png" alt="INNOVADEF" style={{ height: '157.5px', filter: 'brightness(0) saturate(100%) invert(74%) sepia(47%) saturate(539%) hue-rotate(86deg) brightness(107%) contrast(103%)' }} />
+          <img src="/logoinnovadef.png" alt="INNOVADEF" style={{ height: '120px'}} />
         </button>
 
         {/* Nav items */}
@@ -752,7 +818,13 @@ export default function App() {
       <StatusBar module={activeModCode} onHome={reset} bootStage={bootStage} />
 
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+        @font-face {
+          font-family: 'Share Tech Mono';
+          src: url('/ShareTechMono-Regular.ttf') format('truetype');
+          font-weight: 400;
+          font-style: normal;
+          font-display: swap;
+        }
         * { box-sizing: border-box; }
         ::selection { background: rgba(0,255,65,0.2); color: #00FF41; }
         ::-webkit-scrollbar { width: 4.01px; background: #070707; }

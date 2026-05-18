@@ -332,3 +332,33 @@ export function sfxReset() {
   deepRumble(ac, now + 0.1, 0.6, 0.1)
   filteredNoise(ac, now, 0.4, 0.06, 500, 80)
 }
+
+// ── RUIDO DE FONDO AMBIENTAL ────────────────────────────────────────────────────────
+
+let ambientAudio = null
+
+// Iniciar ruido de fondo con sonar de submarino en loop
+export function startAmbient() {
+  if (ambientAudio) stopAmbient() // Detener si ya existe
+
+  ambientAudio = new Audio('/submarine_sonar.wav')
+  ambientAudio.loop = true
+  ambientAudio.volume = 0.3
+  ambientAudio.play().catch(() => {})
+}
+
+// Detener ruido de fondo
+export function stopAmbient() {
+  if (!ambientAudio) return
+  const fadeDuration = 500
+  const startVolume = ambientAudio.volume
+  
+  const fadeInterval = setInterval(() => {
+    ambientAudio.volume -= startVolume / (fadeDuration / 50)
+    if (ambientAudio.volume <= 0) {
+      clearInterval(fadeInterval)
+      ambientAudio.pause()
+      ambientAudio = null
+    }
+  }, 50)
+}

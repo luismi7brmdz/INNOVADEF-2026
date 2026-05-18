@@ -357,15 +357,15 @@ export default function IntroScreen({ onEnter }) {
             style={{
               fontFamily: FONT, fontSize: '27px', letterSpacing: '9px',
               padding: '18px 48px',
-              background: phase === 'firing' ? `${ACCENT}22` : 'transparent',
+              background: '#ffaa00',
               border: `1px solid ${ACCENT}`,
-              color: ACCENT,
+              color: '#000',
               cursor: 'pointer',
               position: 'relative',
               overflow: 'hidden',
               animation: 'fadeInUp 0.75s ease both, btnPulse 3.75s ease-in-out infinite',
               transition: 'all 0.225s',
-              boxShadow: phase === 'firing' ? `0 0 40px ${ACCENT}44, inset 0 0 40px ${ACCENT}22` : `0 0 12px ${ACCENT}22`,
+              boxShadow: phase === 'firing' ? `0 0 40px #ffaa0044, inset 0 0 40px #ffaa0022` : `0 0 12px #ffaa0022`,
               transform: phase === 'firing' ? 'scale(0.97)' : 'scale(1)',
             }}
           >

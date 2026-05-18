@@ -141,7 +141,7 @@ export default function PulseSurvey({ onComplete }) {
             {q.options.map((option, i) => (
               <button key={i} onClick={() => handleAnswer(i)}
                 style={{ display: 'flex', alignItems: 'center', gap: '14px', padding: '14px 16px', textAlign: 'left', width: '100%', background: '#070707', border: `1px solid ${BORDER}`, color: TEXT2, cursor: 'pointer', transition: 'all 0.12s', fontFamily: FONT, fontSize: '11px', letterSpacing: '0.5px' }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = `${ACCENT}55`; e.currentTarget.style.background = 'rgba(0,255,65,0.04)'; e.currentTarget.style.color = ACCENT }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = '#ffaa0055'; e.currentTarget.style.background = 'rgba(255,170,0,0.04)'; e.currentTarget.style.color = '#ffaa00' }}
                 onMouseLeave={e => { e.currentTarget.style.borderColor = BORDER; e.currentTarget.style.background = '#070707'; e.currentTarget.style.color = TEXT2 }}
               >
                 <span style={{ color: ACCENT, minWidth: '24px', fontSize: '15px' }}>[{String.fromCharCode(65+i)}]</span>
