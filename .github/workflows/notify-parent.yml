@@ -1,0 +1,16 @@
+name: Notify parent repo
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Disparar sync en innovadef-demos
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.PARENT_REPO_TOKEN }}
+          repository: MartinSuarez-Pumpun/innovadef-demos
+          event-type: submodule-push
