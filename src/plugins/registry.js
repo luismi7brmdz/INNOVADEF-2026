@@ -1,26 +1,38 @@
 import { lazy } from 'react'
-import { FileText, Target, BarChart2, AlertTriangle, Activity, Brain, Shield, Crosshair, Terminal } from 'lucide-react'
+import { FileText, Target, BarChart2, AlertTriangle, Activity, Shield, Crosshair, Terminal } from 'lucide-react'
 import { ACCENT, AMBER, RED } from '../theme'
+import { EXTERNAL_PLUGINS } from 'virtual:external-plugins'
 
 /**
  * PLUGIN REGISTRY
  *
- * Añadir un nuevo plugin = 1 entrada aquí. No tocar App.jsx.
+ * Internal modules live in src/modules/ and are registered here.
+ * External plugins (separate repos) are auto-discovered from sibling
+ * demo-* directories via vite-plugin-registry.js — no changes needed here.
  *
- * Campos:
- *   id        — identificador único (usado en la URL /module/:id)
- *   code      — código visible en el HUD (MOD-XX)
- *   label     — título del módulo
- *   desc      — descripción corta
- *   icon      — componente Lucide React
- *   color     — color de acento del módulo
- *   duration  — duración estimada
- *   tag       — etiqueta de categoría visible en la card
- *   category  — categoría para agrupación en el selector (lowercase)
+ * To add an internal module:
+ *   1. Create src/modules/MiModulo.jsx (export default, receives onComplete prop)
+ *   2. Add an entry below
+ *
+ * To add an external plugin:
+ *   1. git submodule add <url> demo-<name>  (in innovadef-demos root)
+ *   2. Ensure the repo has plugin.json + src/plugin.jsx
+ *   Done — it appears automatically on next build/dev restart.
+ *
+ * Fields:
+ *   id        — unique identifier (used in URL /module/:id)
+ *   code      — HUD label (MOD-XX)
+ *   label     — module title
+ *   desc      — short description shown on the card
+ *   icon      — Lucide React component
+ *   color     — card accent color
+ *   duration  — estimated duration
+ *   tag       — badge text on card (uppercase)
+ *   category  — groups cards in selector (lowercase)
  *   status    — 'ACTIVO' | 'PRÓXIMO' | 'MANTENIMIENTO'
- *   component — React.lazy import del componente del módulo
+ *   component — React.lazy import
  */
-export const PLUGIN_REGISTRY = [
+const INTERNAL_MODULES = [
   {
     id: 'capacity',
     code: 'MOD-01',
@@ -87,19 +99,6 @@ export const PLUGIN_REGISTRY = [
     component: lazy(() => import('../modules/PulseSurvey')),
   },
   {
-    id: 'aerocognitio',
-    code: 'MOD-06',
-    label: 'AEROCOGNITIO',
-    desc: 'BATERÍA PSICOTÉCNICA RPAS — EVALUACIÓN COGNITIVO-ESPACIAL — INFORME IA PERSONALIZADO',
-    icon: Brain,
-    color: '#ffb547',
-    duration: '~6 MIN',
-    tag: 'PSICOTÉCNICA',
-    category: 'psicotécnica',
-    status: 'ACTIVO',
-    component: lazy(() => import('@aerocognitio/plugin')),
-  },
-  {
     id: 'cyberdefense',
     code: 'MOD-07',
     label: 'OPERACIÓN ESCUDO DIGITAL',
@@ -139,3 +138,6 @@ export const PLUGIN_REGISTRY = [
     component: lazy(() => import('../modules/CovertMission')),
   },
 ]
+
+// Internal modules first, then auto-discovered external plugins
+export const PLUGIN_REGISTRY = [...INTERNAL_MODULES, ...EXTERNAL_PLUGINS]
