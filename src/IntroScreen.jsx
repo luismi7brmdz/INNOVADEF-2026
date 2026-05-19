@@ -361,7 +361,7 @@ export default function IntroScreen({ onEnter }) {
               fontFamily: FONT, fontSize: 'clamp(14px, 2.5vw, 27px)', letterSpacing: 'clamp(3px, 0.8vw, 9px)',
               padding: 'clamp(12px, 2vw, 18px) clamp(24px, 5vw, 48px)',
               background: 'transparent',
-              border: `1.5px solid #ffaa0055`,
+              border: `1px solid #ffaa00`,
               color: '#ffaa00',
               cursor: 'pointer',
               position: 'relative',
@@ -373,8 +373,8 @@ export default function IntroScreen({ onEnter }) {
             }}
           >
             {/* Corner brackets */}
-            <span style={{ position: 'absolute', top: 4.5, left: 4.5, width: 15, height: 15, borderTop: `1px solid ${ACCENT}`, borderLeft: `1px solid ${ACCENT}` }} />
-            <span style={{ position: 'absolute', top: 4.5, right: 4.5, width: 15, height: 15, borderTop: `1px solid ${ACCENT}`, borderRight: `1px solid ${ACCENT}` }} />
+            <span style={{ position: 'absolute', top: 4.5, left: 4.5, width: 15, height: 15, borderTop: '1px solid #ffaa00', borderLeft: '1px solid #ffaa00' }} />
+            <span style={{ position: 'absolute', top: 4.5, right: 4.5, width: 15, height: 15, borderTop: '1px solid #ffaa00', borderRight: '1px solid #ffaa00' }} />
             <span style={{ position: 'absolute', bottom: 4.5, left: 4.5, width: 15, height: 15, borderBottom: '1px solid #ffaa00', borderLeft: '1px solid #ffaa00' }} />
             <span style={{ position: 'absolute', bottom: 4.5, right: 4.5, width: 15, height: 15, borderBottom: '1px solid #ffaa00', borderRight: '1px solid #ffaa00' }} />
             INICIAR SISTEMA

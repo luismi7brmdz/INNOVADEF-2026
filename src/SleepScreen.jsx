@@ -618,17 +618,17 @@ export default function SleepScreen({ onWake }) {
         <div style={{ flex: 1 }} />
 
         {/* Touch button — zona inferior, hidden once wake starts */}
-        {phase === 'idle' && <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '32px' }}>
+        {phase === 'idle' && <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'clamp(20px, 5vw, 32px)' }}>
           <div style={{
             position: 'relative',
-            width: '414px', height: '414px',
+            width: 'clamp(250px, 50vw, 414px)', height: 'clamp(250px, 50vw, 414px)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}>
             {[0, 1, 2, 3].map(i => (
               <div key={i} style={{
                 position: 'absolute',
                 left: '50%', top: '50%',
-                width: `${165 + i * 82.5}px`, height: `${165 + i * 82.5}px`,
+                width: `clamp(80px, 20vw, ${165 + i * 82.5}px)`, height: `clamp(80px, 20vw, ${165 + i * 82.5}px)`,
                 border: `1.5px solid rgba(0,255,65,${0.6 - i * 0.12})`,
                 borderRadius: '50%',
                 boxShadow: `0 0 ${8 + i * 4}px rgba(0,255,65,0.3)`,
@@ -636,21 +636,21 @@ export default function SleepScreen({ onWake }) {
               }} />
             ))}
             <div style={{
-              width: '165px', height: '165px', borderRadius: '50%',
+              width: 'clamp(100px, 25vw, 165px)', height: 'clamp(100px, 25vw, 165px)', borderRadius: '50%',
               border: `1.5px solid rgba(0,255,65,0.4)`,
               background: 'radial-gradient(circle, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 70%)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: '9px',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 'clamp(6px, 1.5vw, 9px)',
               boxShadow: `0 0 60px rgba(0,0,0,0.5), 0 0 135px rgba(0,0,0,0.3)`,
               animation: 'sleepBtnPulse 3s ease-in-out infinite',
               position: 'relative', zIndex: 1,
             }}>
-              <div style={{ fontFamily: FONT, fontSize: '27px', color: 'rgba(255,255,255,0.9)', letterSpacing: '4.5px' }}>TOQUE</div>
-              <div style={{ fontFamily: FONT, fontSize: '10.5px', color: 'rgba(255,255,255,0.7)', letterSpacing: '3px' }}>PARA INICIAR</div>
+              <div style={{ fontFamily: FONT, fontSize: 'clamp(18px, 4vw, 27px)', color: 'rgba(255,255,255,0.9)', letterSpacing: 'clamp(3px, 0.8vw, 4.5px)' }}>TOQUE</div>
+              <div style={{ fontFamily: FONT, fontSize: 'clamp(8px, 2vw, 10.5px)', color: 'rgba(255,255,255,0.7)', letterSpacing: 'clamp(2px, 0.6vw, 3px)' }}>PARA INICIAR</div>
             </div>
           </div>
 
           {/* Status label — footer */}
-          <div style={{ fontFamily: FONT, fontSize: '12px', color: 'rgba(255,255,255,0.3)', letterSpacing: '5px',
+          <div style={{ fontFamily: FONT, fontSize: 'clamp(10px, 2vw, 12px)', color: 'rgba(255,255,255,0.3)', letterSpacing: 'clamp(3px, 0.8vw, 5px)',
             animation: 'sleepBlink 3.5s ease-in-out infinite' }}>
             INNOVADEF FOCO 2026
           </div>

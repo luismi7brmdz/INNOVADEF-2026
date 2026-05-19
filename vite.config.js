@@ -16,4 +16,10 @@ export default defineConfig(({ mode }) => ({
     // Without this, Zustand hooks and React context break across the boundary.
     dedupe: ['react', 'react-dom', 'react/jsx-runtime'],
   },
+  server: {
+    historyApiFallback: true,
+  },
+  preview: {
+    historyApiFallback: true,
+  },
 }))

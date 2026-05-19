@@ -21,7 +21,7 @@ function LiveClock() {
   useEffect(() => { const i = setInterval(() => setTime(new Date()), 1000); return () => clearInterval(i) }, [])
   const pad = n => String(n).padStart(2, '0')
   return (
-    <span style={{ fontFamily: FONT, fontSize: '16.5px', color: TEXT2, letterSpacing: '3px' }}>
+    <span style={{ fontFamily: FONT, fontSize: 'clamp(14px, 2vw, 20px)', color: TEXT2, letterSpacing: '1px' }}>
       {pad(time.getHours())}:{pad(time.getMinutes())}:{pad(time.getSeconds())} UTC+2
     </span>
   )
@@ -40,17 +40,17 @@ function Panel({ label, children, style = {} }) {
       {label && (
         <div style={{
           position: 'absolute', top: -1.5, left: 0,
-          padding: '6px 18px',
+          padding: 'clamp(5px, 1vw, 9px) clamp(12px, 2.5vw, 24px)',
           background: '#070707',
           borderBottom: `1.5px solid ${BORDER}`,
           borderRight: `1.5px solid ${BORDER}`,
-          fontSize: '20.25px', letterSpacing: '3px', color: TEXT2,
+          fontSize: 'clamp(16px, 2.5vw, 27px)', letterSpacing: 'clamp(2px, 0.6vw, 4px)', color: TEXT2,
           fontFamily: FONT, textTransform: 'uppercase'
         }}>
           {label}
         </div>
       )}
-      <div style={{ paddingTop: label ? '42px' : '0' }}>
+      <div style={{ paddingTop: label ? 'clamp(36px, 5vw, 54px)' : '0' }}>
         {children}
       </div>
     </div>
@@ -69,28 +69,28 @@ function StatusBar({ module, onHome, bootStage = 4 }) {
   return (
     <div style={{
       position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100,
-      height: '48px',
+      height: 'clamp(32px, 4vw, 48px)',
       background: '#050505',
       borderTop: `1.5px solid ${BORDER}`,
       display: 'flex', alignItems: 'center',
-      padding: '0 45px', gap: '0',
-      fontFamily: FONT, fontSize: '22.5px',
+      padding: '0 clamp(18px, 3vw, 36px)', gap: '0',
+      fontFamily: FONT, fontSize: 'clamp(11px, 1.3vw, 15px)',
       transform: bootStage < 2 ? 'translateY(100%)' : 'translateY(0)',
       opacity: bootStage < 2 ? 0 : 1,
       transition: 'transform 0.45s cubic-bezier(0.22,1,0.36,1), opacity 0.35s ease',
     }}>
       {items.map((item, i) => (
-        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '13.5px', paddingRight: '30px', marginRight: '30px', borderRight: `1.5px solid ${BORDER}` }}>
+        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 'clamp(5px, 1vw, 10px)', paddingRight: 'clamp(10px, 2vw, 22px)', marginRight: 'clamp(10px, 2vw, 22px)', borderRight: `1.5px solid ${BORDER}` }}>
           <span style={{ color: TEXT2 }}>{item.label}:</span>
           <span style={{ color: item.color }}>{item.value}</span>
         </div>
       ))}
-      <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '30px' }}>
+      <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 'clamp(10px, 2vw, 20px)' }}>
         {module && (
           <span style={{ color: TEXT2 }}>MÓDULO ACTIVO: <span style={{ color: ACCENT }}>{module}</span></span>
         )}
         <LiveClock />
-        <div style={{ width: '9px', height: '9px', background: ACCENT, boxShadow: `0 0 9px ${ACCENT}44`, animation: 'blink 1.5s infinite' }} />
+        <div style={{ width: 'clamp(6px, 0.8vw, 8px)', height: 'clamp(6px, 0.8vw, 8px)', background: ACCENT, boxShadow: `0 0 9px ${ACCENT}44`, animation: 'blink 1.5s infinite' }} />
       </div>
     </div>
   )
@@ -103,42 +103,42 @@ function EmailScreen({ sessionId, onReset }) {
   const [sent, setSent] = useState(false)
 
   return (
-    <div style={{ maxWidth: '900px', width: '100%', margin: '0 auto' }}>
-      <Panel label="// ENTREGA DE INFORME CLASIFICADO" style={{ marginBottom: '45px' }}>
-        <div style={{ padding: '42px 36px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '48px', alignItems: 'center' }}>
+    <div style={{ width: '100%', margin: '0 auto' }}>
+      <Panel label="// ENTREGA DE INFORME CLASIFICADO" style={{ marginBottom: 'clamp(27px, 5vw, 45px)' }}>
+        <div style={{ padding: 'clamp(24px, 5vw, 42px) clamp(18px, 4vw, 36px)', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'clamp(24px, 5vw, 48px)', alignItems: 'center' }}>
           <div>
-            <div style={{ fontFamily: FONT, fontSize: '20.25px', color: TEXT2, letterSpacing: '3px', marginBottom: '27px' }}>CÓDIGO QR — ACCESO SEGURO</div>
-            <div style={{ background: '#fff', padding: '36px', display: 'inline-block' }}>
-              <QRCode value={`https://innovadef.es/?informe=${sessionId}`} size={240} level="H" />
+            <div style={{ fontFamily: FONT, fontSize: 'clamp(14px, 2.5vw, 20.25px)', color: TEXT2, letterSpacing: 'clamp(2px, 0.6vw, 3px)', marginBottom: 'clamp(15px, 4vw, 27px)' }}>CÓDIGO QR — ACCESO SEGURO</div>
+            <div style={{ background: '#fff', padding: 'clamp(18px, 4vw, 36px)', display: 'inline-block' }}>
+              <QRCode value={`https://innovadef.es/?informe=${sessionId}`} size={200} level="H" />
             </div>
           </div>
           <div>
-            <div style={{ fontFamily: FONT, fontSize: '20.25px', color: TEXT2, letterSpacing: '3px', marginBottom: '27px' }}>ENVÍO A EMAIL REGISTRADO</div>
+            <div style={{ fontFamily: FONT, fontSize: 'clamp(14px, 2.5vw, 20.25px)', color: TEXT2, letterSpacing: 'clamp(2px, 0.6vw, 3px)', marginBottom: 'clamp(15px, 4vw, 27px)' }}>ENVÍO A EMAIL REGISTRADO</div>
             {!sent ? (
               <>
                 <input type="email" value={email} onChange={e => setEmail(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && email.includes('@') && setSent(true)}
                   placeholder="USUARIO@ORGANIZACION.ES"
-                  style={{ width: '100%', padding: '27px', background: '#0a0a0a', border: `1.5px solid ${BORDER}`, color: ACCENT, fontFamily: FONT, fontSize: '24.75px', letterSpacing: '1.5px', outline: 'none', marginBottom: '15px', boxSizing: 'border-box' }}
+                  style={{ width: '100%', padding: 'clamp(15px, 3vw, 27px)', background: '#0a0a0a', border: `1.5px solid ${BORDER}`, color: ACCENT, fontFamily: FONT, fontSize: 'clamp(16px, 3vw, 24.75px)', letterSpacing: 'clamp(1px, 0.3vw, 1.5px)', outline: 'none', marginBottom: 'clamp(9px, 2vw, 15px)', boxSizing: 'border-box' }}
                   onFocus={e => e.target.style.borderColor = ACCENT}
                   onBlur={e => e.target.style.borderColor = BORDER}
                 />
                 <button onClick={() => email.includes('@') && setSent(true)}
                   disabled={!email.includes('@')}
                   style={{ ...S.btnPrimary, width: '100%', justifyContent: 'center', opacity: email.includes('@') ? 1 : 0.35 }}>
-                  <Send size={18} /> TRANSMITIR
+                  <Send size={16} /> TRANSMITIR
                 </button>
               </>
             ) : (
-              <div style={{ border: `1.5px solid ${ACCENT}44`, padding: '36px', background: 'rgba(0,255,65,0.04)' }}>
-                <div style={{ fontFamily: FONT, fontSize: '22.5px', color: ACCENT, letterSpacing: '3px', marginBottom: '9px' }}>TRANSMISIÓN EXITOSA</div>
-                <div style={{ fontFamily: FONT, fontSize: '24.75px', color: TEXT2 }}>DEST: {email.toUpperCase()}</div>
+              <div style={{ border: `1.5px solid ${ACCENT}44`, padding: 'clamp(18px, 4vw, 36px)', background: 'rgba(0,255,65,0.04)' }}>
+                <div style={{ fontFamily: FONT, fontSize: 'clamp(15px, 2.5vw, 22.5px)', color: ACCENT, letterSpacing: 'clamp(2px, 0.6vw, 3px)', marginBottom: 'clamp(6px, 1.5vw, 9px)' }}>TRANSMISIÓN EXITOSA</div>
+                <div style={{ fontFamily: FONT, fontSize: 'clamp(16px, 3vw, 24.75px)', color: TEXT2 }}>DEST: {email.toUpperCase()}</div>
               </div>
             )}
           </div>
         </div>
       </Panel>
-      <button onClick={onReset} style={{ background: 'none', border: 'none', color: TEXT2, cursor: 'pointer', fontFamily: FONT, fontSize: '22.5px', letterSpacing: '3px', textTransform: 'uppercase', display: 'block', margin: '0 auto' }}
+      <button onClick={onReset} style={{ background: 'none', border: 'none', color: TEXT2, cursor: 'pointer', fontFamily: FONT, fontSize: 'clamp(15px, 2.5vw, 22.5px)', letterSpacing: 'clamp(2px, 0.6vw, 3px)', textTransform: 'uppercase', display: 'block', margin: '0 auto' }}
         onMouseEnter={e => e.currentTarget.style.color = '#ffaa00'}
         onMouseLeave={e => e.currentTarget.style.color = TEXT2}>
         [ NUEVA EVALUACIÓN ]
@@ -195,23 +195,28 @@ function ModuleSelector({ onSelect, bootStage = 4 }) {
   })
 
   return (
-    <div style={{ maxWidth: '1800px', width: '100%', margin: '0 auto' }}>
+    <div style={{ width: '100%', margin: '0 auto' }}>
 
       {/* HUD scan line sweeps screen on entry */}
       <HudScanLine active={bootStage === 3} />
 
       {/* System header panels — staggered */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '18px', marginBottom: '72px' }}>
+      <div className="info-panels-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'clamp(10px, 1.5vw, 16px)', marginBottom: 'clamp(30px, 5vw, 54px)' }}>
+        <style>{`
+          @media (max-width: 900px) {
+            .info-panels-grid { grid-template-columns: 1fr !important; }
+          }
+        `}</style>
         {[
           { label: '// SISTEMA', content: (
-            <div style={{ padding: '31.5px 36px', fontFamily: FONT, fontSize: '22.5px', lineHeight: 3, color: TEXT2 }}>
+            <div style={{ padding: 'clamp(10px, 1.5vw, 16px) clamp(12px, 2vw, 20px)', fontFamily: FONT, fontSize: 'clamp(10px, 1.2vw, 14px)', lineHeight: 2.2, color: TEXT2 }}>
               <div>PLATFORM: <span style={{ color: ACCENT }}>INNOVADEF-KIOSK v2.0</span></div>
               <div>OPERATOR: <span style={{ color: ACCENT }}>FOCO-2026-OPERATOR</span></div>
               <div>LOCATION: <span style={{ color: AMBER }}>MADRID // 40°25'N 3°41'W</span></div>
             </div>
           )},
-          { label: '// ESTADO DE SISTEMAS', content: (
-            <div style={{ padding: '31.5px 36px', fontFamily: FONT, fontSize: '22.5px', lineHeight: 3 }}>
+          { label: '// SISTEMAS', content: (
+            <div style={{ padding: 'clamp(10px, 1.5vw, 16px) clamp(12px, 2vw, 20px)', fontFamily: FONT, fontSize: 'clamp(10px, 1.2vw, 14px)', lineHeight: 2.2 }}>
               {[
                 { label: 'RED ENS', val: 'CONECTADA', c: ACCENT },
                 { label: 'CIFRADO', val: 'AES-256 OK', c: ACCENT },
@@ -222,7 +227,7 @@ function ModuleSelector({ onSelect, bootStage = 4 }) {
             </div>
           )},
           { label: '// TELEMETRÍA', content: (
-            <div style={{ padding: '31.5px 36px', fontFamily: FONT, fontSize: '22.5px', lineHeight: 3, color: TEXT2 }}>
+            <div style={{ padding: 'clamp(10px, 1.5vw, 16px) clamp(12px, 2vw, 20px)', fontFamily: FONT, fontSize: 'clamp(10px, 1.2vw, 14px)', lineHeight: 2.2, color: TEXT2 }}>
               <div>EVALUACIONES HOY: <span style={{ color: AMBER }}>47</span></div>
               <div>MÓDULO + ACTIVO: <span style={{ color: ACCENT }}>MOD-01</span></div>
               <div>SESIÓN ACTUAL: <span style={{ color: ACCENT }}>FOCO-{Date.now().toString(36).toUpperCase().slice(-6)}</span></div>
@@ -236,11 +241,11 @@ function ModuleSelector({ onSelect, bootStage = 4 }) {
       </div>
 
       {/* Title */}
-      <div style={{ marginBottom: '63px', borderBottom: `1.5px solid ${BORDER}`, paddingBottom: '30px', ...vis(3, 540) }}>
-        <div style={{ fontFamily: FONT, fontSize: '20.25px', color: TEXT2, letterSpacing: '4.01px', marginBottom: '27px' }}>
+      <div style={{ marginBottom: 'clamp(36px, 6vw, 63px)', borderBottom: `1.5px solid ${BORDER}`, paddingBottom: 'clamp(18px, 4vw, 30px)', ...vis(3, 540) }}>
+        <div style={{ fontFamily: FONT, fontSize: 'clamp(17px, 2.5vw, 27px)', color: TEXT2, letterSpacing: 'clamp(3px, 0.6vw, 5px)', marginBottom: 'clamp(18px, 3vw, 33px)' }}>
           // SISTEMA DE EVALUACIÓN INTERACTIVA — SELECCIONE MÓDULO DE OPERACIÓN
         </div>
-        <div style={{ fontFamily: FONT, fontSize: '33px', letterSpacing: '5px', color: ACCENT, textShadow: `0 0 60px ${ACCENT}33`, lineHeight: 1.1 }}>
+        <div style={{ fontFamily: FONT, fontSize: 'clamp(28px, 5vw, 80px)', letterSpacing: 'clamp(3px, 0.8vw, 6px)', color: ACCENT, textShadow: `0 0 60px ${ACCENT}33`, lineHeight: 1.1 }}>
           CENTRO DE OPERACIONES<br />
           <span style={{ color: TEXT2, fontSize: '65%' }}>INNOVADEF FOCO 2026 — MADRID</span>
         </div>
@@ -256,21 +261,21 @@ function ModuleSelector({ onSelect, bootStage = 4 }) {
         })
         let globalIdx = 0
         return Object.entries(byCategory).map(([cat, mods], catIdx) => (
-          <div key={cat} style={{ marginBottom: '54px' }}>
+          <div key={cat} style={{ marginBottom: 'clamp(30px, 6vw, 54px)' }}>
             {/* Category header */}
             <div style={{
-              display: 'flex', alignItems: 'center', gap: '18px',
-              marginBottom: '18px',
+              display: 'flex', alignItems: 'center', gap: 'clamp(10px, 2vw, 18px)',
+              marginBottom: 'clamp(10px, 2vw, 18px)',
               ...vis(3, 660 + catIdx * 80),
             }}>
               <div style={{ height: '1px', background: BORDER, flex: 1 }} />
-              <span style={{ fontFamily: FONT, fontSize: '15px', color: TEXT2, letterSpacing: '4px', textTransform: 'uppercase' }}>
+              <span style={{ fontFamily: FONT, fontSize: 'clamp(15px, 2vw, 19px)', color: TEXT2, letterSpacing: 'clamp(3px, 0.6vw, 5px)', textTransform: 'uppercase' }}>
                 // {cat.toUpperCase()}
               </span>
               <div style={{ height: '1px', background: BORDER, flex: 1 }} />
             </div>
             {/* Cards grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(465px, 1fr))', gap: '18px', alignItems: 'stretch' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(clamp(340px, 45vw, 560px), 1fr))', gap: 'clamp(15px, 2vw, 24px)', alignItems: 'stretch' }}>
               {mods.map((mod) => {
                 const idx = globalIdx++
                 const Icon = mod.icon
@@ -294,32 +299,32 @@ function ModuleSelector({ onSelect, bootStage = 4 }) {
                       {/* Module header bar */}
                       <div style={{
                         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                        padding: '12px 21px',
+                        padding: 'clamp(12px, 2vw, 18px) clamp(16px, 3vw, 28px)',
                         borderBottom: `1.5px solid ${isH ? `#ffaa0033` : BORDER}`,
                         background: isH ? 'rgba(255,170,0,0.04)' : '#0a0a0a'
                       }}>
-                        <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
-                          <Icon size={21} color={isH ? '#ffaa00' : TEXT2} />
-                          <span style={{ fontFamily: FONT, fontSize: '20.25px', color: TEXT2, letterSpacing: '3px' }}>{mod.code}</span>
+                        <div style={{ display: 'flex', gap: 'clamp(8px, 1.5vw, 15px)', alignItems: 'center' }}>
+                          <Icon size={22} color={isH ? '#ffaa00' : TEXT2} />
+                          <span style={{ fontFamily: FONT, fontSize: 'clamp(17px, 2.5vw, 26px)', color: TEXT2, letterSpacing: 'clamp(2px, 0.6vw, 3px)' }}>{mod.code}</span>
                         </div>
-                        <div style={{ display: 'flex', gap: '18px', alignItems: 'center' }}>
-                          <span style={{ fontFamily: FONT, fontSize: '18px', letterSpacing: '3px', color: isH ? '#ffaa00' : TEXT2, padding: '3px 9px', border: `1.5px solid ${isH ? `#ffaa0044` : BORDER}` }}>
+                        <div style={{ display: 'flex', gap: 'clamp(10px, 2vw, 18px)', alignItems: 'center' }}>
+                          <span style={{ fontFamily: FONT, fontSize: 'clamp(15px, 2vw, 22px)', letterSpacing: 'clamp(2px, 0.6vw, 3px)', color: isH ? '#ffaa00' : TEXT2, padding: '3px 9px', border: `1.5px solid ${isH ? `#ffaa0044` : BORDER}` }}>
                             {mod.tag}
                           </span>
-                          <span style={{ width: '9px', height: '9px', background: isH ? '#ffaa00' : ACCENT, display: 'inline-block', boxShadow: isH ? `0 0 12px #ffaa00` : `0 0 12px ${ACCENT}`, animation: 'blink 3s infinite' }} />
+                          <span style={{ width: 'clamp(6px, 1vw, 9px)', height: 'clamp(6px, 1vw, 9px)', background: isH ? '#ffaa00' : ACCENT, display: 'inline-block', boxShadow: isH ? `0 0 12px #ffaa00` : `0 0 12px ${ACCENT}`, animation: 'blink 3s infinite' }} />
                         </div>
                       </div>
                       {/* Body */}
-                      <div style={{ padding: '24px 21px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                        <div style={{ fontFamily: FONT, fontSize: '19.5px', letterSpacing: '1.5px', color: isH ? '#ffaa00' : TEXT2, marginBottom: '15px', lineHeight: 1.3 }}>
+                      <div style={{ padding: 'clamp(18px, 3.5vw, 30px) clamp(16px, 3vw, 28px)', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                        <div style={{ fontFamily: FONT, fontSize: 'clamp(17px, 2.5vw, 25px)', letterSpacing: 'clamp(1px, 0.3vw, 1.5px)', color: isH ? '#ffaa00' : TEXT2, marginBottom: 'clamp(12px, 2vw, 18px)', lineHeight: 1.3 }}>
                           {mod.label}
                         </div>
-                        <div style={{ fontFamily: FONT, fontSize: '22.5px', color: 'rgba(0,255,65,0.3)', lineHeight: 1.7, letterSpacing: '0.75px', marginBottom: '21px' }}>
+                        <div style={{ fontFamily: FONT, fontSize: 'clamp(18px, 2.5vw, 27px)', color: 'rgba(0,255,65,0.3)', lineHeight: 1.7, letterSpacing: '0.75px', marginBottom: 'clamp(15px, 3vw, 27px)' }}>
                           {mod.desc}
                         </div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <span style={{ fontFamily: FONT, fontSize: '20.25px', color: 'rgba(0,255,65,0.25)', letterSpacing: '1.5px' }}>DURACIÓN: {mod.duration}</span>
-                          <span style={{ fontFamily: FONT, fontSize: '22.5px', color: isH ? '#ffaa00' : TEXT2, letterSpacing: '1.5px' }}>{isH ? '[EJECUTAR ▶]' : '[──────]'}</span>
+                          <span style={{ fontFamily: FONT, fontSize: 'clamp(16px, 2.5vw, 25px)', color: 'rgba(0,255,65,0.25)', letterSpacing: 'clamp(1px, 0.3vw, 1.5px)' }}>DURACIÓN: {mod.duration}</span>
+                          <span style={{ fontFamily: FONT, fontSize: 'clamp(17px, 2.5vw, 27px)', color: isH ? '#ffaa00' : TEXT2, letterSpacing: 'clamp(1px, 0.3vw, 1.5px)' }}>{isH ? '[EJECUTAR ▶]' : '[──────]'}</span>
                         </div>
                       </div>
                     </button>
@@ -451,6 +456,24 @@ export default function App() {
     else if (screen === 'email') navigate('/email')
   }, [screen, activeModule, navigate])
 
+  // Handle browser back/forward buttons
+  useEffect(() => {
+    const handlePopState = () => {
+      const path = location.pathname
+      if (path === '/') setScreen('sleep')
+      else if (path === '/intro') setScreen('intro')
+      else if (path === '/selector') setScreen('selector')
+      else if (path === '/email') setScreen('email')
+      else if (path.startsWith('/module/')) {
+        const moduleId = path.split('/')[2]
+        setActiveModule(moduleId)
+        setScreen('module')
+      }
+    }
+    window.addEventListener('popstate', handlePopState)
+    return () => window.removeEventListener('popstate', handlePopState)
+  }, [location.pathname])
+
   // Ambient background sound — TEMPORARILY DISABLED
   useEffect(() => {
     return () => {}
@@ -547,7 +570,7 @@ export default function App() {
       {/* Header */}
       <header style={{
         position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50,
-        height: '117px',
+        height: '90px',
         background: 'rgba(5,5,5,0.96)',
         borderBottom: `1.5px solid ${BORDER}`,
         display: 'flex', alignItems: 'stretch',
@@ -556,27 +579,27 @@ export default function App() {
         transition: 'transform 0.67s cubic-bezier(0.22,1,0.36,1), opacity 0.52s ease',
       }}>
         {/* Logo block */}
-        <button onClick={reset} style={{
+        <button onClick={reset} className="hdr-logo" style={{
           background: 'none', border: 'none', borderRight: `1.5px solid ${BORDER}`,
-          padding: '0 54px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '27px'
+          padding: '0 clamp(16px, 2.5vw, 32px)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 'clamp(10px, 1.5vw, 18px)'
         }}>
-          <img src="/logoinnovadef.png" alt="INNOVADEF" style={{ height: '120px'}} />
+          <img src="/logoinnovadef.png" alt="INNOVADEF" style={{ height: '120px' }} />
         </button>
 
         {/* Nav items */}
-        <div style={{ display: 'flex', alignItems: 'center', flex: 1, padding: '0 45px', gap: '0' }}>
+        <div className="hdr-nav" style={{ display: 'flex', alignItems: 'center', flex: 1, padding: '0', gap: '0' }}>
           {[
             { label: 'CENTRO OPS', active: screen === 'selector', action: reset },
             { label: activeModCode || '—', active: screen === 'module', action: null },
           ].map((nav, i) => (
             <div key={i} style={{
-              padding: '0 24px', height: '100%', display: 'flex', alignItems: 'center',
+              padding: '0 clamp(12px, 2vw, 24px)', height: '100%', display: 'flex', alignItems: 'center',
               borderRight: `1.5px solid ${BORDER}`,
-              fontFamily: FONT, fontSize: '22.5px', letterSpacing: '3px',
+              fontFamily: FONT, fontSize: 'clamp(14px, 2vw, 20px)', letterSpacing: 'clamp(2px, 0.4vw, 3px)',
               color: nav.active ? ACCENT : TEXT2,
               borderBottom: nav.active ? `3px solid ${ACCENT}` : '3px solid transparent',
               cursor: nav.action ? 'pointer' : 'default',
-              background: nav.active ? 'rgba(0,255,65,0.03)' : 'transparent'
+              background: nav.active ? 'rgba(0,255,65,0.04)' : 'transparent'
             }} onClick={nav.action}>
               {nav.label}
             </div>
@@ -590,13 +613,13 @@ export default function App() {
               onMouseLeave={e => { e.currentTarget.style.color = TEXT2; e.currentTarget.style.borderColor = BORDER }}
               style={{
                 marginLeft: 'auto',
-                display: 'flex', alignItems: 'center', gap: '12px',
-                padding: '0 27px', height: '100%',
+                display: 'flex', alignItems: 'center', gap: 'clamp(8px, 1.2vw, 14px)',
+                padding: '0 clamp(12px, 2vw, 20px)', height: '100%',
                 background: 'none', border: 'none',
                 borderLeft: `1.5px solid ${BORDER}`,
                 color: TEXT2, cursor: 'pointer',
-                fontFamily: FONT, fontSize: '19.5px', letterSpacing: '3px',
-                transition: 'color 0.18s, border-color 0.18s',
+                fontFamily: FONT, fontSize: 'clamp(14px, 2vw, 20px)', letterSpacing: 'clamp(2px, 0.4vw, 3px)',
+                transition: 'color 0.27s, border-color 0.27s',
               }}
             >
               ← MENÚ PRINCIPAL
@@ -611,23 +634,23 @@ export default function App() {
             { label: 'NET', val: 'ENS', c: ACCENT },
             { label: 'SEC', val: 'A', c: ACCENT },
           ].map((ind, i) => (
-            <div key={i} style={{ padding: '0 31.5px', borderRight: `1.5px solid ${BORDER}`, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '4.5px' }}>
-              <div style={{ fontFamily: FONT, fontSize: '18px', color: TEXT2, letterSpacing: '1.5px' }}>{ind.label}</div>
-              <div style={{ fontFamily: FONT, fontSize: '22.5px', color: ind.c, letterSpacing: '1.5px' }}>{ind.val}</div>
+            <div key={i} className="hdr-indicators" style={{ padding: '0 clamp(12px, 2vw, 24px)', borderRight: `1.5px solid ${BORDER}`, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 'clamp(3px, 0.5vw, 6px)' }}>
+              <div style={{ fontFamily: FONT, fontSize: 'clamp(11px, 1.5vw, 16px)', color: TEXT2, letterSpacing: '1px' }}>{ind.label}</div>
+              <div style={{ fontFamily: FONT, fontSize: 'clamp(14px, 2vw, 20px)', color: ind.c, letterSpacing: '1px' }}>{ind.val}</div>
             </div>
           ))}
-          <div style={{ padding: '0 24px', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '4.5px' }}>
-            <div style={{ fontFamily: FONT, fontSize: '18px', color: TEXT2, letterSpacing: '1.5px' }}>HORA LOCAL</div>
+          <div className="hdr-clock" style={{ padding: '0 clamp(12px, 2vw, 24px)', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 'clamp(3px, 0.5vw, 6px)' }}>
+            <div style={{ fontFamily: FONT, fontSize: 'clamp(11px, 1.5vw, 16px)', color: TEXT2, letterSpacing: '1px' }}>HORA LOCAL</div>
             <LiveClock />
           </div>
         </div>
       </header>
 
       {/* Content */}
-      <div style={{ position: 'relative', zIndex: 2, paddingTop: '78px', paddingBottom: '48px', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '120px 48px 72px' }}>
+      <div style={{ position: 'relative', zIndex: 2, paddingTop: '117px', paddingBottom: '72px', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'clamp(140px, 18vw, 200px) clamp(24px, 4vw, 60px) clamp(52px, 7vw, 80px)' }}>
         {screen === 'selector' && (
           <div key="selector" style={{ width: '100%',
-            animation: transitioning ? 'contentFadeOut 0.5s ease-in 0.45s forwards' : 'contentFadeIn 0.6s ease-out both' }}>
+            animation: transitioning ? 'contentFadeOut 0.75s ease-in 0.67s forwards' : 'contentFadeIn 0.9s ease-out both' }}>
             <ModuleSelector onSelect={selectModule} bootStage={bootStage} />
           </div>
         )}
