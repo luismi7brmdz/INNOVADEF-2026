@@ -7,9 +7,9 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      // Allows importing AeroCognitio plugin from the sibling repo.
-      // Both repos must live on the same machine/server at the same directory level.
-      '@aerocognitio': path.resolve(__dirname, '../../demoinnovadef/src'),
+      // Each plugin lives as a submodule of innovadef-demos (sibling of this repo).
+      // To add a plugin: git submodule add <url> in innovadef-demos, then add an entry to registry.js.
+      '@aerocognitio': path.resolve(__dirname, '../demo-aerocognitio/src'),
     },
     // Force a single React instance even though both repos have it installed.
     // Without this, Zustand hooks and React context break across the boundary.
