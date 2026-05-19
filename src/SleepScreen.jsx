@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import * as THREE from 'three'
 import { ACCENT, FONT, TEXT2 } from './theme'
-import { sfxWakeTouch, sfxWakeSweep, sfxWakeExplosion } from './sfx'
+import { sfxWakeTouch, sfxWakeSweep, sfxWakeExplosion, markUserInteracted } from './sfx'
 
 // ─── SLEEP BACKGROUND (DNA STRANDS) ───────────────────────────────────────────────────
 function SleepBackground({ wakeProgress }) {
@@ -175,7 +175,7 @@ function SleepBackground({ wakeProgress }) {
 }
 
 // ─── PLASMA SPHERE (Siri-like interactive orb) ───────────────────────────────────────
-function PlasmaSphere() {
+function PlasmaSphere({ exploding = false, wakeProgress = 0 }) {
   const containerRef = useRef(null)
   const canvasRef = useRef(null)
 
@@ -191,7 +191,7 @@ function PlasmaSphere() {
 
     const scene = new THREE.Scene()
     const camera = new THREE.PerspectiveCamera(48, 1, 0.1, 100)
-    camera.position.z = 3.2
+    camera.position.z = 5.5
 
     const mouse = new THREE.Vector2(9999, 9999)
     const mouseVel = new THREE.Vector2(0, 0)
@@ -199,8 +199,8 @@ function PlasmaSphere() {
     let rawStr = 0
 
     const getSide = () => {
-      const w = container.clientWidth * 0.7
-      const h = container.clientHeight * 0.7
+      const w = container.clientWidth
+      const h = container.clientHeight
       return Math.min(w, h)
     }
 
@@ -225,8 +225,9 @@ function PlasmaSphere() {
       rawStr = Math.min(1, Math.sqrt(dvx * dvx + dvy * dvy) * 22)
     }
 
-    canvas.addEventListener('mousemove', e => onMove(e.clientX, e.clientY))
-    canvas.addEventListener('mouseleave', () => { mouse.set(9999, 9999); rawStr = 0 })
+    const onMouseMove = e => onMove(e.clientX, e.clientY)
+    const onMouseLeave = () => { mouse.set(9999, 9999); rawStr = 0 }
+    window.addEventListener('mousemove', onMouseMove)
     canvas.addEventListener('touchmove', e => {
       e.preventDefault()
       onMove(e.touches[0].clientX, e.touches[0].clientY)
@@ -238,6 +239,8 @@ function PlasmaSphere() {
       uniform vec2  u_mouse;
       uniform float u_mouseStr;
       uniform vec2  u_mouseVel;
+      uniform float u_exploding;
+      uniform float u_wakeProgress;
       varying vec3  vNormal;
       varying float vDisp;
       varying float vRipple;
@@ -277,33 +280,54 @@ function PlasmaSphere() {
         float n1 = snoise(position*1.8+vec3(t,t*0.6,t*0.4));
         float n2 = snoise(position*3.2+vec3(-t*0.5,t*0.8,-t*0.3));
         float n3 = snoise(position*5.5+vec3(t*0.3,-t*0.4,t*0.7));
-        float baseDisp = n1*0.22+n2*0.10+n3*0.04;
+        float baseDisp = n1*0.28+n2*0.13+n3*0.05;
 
         float ripple = 0.0;
+        float dent   = 0.0;
         if(u_mouse.x < 9.0){
           vec4 mvp = projectionMatrix*modelViewMatrix*vec4(position,1.0);
           vec2 screenPos = mvp.xy/mvp.w;
           vec2 toMouse = screenPos - u_mouse;
           float dist = length(toMouse);
-          float wave = exp(-dist*2.8)*u_mouseStr;
+
+          // Liquid push/pull wave
+          float wave = exp(-dist*2.2)*u_mouseStr;
           float velMag = length(u_mouseVel);
           vec2 velDir = velMag>0.001 ? normalize(u_mouseVel) : vec2(0.);
           float directional = dot(normalize(toMouse+0.001),velDir);
-          ripple = wave*(0.5+directional*0.5)*0.45;
-          float rippleWave = sin(dist*12.0-u_time*2.5)*exp(-dist*1.8)*u_mouseStr*0.12;
+          ripple = wave*(0.6+directional*0.4)*0.6;
+          float rippleWave = sin(dist*10.0-u_time*3.0)*exp(-dist*1.5)*u_mouseStr*0.18;
           ripple += rippleWave;
+
+          // Deep dent when cursor is close (absorption)
+          float proximity = exp(-dist*4.5);
+          dent = -proximity * u_mouseStr * 0.55;
+
+          // Secondary liquid bulge around dent
+          float bulge = exp(-dist*1.8) * (1.0-proximity) * u_mouseStr * 0.25;
+          ripple += bulge;
         }
 
-        vDisp   = baseDisp + ripple;
-        vRipple = ripple;
+        // Explosion effect - expand and disintegrate
+        float explosion = 0.0;
+        if(u_exploding > 0.5){
+          float explNoise = snoise(position*3.0+vec3(t*2.0,t*1.5,t*1.8));
+          explosion = u_wakeProgress * 2.5 * (1.0 + explNoise);
+        }
+
+        float totalDisp = baseDisp + ripple + dent + explosion;
+        vDisp   = totalDisp;
+        vRipple = ripple + abs(dent) + explosion;
         vNormal = normalize(normalMatrix*normal);
-        gl_Position = projectionMatrix*modelViewMatrix*vec4(position+normal*(baseDisp+ripple),1.0);
+        gl_Position = projectionMatrix*modelViewMatrix*vec4(position+normal*totalDisp,1.0);
       }
     `
 
     // Fragment shader
     const fs = `
       uniform float u_mouseStr;
+      uniform float u_exploding;
+      uniform float u_wakeProgress;
       varying vec3  vNormal;
       varying float vDisp;
       varying float vRipple;
@@ -321,11 +345,29 @@ function PlasmaSphere() {
         col = mix(col, cMid, clamp(vDisp*3.5,0.,1.)*0.55);
         col += fresnel * vec3(0.10, 0.68, 0.25) * 0.9;
 
-        float rh = clamp(vRipple*4.5, 0., 1.);
-        col = mix(col, vec3(0.15, 1.0, 0.35), rh*0.5*u_mouseStr);
+        float rh = clamp(vRipple*5.0, 0., 1.);
+        col = mix(col, vec3(0.15, 1.0, 0.35), rh*0.6*u_mouseStr);
 
-        float alpha = clamp(0.50+fresnel*0.38+glow*0.28, 0., 1.);
-        gl_FragColor = vec4(col*(0.72+glow*0.55), alpha);
+        // Dark cavity effect at dent points
+        float cavity = clamp(-vDisp*4.0, 0., 1.);
+        col = mix(col, vec3(0.01, 0.15, 0.05), cavity*0.7);
+
+        // Explosion effect - bright white/cyan flash
+        if(u_exploding > 0.5){
+          float explFlash = u_wakeProgress * 2.0;
+          vec3 cExpl = mix(vec3(0.2, 1.0, 0.8), vec3(1.0, 1.0, 1.0), explFlash);
+          col = mix(col, cExpl, explFlash * 0.8);
+        }
+
+        float alpha = clamp(0.55+fresnel*0.40+glow*0.30, 0., 1.);
+        alpha = mix(alpha, alpha*0.5, cavity*0.5);
+        
+        // Fade out during explosion
+        if(u_exploding > 0.5){
+          alpha *= (1.0 - u_wakeProgress * 0.8);
+        }
+        
+        gl_FragColor = vec4(col*(0.78+glow*0.60), alpha);
       }
     `
 
@@ -336,7 +378,9 @@ function PlasmaSphere() {
         u_time: { value: 0 },
         u_mouse: { value: new THREE.Vector2(9999, 9999) },
         u_mouseStr: { value: 0 },
-        u_mouseVel: { value: new THREE.Vector2(0, 0) }
+        u_mouseVel: { value: new THREE.Vector2(0, 0) },
+        u_exploding: { value: 0 },
+        u_wakeProgress: { value: 0 }
       },
       transparent: true, depthWrite: false,
       blending: THREE.AdditiveBlending, side: THREE.DoubleSide
@@ -361,40 +405,52 @@ function PlasmaSphere() {
     let rotX = 0, rotY = 0, rotVX = 0.0003, rotVY = 0.0006
     let smoothStr = 0, smoothVelX = 0, smoothVelY = 0
     let lagMouseX = 9999, lagMouseY = 9999
+    let proximityStr = 0
 
     const animate = () => {
       requestAnimationFrame(animate)
       const elapsed = (Date.now() - t0) * 0.001
 
-      const INERTIA = 0.025
-      const VEL_INERTIA = 0.04
+      const INERTIA = 0.03
+      const VEL_INERTIA = 0.06
 
       smoothStr += (rawStr - smoothStr) * VEL_INERTIA
       smoothVelX += (mouseVel.x - smoothVelX) * VEL_INERTIA
       smoothVelY += (mouseVel.y - smoothVelY) * VEL_INERTIA
-      rawStr *= 0.96
+      rawStr *= 0.94
 
       if (mouse.x < 9.0) {
         lagMouseX += (mouse.x - lagMouseX) * INERTIA
         lagMouseY += (mouse.y - lagMouseY) * INERTIA
+
+        // Proximity = how close cursor is to center of orb
+        const px = lagMouseX * lagMouseX + lagMouseY * lagMouseY
+        const targetProximity = Math.max(0, 1.0 - Math.sqrt(px) * 1.5)
+        proximityStr += (targetProximity - proximityStr) * 0.04
       } else {
         lagMouseX = 9999; lagMouseY = 9999
+        proximityStr += (0 - proximityStr) * 0.03
       }
+
+      // Combined str includes proximity (cursor near center = max effect)
+      const combinedStr = Math.min(1, smoothStr + proximityStr * 0.7)
 
       mat.uniforms.u_time.value = elapsed
       mat.uniforms.u_mouse.value.set(lagMouseX, lagMouseY)
-      mat.uniforms.u_mouseStr.value = smoothStr
+      mat.uniforms.u_mouseStr.value = combinedStr
       mat.uniforms.u_mouseVel.value.set(smoothVelX, smoothVelY)
-      h1.uniforms.u_ms.value = smoothStr
-      h2.uniforms.u_ms.value = smoothStr
+      mat.uniforms.u_exploding.value = exploding ? 1 : 0
+      mat.uniforms.u_wakeProgress.value = wakeProgress
+      h1.uniforms.u_ms.value = combinedStr
+      h2.uniforms.u_ms.value = combinedStr
 
       rotVX += (Math.random() - 0.5) * 0.000012
       rotVY += (Math.random() - 0.5) * 0.000012
       rotVX *= 0.999; rotVY *= 0.999
 
-      const drag = 1.0 - smoothStr * 0.2
+      const drag = 1.0 - combinedStr * 0.3
       rotX += rotVX * drag
-      rotY += rotVY * drag + smoothVelX * 0.003
+      rotY += rotVY * drag + smoothVelX * 0.006
 
       scene.children.forEach(c => { c.rotation.x = rotX; c.rotation.y = rotY })
       renderer.render(scene, camera)
@@ -409,12 +465,13 @@ function PlasmaSphere() {
     return () => {
       ro.disconnect()
       renderer.dispose()
+      window.removeEventListener('mousemove', onMouseMove)
     }
   }, [])
 
   return (
-    <div ref={containerRef} style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1, pointerEvents: 'none' }}>
-      <canvas ref={canvasRef} style={{ display: 'block' }} />
+    <div ref={containerRef} style={{ position: 'absolute', left: '-10%', right: '-10%', top: '5%', height: '75%', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 4, pointerEvents: 'none' }}>
+      <canvas ref={canvasRef} style={{ display: 'block', pointerEvents: 'none' }} />
     </div>
   )
 }
@@ -430,6 +487,7 @@ export default function SleepScreen({ onWake }) {
 
   const wake = useCallback((e) => {
     if (phase !== 'idle') return
+    markUserInteracted()
     const x = e?.clientX ?? e?.touches?.[0]?.clientX ?? window.innerWidth / 2
     const y = e?.clientY ?? e?.touches?.[0]?.clientY ?? window.innerHeight / 2
     setTouchOrigin({ x, y })
@@ -483,60 +541,68 @@ export default function SleepScreen({ onWake }) {
         opacity: 1 - wakeProgress * 0.8,
         transition: 'opacity 0.1s' }} />
 
-      {/* ── Plasma Sphere (Siri-like interactive orb) ── */}
-      <PlasmaSphere />
+      {/* ── Plasma Sphere rendered inside the UI column ── */}
+      <PlasmaSphere exploding={isExploding} wakeProgress={wakeProgress} small />
 
       {/* ── UI layer ── */}
-      <div style={{ position: 'absolute', inset: 0, zIndex: 3, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-between', padding: '60px 0', pointerEvents: 'auto' }}>
+      <div style={{ position: 'absolute', inset: 0, zIndex: 3, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-between', padding: '48px 0 40px', pointerEvents: 'auto' }}>
 
-        {/* Logo */}
+        {/* Logo — top */}
         <div style={{
           animation: isWaking ? 'none' : 'sleepFloat 4s ease-in-out infinite',
           opacity: isWaking ? Math.max(0, 1 - wakeProgress * 2) : 1,
           transform: isWaking ? `scale(${1 + wakeProgress * 0.3}) translateY(${-wakeProgress * 30}px)` : undefined,
-          filter: isWaking ? `drop-shadow(0 0 ${wakeProgress * 60}px ${ACCENT}) brightness(${1 + wakeProgress})` : undefined,
           transition: 'filter 0.05s',
         }}>
           <img src="/logoinnovadef.png" alt="INNOVADEF"
-            style={{ height: 'clamp(120px, 20vw, 200px)',
-              filter: `brightness(0) saturate(100%) invert(74%) sepia(47%) saturate(539%) hue-rotate(86deg) brightness(107%) contrast(103%)`,
+            style={{ height: 'clamp(80px, 12vw, 130px)',
               opacity: 0.8 + wakeProgress * 0.2 }} />
         </div>
 
-        {/* Touch button — collapses inward on wake */}
-        <div style={{
-          position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center',
-          opacity: isWaking ? Math.max(0, 1 - wakeProgress * 3) : 1,
-          transform: isWaking ? `scale(${1 - wakeProgress * 0.5})` : undefined,
-          transition: 'opacity 0.1s, transform 0.1s',
-        }}>
-          {[0, 1, 2, 3].map(i => (
-            <div key={i} style={{
-              position: 'absolute',
-              width: `${165 + i * 82.5}px`, height: `${165 + i * 82.5}px`,
-              border: `1.5px solid rgba(0,0,0,1)`,
-              borderRadius: '112.5px',
-              animation: `sleepRing 2.6s ease-out ${i * 0.35}s infinite`,
-            }} />
-          ))}
-          <div style={{
-            width: '165px', height: '165px', borderRadius: '112.5px',
-            border: `1.5px solid rgba(0,0,0,1)`,
-            background: 'radial-gradient(circle, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 70%)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: '9px',
-            boxShadow: `0 0 60px rgba(0,0,0,0.5), 0 0 135px rgba(0,0,0,0.3)`,
-            animation: 'sleepBtnPulse 3s ease-in-out infinite',
-          }}>
-            <div style={{ fontFamily: FONT, fontSize: '27px', color: 'rgba(255,255,255,0.9)', letterSpacing: '4.5px' }}>TOQUE</div>
-            <div style={{ fontFamily: FONT, fontSize: '10.5px', color: 'rgba(255,255,255,0.7)', letterSpacing: '3px' }}>PARA INICIAR</div>
-          </div>
-        </div>
+        {/* Spacer with orb — orbe ya renderizado en posición absoluta, este div ocupa el centro */}
+        <div style={{ flex: 1 }} />
 
-        {/* Status label */}
-        <div style={{ fontFamily: FONT, fontSize: '13.5px', color: 'rgba(255,255,255,0.6)', letterSpacing: '6px',
-          opacity: isWaking ? 0 : 1, transition: 'opacity 0.2s',
-          animation: 'sleepBlink 3.5s ease-in-out infinite' }}>
-          SISTEMA EN ESPERA // INNOVADEF FOCO 2026
+        {/* Touch button — zona inferior, collapses on wake */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '32px' }}>
+          <div style={{
+            position: 'relative',
+            width: '414px', height: '414px',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            opacity: isWaking ? Math.max(0, 1 - wakeProgress * 3) : 1,
+            transform: isWaking ? `scale(${1 - wakeProgress * 0.5})` : undefined,
+            transition: 'opacity 0.1s, transform 0.1s',
+          }}>
+            {[0, 1, 2, 3].map(i => (
+              <div key={i} style={{
+                position: 'absolute',
+                left: '50%', top: '50%',
+                width: `${165 + i * 82.5}px`, height: `${165 + i * 82.5}px`,
+                border: `1.5px solid rgba(0,255,65,${0.6 - i * 0.12})`,
+                borderRadius: '50%',
+                boxShadow: `0 0 ${8 + i * 4}px rgba(0,255,65,0.3)`,
+                animation: `sleepRing 2.6s ease-out ${i * 0.4}s infinite`,
+              }} />
+            ))}
+            <div style={{
+              width: '165px', height: '165px', borderRadius: '50%',
+              border: `1.5px solid rgba(0,255,65,0.4)`,
+              background: 'radial-gradient(circle, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 70%)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: '9px',
+              boxShadow: `0 0 60px rgba(0,0,0,0.5), 0 0 135px rgba(0,0,0,0.3)`,
+              animation: 'sleepBtnPulse 3s ease-in-out infinite',
+              position: 'relative', zIndex: 1,
+            }}>
+              <div style={{ fontFamily: FONT, fontSize: '27px', color: 'rgba(255,255,255,0.9)', letterSpacing: '4.5px' }}>TOQUE</div>
+              <div style={{ fontFamily: FONT, fontSize: '10.5px', color: 'rgba(255,255,255,0.7)', letterSpacing: '3px' }}>PARA INICIAR</div>
+            </div>
+          </div>
+
+          {/* Status label — footer */}
+          <div style={{ fontFamily: FONT, fontSize: '12px', color: 'rgba(255,255,255,0.3)', letterSpacing: '5px',
+            opacity: isWaking ? 0 : 1, transition: 'opacity 0.2s',
+            animation: 'sleepBlink 3.5s ease-in-out infinite' }}>
+            INNOVADEF FOCO 2026
+          </div>
         </div>
       </div>
 
