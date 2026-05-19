@@ -151,25 +151,25 @@ export default function TacticalSimulator({ onComplete }) {
   const F = FONT
 
   return (
-    <div style={{ maxWidth: '820px', width: '100%', margin: '0 auto', fontFamily: F }}>
+    <div style={{ maxWidth: '1280px', width: '100%', margin: '0 auto', fontFamily: F }}>
 
       {phase === 'briefing' && (
         <div>
           <div style={{ display: 'flex', gap: '18px', marginBottom: '30px', alignItems: 'center' }}>
-            <div style={{ padding: '3px 10px', fontSize: '15px', letterSpacing: '2px', background: scenario.urgency === 'CRÍTICA' ? 'rgba(255,43,43,0.08)' : 'rgba(255,170,0,0.08)', border: `1px solid ${scenario.urgency === 'CRÍTICA' ? 'rgba(255,43,43,0.4)' : 'rgba(255,170,0,0.4)'}`, color: scenario.urgency === 'CRÍTICA' ? '#FF2B2B' : '#FFAA00' }}>
+            <div style={{ padding: '5px 14px', fontSize: '18px', letterSpacing: '2px', background: scenario.urgency === 'CRÍTICA' ? 'rgba(255,43,43,0.08)' : 'rgba(255,170,0,0.08)', border: `1px solid ${scenario.urgency === 'CRÍTICA' ? 'rgba(255,43,43,0.4)' : 'rgba(255,170,0,0.4)'}`, color: scenario.urgency === 'CRÍTICA' ? '#FF2B2B' : '#FFAA00' }}>
               URGENCIA: {scenario.urgency}
             </div>
-            <span style={{ fontSize: '15px', color: TEXT2, letterSpacing: '2px' }}>{scenario.code}</span>
+            <span style={{ fontSize: '18px', color: TEXT2, letterSpacing: '2px' }}>{scenario.code}</span>
           </div>
 
-          <div style={{ fontSize: '9px', letterSpacing: '2px', color: TEXT2, marginBottom: '12px' }}>// ESCENARIO ACTIVO</div>
-          <div style={{ fontSize: 'clamp(20px, 3.75vw, 30px)', letterSpacing: '2px', color: ACCENT, marginBottom: '36px', textShadow: `0 0 20px ${ACCENT}33`, textTransform: 'uppercase' }}>
+          <div style={{ fontSize: '13px', letterSpacing: '2px', color: TEXT2, marginBottom: '12px' }}>// ESCENARIO ACTIVO</div>
+          <div style={{ fontSize: 'clamp(26px, 3.75vw, 40px)', letterSpacing: '2px', color: ACCENT, marginBottom: '36px', textShadow: `0 0 20px ${ACCENT}33`, textTransform: 'uppercase' }}>
             {scenario.title}
           </div>
 
           <div style={{ ...CARD, marginBottom: '36px', borderLeft: `2px solid ${ACCENT}44` }}>
-            <div style={{ fontSize: '9px', letterSpacing: '2px', color: TEXT2, marginBottom: '10px' }}>// BRIEFING OPERACIONAL</div>
-            <p style={{ fontSize: '13px', lineHeight: 1.8, color: TEXT2, margin: 0, letterSpacing: '0.5px' }}>{scenario.briefing}</p>
+            <div style={{ fontSize: '13px', letterSpacing: '2px', color: TEXT2, marginBottom: '10px' }}>// BRIEFING OPERACIONAL</div>
+            <p style={{ fontSize: '16px', lineHeight: 1.8, color: TEXT2, margin: 0, letterSpacing: '0.5px' }}>{scenario.briefing}</p>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '28px' }}>
@@ -178,9 +178,9 @@ export default function TacticalSimulator({ onComplete }) {
               { label: 'T/DECISIÓN', value: '45 SEGUNDOS' },
               { label: 'EVALUACIÓN', value: 'PERFIL LIDERAZGO' }
             ].map(item => (
-              <div key={item.label} style={{ ...CARD, padding: '12px 14px' }}>
-                <div style={{ fontSize: '9px', color: TEXT2, letterSpacing: '2px', marginBottom: '4px' }}>{item.label}</div>
-                <div style={{ fontSize: '11px', color: ACCENT, letterSpacing: '1px' }}>{item.value}</div>
+              <div key={item.label} style={{ ...CARD, padding: '14px 16px' }}>
+                <div style={{ fontSize: '13px', color: TEXT2, letterSpacing: '2px', marginBottom: '6px' }}>{item.label}</div>
+                <div style={{ fontSize: '15px', color: ACCENT, letterSpacing: '1px' }}>{item.value}</div>
               </div>
             ))}
           </div>

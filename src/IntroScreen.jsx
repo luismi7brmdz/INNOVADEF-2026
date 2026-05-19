@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { ACCENT, FONT, TEXT2, BORDER } from './theme'
-import { sfxBootLine, sfxBootReady, sfxShot, sfxEnterFiring } from './sfx'
+import { sfxBootLine, sfxBootReady, sfxShot, sfxEnterFiring, markUserInteracted, hasUserInteracted } from './sfx'
 
 // ─── CURSOR DE MIRA ────────────────────────────────────────────────────────────
 function MilitaryCursor() {
@@ -270,17 +270,21 @@ export default function IntroScreen({ onEnter }) {
     const interval = setInterval(() => {
       if (i < lines.length) {
         setBoot(b => [...b, lines[i]])
-        sfxBootLine()
+        if (hasUserInteracted()) sfxBootLine()
         i++
       } else {
         clearInterval(interval)
-        setTimeout(() => { setShowBtn(true); sfxBootReady() }, 480)
+        setTimeout(() => { 
+          setShowBtn(true) 
+          if (hasUserInteracted()) sfxBootReady()
+        }, 480)
       }
     }, 480)
     return () => clearInterval(interval)
   }, [])
 
   const handleEnter = () => {
+    markUserInteracted()
     sfxEnterFiring()
     setPhase('firing')
     setTimeout(() => setPhase('transition'), 450)
@@ -319,8 +323,7 @@ export default function IntroScreen({ onEnter }) {
             alt="INNOVADEF"
             style={{
               height: 'clamp(90px, 21vw, 180px)',
-              filter: 'brightness(0) saturate(100%) invert(74%) sepia(47%) saturate(539%) hue-rotate(86deg) brightness(107%) contrast(103%)',
-              filter: `drop-shadow(0 0 24px ${ACCENT}) drop-shadow(0 0 60px ${ACCENT}44) brightness(0) saturate(100%) invert(74%) sepia(47%) saturate(539%) hue-rotate(86deg) brightness(107%) contrast(103%)`
+              filter: `drop-shadow(0 0 24px ${ACCENT}) drop-shadow(0 0 60px ${ACCENT}44)`
             }}
           />
           {/* Líneas de escáner debajo del logo */}
@@ -338,7 +341,7 @@ export default function IntroScreen({ onEnter }) {
           FOCO 2026
         </div>
         <div style={{ fontFamily: FONT, fontSize: 'clamp(12px, 1.5vw, 16.5px)', letterSpacing: '5px', color: TEXT2, opacity: 0.75, marginBottom: '18px', animation: 'fadeInUp 0.9s ease 0.9s both' }}>
-          EOI MADRID · 23.06.2026 · ENS CAT-A CERTIFICADO
+          23.06.2026 · MADRID · ENS CAT-A CERTIFICADO
         </div>
 
         {/* Boot sequence */}
@@ -357,15 +360,15 @@ export default function IntroScreen({ onEnter }) {
             style={{
               fontFamily: FONT, fontSize: '27px', letterSpacing: '9px',
               padding: '18px 48px',
-              background: '#ffaa00',
-              border: `1px solid ${ACCENT}`,
-              color: '#000',
+              background: 'transparent',
+              border: `1.5px solid #ffaa0055`,
+              color: '#ffaa00',
               cursor: 'pointer',
               position: 'relative',
               overflow: 'hidden',
               animation: 'fadeInUp 0.75s ease both, btnPulse 3.75s ease-in-out infinite',
               transition: 'all 0.225s',
-              boxShadow: phase === 'firing' ? `0 0 40px #ffaa0044, inset 0 0 40px #ffaa0022` : `0 0 12px #ffaa0022`,
+              boxShadow: phase === 'firing' ? `0 0 0 1.5px #ffaa0022, 0 0 40px #ffaa0044, inset 0 0 40px #ffaa0022` : `0 0 0 1.5px #ffaa0022, 0 0 24px #ffaa0018`,
               transform: phase === 'firing' ? 'scale(0.97)' : 'scale(1)',
             }}
           >

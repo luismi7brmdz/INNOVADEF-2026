@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useNavigate, useLocation, Routes, Route } from 'react-router-dom'
-import { Send, Cpu, CheckCircle, ChevronRight, Mail, Target, BarChart2, AlertTriangle, Activity, FileText } from 'lucide-react'
+import { Send, Cpu, CheckCircle, ChevronRight, Mail, Target, BarChart2, AlertTriangle, Activity, FileText, Shield, Crosshair, Terminal } from 'lucide-react'
 import { QRCodeSVG as QRCode } from 'qrcode.react'
 import MilitaryBackground from './MilitaryBackground'
 import IntroScreen, { MilitaryCursor } from './IntroScreen'
@@ -9,8 +9,11 @@ import TacticalSimulator from './modules/TacticalSimulator'
 import MaturityRadar from './modules/MaturityRadar'
 import ThreatClassifier from './modules/ThreatClassifier'
 import PulseSurvey from './modules/PulseSurvey'
+import CyberDefense from './modules/CyberDefense'
+import TacticalMap from './modules/TacticalMap'
+import CovertMission from './modules/CovertMission'
 import { ACCENT, ACCENT2, AMBER, RED, DIM, DIMLO, BORDER, BG, TEXT, TEXT2, FONT, CARD, S } from './theme'
-import { sfxBootHeader, sfxHudScan, sfxCardAppear, sfxModuleSelect, sfxHover, sfxReset, sfxRadarPing, sfxIntroWipe, startAmbient, stopAmbient } from './sfx'
+import { sfxBootHeader, sfxHudScan, sfxCardAppear, sfxModuleSelect, sfxHover, sfxReset, sfxRadarPing, sfxIntroWipe, startAmbient, stopAmbient, markUserInteracted, hasUserInteracted } from './sfx'
 
 // ─── CONSTANTS ───────────────────────────────────────────────────────────────
 
@@ -35,6 +38,9 @@ const MODULES = [
   { id: 'radar', code: 'MOD-03', label: 'RADAR DE MADUREZ ORGANIZACIONAL', desc: '6 VECTORES ESTRATÉGICOS — VISUALIZACIÓN RADAR EN TIEMPO REAL', icon: BarChart2, color: '#0099FF', duration: '~3 MIN', tag: 'DIAGNÓSTICO', status: 'ACTIVO' },
   { id: 'threats', code: 'MOD-04', label: 'CLASIFICADOR DE AMENAZAS', desc: 'PRIORIZACIÓN DE AMENAZAS ACTIVAS — ASIGNACIÓN DE RECURSOS — ANÁLISIS DE RIESGOS', icon: AlertTriangle, color: RED, duration: '~4 MIN', tag: 'INTELIGENCIA', status: 'ACTIVO' },
   { id: 'pulse', code: 'MOD-05', label: 'ENCUESTA DE PULSO FOCO 2026', desc: '10 PREGUNTAS — RESULTADOS AGREGADOS EN TIEMPO REAL CON OTROS ASISTENTES', icon: Activity, color: AMBER, duration: '~2 MIN', tag: 'COMUNIDAD', status: 'ACTIVO' },
+  { id: 'cyberdefense', code: 'MOD-06', label: 'OPERACIÓN ESCUDO DIGITAL', desc: 'DEFENSA DE RED EN TIEMPO REAL — NEUTRALIZA AMENAZAS ANTES DE QUE LLEGUEN AL SERVIDOR', icon: Shield, color: '#00FF41', duration: '~4 MIN', tag: 'SIMULADOR', status: 'ACTIVO' },
+  { id: 'tacticalmap', code: 'MOD-07', label: 'SALA DE GUERRA — MANDO TÁCTICO', desc: 'ARRASTRA UNIDADES PARA INTERCEPTAR AMENAZAS — 6 OLEADAS — MANDO EN TIEMPO REAL', icon: Crosshair, color: '#00AAFF', duration: '~4 MIN', tag: 'SIMULADOR', status: 'ACTIVO' },
+  { id: 'covertmission', code: 'MOD-08', label: 'MISIÓN SOMBRA — TERMINAL CLASIFICADO', desc: 'INFILTRA LA RED — DECODIFICA TRANSMISIONES CIFRADAS — NEUTRALIZA AL AGENTE', icon: Terminal, color: '#CC44FF', duration: '~5 MIN', tag: 'OPERACIÓN', status: 'ACTIVO' },
 ]
 
 // ─── LIVE CLOCK ──────────────────────────────────────────────────────────────
@@ -226,7 +232,7 @@ function CapacityTest({ onComplete }) {
         <Panel label="// FOCO 2026">
           <div style={{ padding: '45px 36px', fontFamily: FONT, fontSize: '15.75px', color: TEXT2, letterSpacing: '1.5px', lineHeight: 3.2, minWidth: '240px' }}>
             <div>DATE: 23JUN2026</div>
-            <div>LOC: EOI MADRID</div>
+            <div>LOC: MADRID</div>
             <div>ORG: INNOVADEF</div>
             <div style={{ color: ACCENT }}>STAT: CLASIFICADO</div>
           </div>
@@ -403,19 +409,23 @@ function ModuleSelector({ onSelect, bootStage = 4 }) {
   // SFX: boot stages
   const prevStage = useRef(0)
   useEffect(() => {
-    if (bootStage > prevStage.current) {
-      if (bootStage === 1) sfxBootHeader()
-      if (bootStage === 3) setTimeout(() => sfxHudScan(), 75)
-      if (bootStage === 3) MODULES.forEach((_, i) => setTimeout(() => sfxCardAppear(), 720 + i * 150))
+    if (bootStage > prevStage.current && hasUserInteracted()) {
       prevStage.current = bootStage
+      if (bootStage === 1) sfxBootHeader()
+      if (bootStage === 2) sfxHudScan()
+      if (bootStage === 3) sfxHudScan()
+      if (bootStage === 4) sfxCardAppear()
     }
   }, [bootStage])
 
-  // SFX: radar ping every ~6s
+  // SFX: radar ping every ~15s
   useEffect(() => {
-    const i = setInterval(() => sfxRadarPing(), 6300)
+    if (screen === 'intro' || screen === 'sleep') return
+    const i = setInterval(() => {
+      if (hasUserInteracted()) sfxRadarPing()
+    }, 15000)
     return () => clearInterval(i)
-  }, [])
+  }, [screen])
 
   // Each element gets its own visibility threshold based on bootStage
   const vis = (minStage, delay = 0) => ({
@@ -438,7 +448,7 @@ function ModuleSelector({ onSelect, bootStage = 4 }) {
             <div style={{ padding: '31.5px 36px', fontFamily: FONT, fontSize: '22.5px', lineHeight: 3, color: TEXT2 }}>
               <div>PLATFORM: <span style={{ color: ACCENT }}>INNOVADEF-KIOSK v2.0</span></div>
               <div>OPERATOR: <span style={{ color: ACCENT }}>FOCO-2026-OPERATOR</span></div>
-              <div>LOCATION: <span style={{ color: AMBER }}>EOI MADRID // 40°25'N 3°41'W</span></div>
+              <div>LOCATION: <span style={{ color: AMBER }}>MADRID // 40°25'N 3°41'W</span></div>
             </div>
           )},
           { label: '// ESTADO DE SISTEMAS', content: (
@@ -478,19 +488,19 @@ function ModuleSelector({ onSelect, bootStage = 4 }) {
       </div>
 
       {/* Module grid — each card staggers in */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(465px, 1fr))', gap: '18px', marginBottom: '72px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(465px, 1fr))', gap: '18px', marginBottom: '72px', alignItems: 'stretch' }}>
         {MODULES.map((mod, idx) => {
           const Icon = mod.icon
           const isH = hovered === mod.id
           const cardDelay = 720 + idx * 150
           return (
-            <div key={mod.id} style={{ ...vis(3, cardDelay) }}>
+            <div key={mod.id} style={{ ...vis(3, cardDelay), height: '100%' }}>
               <button
                 onClick={() => { sfxModuleSelect(); onSelect(mod.id) }}
                 onMouseEnter={() => { sfxHover(); setHovered(mod.id) }}
                 onMouseLeave={() => setHovered(null)}
                 style={{
-                  display: 'flex', flexDirection: 'column', padding: '0', width: '100%',
+                  display: 'flex', flexDirection: 'column', padding: '0', width: '100%', height: '100%',
                   background: isH ? `rgba(255,170,0,0.03)` : '#070707',
                   border: `1.5px solid ${isH ? `#ffaa0055` : BORDER}`,
                   color: ACCENT, cursor: 'pointer', textAlign: 'left',
@@ -517,7 +527,7 @@ function ModuleSelector({ onSelect, bootStage = 4 }) {
                   </div>
                 </div>
                 {/* Body */}
-                <div style={{ padding: '24px 21px' }}>
+                <div style={{ padding: '24px 21px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                   <div style={{ fontFamily: FONT, fontSize: '19.5px', letterSpacing: '1.5px', color: isH ? '#ffaa00' : TEXT2, marginBottom: '15px', lineHeight: 1.3 }}>
                     {mod.label}
                   </div>
@@ -537,7 +547,7 @@ function ModuleSelector({ onSelect, bootStage = 4 }) {
 
       {/* Footer */}
       <div style={{ fontFamily: FONT, fontSize: '20.25px', color: 'rgba(0,255,65,0.18)', letterSpacing: '3px', textAlign: 'center', ...vis(3, 1500) }}>
-        INNOVADEF FOCO 2026 // 23.06.2026 // EOI MADRID // SISTEMA CERTIFICADO ENS-CAT-A
+        INNOVADEF FOCO 2026 // 23.06.2026 // MADRID // SISTEMA CERTIFICADO ENS-CAT-A
       </div>
     </div>
   )
@@ -618,12 +628,32 @@ function useScreenTransition(duration = 630) {
 export default function App() {
   const navigate = useNavigate()
   const location = useLocation()
-  const [screen, setScreen] = useState('sleep')
-  const [activeModule, setActiveModule] = useState(null)
+
+  // Inicializar screen basado en la URL actual
+  const getInitialScreen = () => {
+    const path = location.pathname
+    if (path === '/') return 'sleep'
+    else if (path === '/intro') return 'intro'
+    else if (path === '/selector') return 'selector'
+    else if (path === '/email') return 'email'
+    else if (path.startsWith('/module/')) return 'module'
+    return 'sleep' // fallback
+  }
+
+  const getInitialActiveModule = () => {
+    const path = location.pathname
+    if (path.startsWith('/module/')) {
+      return path.split('/')[2] || null
+    }
+    return null
+  }
+
+  const [screen, setScreen] = useState(getInitialScreen)
+  const [activeModule, setActiveModule] = useState(getInitialActiveModule)
   const [moduleResult, setModuleResult] = useState(null)
   const [sessionId] = useState(() => `FOCO-${Date.now().toString(36).toUpperCase()}`)
-  const [booting, setBooting] = useState(false)
-  const [bootStage, setBootStage] = useState(0)
+  const [booting, setBooting] = useState(() => getInitialScreen() === 'selector')
+  const [bootStage, setBootStage] = useState(() => getInitialScreen() === 'selector' ? 4 : 0)
   const [transitioning, setTransitioning] = useState(false)
   const [pendingModule, setPendingModule] = useState(null)
   const { overlay, go } = useScreenTransition(750)
@@ -641,21 +671,17 @@ export default function App() {
   // Sync URL with screen
   useEffect(() => {
     if (screen === 'sleep') navigate('/', { replace: true })
-    else if (screen === 'intro') navigate('/intro', { replace: true })
-    else if (screen === 'selector') navigate('/selector', { replace: true })
-    else if (screen === 'module' && activeModule) navigate(`/module/${activeModule}`, { replace: true })
-    else if (screen === 'email') navigate('/email', { replace: true })
+    else if (screen === 'intro') navigate('/intro')
+    else if (screen === 'selector') navigate('/selector')
+    else if (screen === 'module' && activeModule) navigate(`/module/${activeModule}`)
+    else if (screen === 'email') navigate('/email')
   }, [screen, activeModule, navigate])
 
-  // Ambient background sound
+  // Ambient background sound - TEMPORARILY DISABLED
   useEffect(() => {
-    if (screen !== 'sleep') {
-      startAmbient()
-    } else {
-      stopAmbient()
-    }
-    return () => stopAmbient()
-  }, [screen])
+    // Disabled for testing
+    return () => {}
+  }, [])
 
   // Inactivity timeout - return to sleep after 60 seconds
   useEffect(() => {
@@ -692,6 +718,7 @@ export default function App() {
   }, [screen, navigate])
 
   const enterDashboard = () => {
+    markUserInteracted()
     sfxIntroWipe()
     go(() => {
       setScreen('selector')
@@ -720,6 +747,7 @@ export default function App() {
     go(() => { setModuleResult(result); setScreen('email') })
   }
   const reset = () => {
+    markUserInteracted()
     sfxReset()
     go(() => { setScreen('selector'); setActiveModule(null); setModuleResult(null) })
   }
@@ -810,6 +838,9 @@ export default function App() {
             {activeModule === 'radar' && <MaturityRadar onComplete={handleComplete} />}
             {activeModule === 'threats' && <ThreatClassifier onComplete={handleComplete} />}
             {activeModule === 'pulse' && <PulseSurvey onComplete={handleComplete} />}
+            {activeModule === 'cyberdefense' && <CyberDefense onComplete={handleComplete} />}
+            {activeModule === 'tacticalmap' && <TacticalMap onComplete={handleComplete} />}
+            {activeModule === 'covertmission' && <CovertMission onComplete={handleComplete} />}
           </>
         )}
         {screen === 'email' && <EmailScreen sessionId={sessionId} onReset={reset} />}

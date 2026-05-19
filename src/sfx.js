@@ -3,16 +3,35 @@
 // Software sofisticado, serio, profesional.
 
 let ctx = null
+let userInteracted = false
+
+// Llamar esto cuando el usuario hace click/touch
+export function markUserInteracted() {
+  userInteracted = true
+  if (ctx && ctx.state === 'suspended') {
+    ctx.resume().catch(() => {})
+  }
+}
+
+// Verificar si el usuario ya ha interactuado
+export function hasUserInteracted() {
+  return userInteracted
+}
 
 function getCtx() {
-  if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)()
-  if (ctx.state === 'suspended') ctx.resume()
+  if (!ctx && userInteracted) {
+    ctx = new (window.AudioContext || window.webkitAudioContext)()
+  }
+  if (ctx && ctx.state === 'suspended' && userInteracted) {
+    ctx.resume().catch(() => {})
+  }
   return ctx
 }
 
 // ── Utilidades avanzadas ────────────────────────────────────────────────────────
 
 function sine(ac, freq, startTime, duration, gain, freqEnd, type = 'sine') {
+  if (!ac) return
   const o = ac.createOscillator()
   const g = ac.createGain()
   o.type = type
@@ -26,6 +45,7 @@ function sine(ac, freq, startTime, duration, gain, freqEnd, type = 'sine') {
 }
 
 function filteredNoise(ac, startTime, duration, gain, lpFreq = 800, hpFreq = null) {
+  if (!ac) return
   const bufSize = Math.ceil(ac.sampleRate * duration)
   const buf = ac.createBuffer(1, bufSize, ac.sampleRate)
   const data = buf.getChannelData(0)
@@ -52,6 +72,7 @@ function filteredNoise(ac, startTime, duration, gain, lpFreq = 800, hpFreq = nul
 }
 
 function deepRumble(ac, startTime, duration, gain = 0.12) {
+  if (!ac) return
   const o = ac.createOscillator()
   const lfo = ac.createOscillator()
   const lfoG = ac.createGain()
@@ -69,6 +90,7 @@ function deepRumble(ac, startTime, duration, gain = 0.12) {
 }
 
 function cinematicWhoosh(ac, startTime, freqFrom, freqTo, duration, gain = 0.1) {
+  if (!ac) return
   const bufSize = Math.ceil(ac.sampleRate * duration)
   const buf = ac.createBuffer(1, bufSize, ac.sampleRate)
   const data = buf.getChannelData(0)
@@ -90,6 +112,7 @@ function cinematicWhoosh(ac, startTime, freqFrom, freqTo, duration, gain = 0.1) 
 }
 
 function metallicPing(ac, startTime, freq, duration, gain) {
+  if (!ac) return
   const o = ac.createOscillator()
   const g = ac.createGain()
   const filt = ac.createBiquadFilter()
@@ -106,6 +129,7 @@ function metallicPing(ac, startTime, freq, duration, gain) {
 }
 
 function chord(ac, startTime, freqs, duration, gain, stagger = 0.02) {
+  if (!ac) return
   freqs.forEach((f, i) => sine(ac, f, startTime + i * stagger, duration, gain * (1 - i * 0.1)))
 }
 
@@ -114,6 +138,7 @@ function chord(ac, startTime, freqs, duration, gain, stagger = 0.02) {
 // SleepScreen: activación de sistemas — power-up militar sofisticado
 export function sfxWakeTouch() {
   const ac = getCtx()
+  if (!ac) return
   const now = ac.currentTime
   deepRumble(ac, now, 2.0, 0.22)
   cinematicWhoosh(ac, now, 40, 600, 1.2, 0.15)
@@ -124,6 +149,7 @@ export function sfxWakeTouch() {
 // Wake sweep — sistema arrancando, sweep de frecuencia sofisticado
 export function sfxWakeSweep() {
   const ac = getCtx()
+  if (!ac) return
   const now = ac.currentTime
   const o = ac.createOscillator()
   const g = ac.createGain()
@@ -150,6 +176,7 @@ export function sfxWakeSweep() {
 // Explosión energética wake→intro — impacto imponente y respetable
 export function sfxWakeExplosion() {
   const ac = getCtx()
+  if (!ac) return
   const now = ac.currentTime
   
   // Sub-bass impact layer 1 — muy grave, largo
@@ -208,18 +235,42 @@ export function sfxWakeExplosion() {
   // High impact layer — brillo del impacto
   chord(ac, now + 0.08, [160, 240, 320, 400], 0.9, 0.15, 0.02)
   
-  // Metallic resonance — eco largo
-  metallicPing(ac, now + 0.12, 1200, 1.4, 0.06)
-  metallicPing(ac, now + 0.18, 1800, 1.2, 0.04)
-  metallicPing(ac, now + 0.24, 2400, 1.0, 0.03)
+  // Deep resonance sweep — eco militar largo
+  const oRes = ac.createOscillator()
+  const gRes = ac.createGain()
+  const fRes = ac.createBiquadFilter()
+  oRes.type = 'sawtooth'
+  oRes.frequency.setValueAtTime(55, now + 0.1)
+  oRes.frequency.exponentialRampToValueAtTime(28, now + 2.0)
+  fRes.type = 'lowpass'
+  fRes.frequency.setValueAtTime(300, now + 0.1)
+  fRes.frequency.exponentialRampToValueAtTime(80, now + 2.0)
+  gRes.gain.setValueAtTime(0.0001, now + 0.1)
+  gRes.gain.linearRampToValueAtTime(0.22, now + 0.2)
+  gRes.gain.exponentialRampToValueAtTime(0.0001, now + 2.2)
+  oRes.connect(fRes); fRes.connect(gRes); gRes.connect(ac.destination)
+  oRes.start(now + 0.1); oRes.stop(now + 2.3)
 
-  // Shimmer high-frequency
-  filteredNoise(ac, now + 0.15, 0.8, 0.04, 12000, 6000)
+  // Klaxon alert sweep — tono de alerta militar descendente
+  const oKlax = ac.createOscillator()
+  const gKlax = ac.createGain()
+  oKlax.type = 'square'
+  oKlax.frequency.setValueAtTime(320, now + 0.05)
+  oKlax.frequency.exponentialRampToValueAtTime(160, now + 0.5)
+  gKlax.gain.setValueAtTime(0.0001, now + 0.05)
+  gKlax.gain.linearRampToValueAtTime(0.12, now + 0.12)
+  gKlax.gain.exponentialRampToValueAtTime(0.0001, now + 0.55)
+  oKlax.connect(gKlax); gKlax.connect(ac.destination)
+  oKlax.start(now + 0.05); oKlax.stop(now + 0.6)
+
+  // Textured noise tail — cola de impacto profesional
+  filteredNoise(ac, now + 0.1, 1.2, 0.06, 600, 200)
 }
 
 // Línea de boot — escritura de terminal clasificado
 export function sfxBootLine() {
   const ac = getCtx()
+  if (!ac) return
   const now = ac.currentTime
   filteredNoise(ac, now, 0.03, 0.03, 5000, 2000)
   metallicPing(ac, now, 2400, 0.02, 0.012)
@@ -229,6 +280,7 @@ export function sfxBootLine() {
 // Botón de sistema listo — chord de confirmación profesional
 export function sfxBootReady() {
   const ac = getCtx()
+  if (!ac) return
   const now = ac.currentTime
   chord(ac, now, [130, 164, 196, 261, 329], 1.4, 0.07, 0.04)
   filteredNoise(ac, now + 0.15, 0.6, 0.025, 8000, 3000)
@@ -238,6 +290,7 @@ export function sfxBootReady() {
 // Cursor — click de sistema HUD táctico
 export function sfxShot() {
   const ac = getCtx()
+  if (!ac) return
   const now = ac.currentTime
   filteredNoise(ac, now, 0.04, 0.05, 4000, 1500)
   metallicPing(ac, now, 1200, 0.03, 0.03)
@@ -247,6 +300,7 @@ export function sfxShot() {
 // Botón INICIAR SISTEMA — power-up cinematográfico sofisticado
 export function sfxEnterFiring() {
   const ac = getCtx()
+  if (!ac) return
   const now = ac.currentTime
   deepRumble(ac, now, 1.8, 0.25)
   cinematicWhoosh(ac, now, 60, 1500, 1.0, 0.18)
@@ -258,6 +312,7 @@ export function sfxEnterFiring() {
 // Transición intro → dashboard — wipe cinematográfico
 export function sfxIntroWipe() {
   const ac = getCtx()
+  if (!ac) return
   const now = ac.currentTime
   cinematicWhoosh(ac, now, 2500, 60, 0.8, 0.18)
   deepRumble(ac, now, 1.0, 0.18)
@@ -268,6 +323,7 @@ export function sfxIntroWipe() {
 // Dashboard: header materializa
 export function sfxBootHeader() {
   const ac = getCtx()
+  if (!ac) return
   const now = ac.currentTime
   cinematicWhoosh(ac, now, 150, 1000, 0.3, 0.09)
   chord(ac, now, [320, 400, 480], 0.25, 0.035, 0.02)
@@ -277,6 +333,7 @@ export function sfxBootHeader() {
 // HUD scan line — barrido de sonar militar
 export function sfxHudScan() {
   const ac = getCtx()
+  if (!ac) return
   const now = ac.currentTime
   sine(ac, 1500, now, 0.8, 0.07, 120)
   sine(ac, 750, now + 0.1, 0.6, 0.04, 80)
@@ -287,6 +344,7 @@ export function sfxHudScan() {
 // Card de módulo aparece
 export function sfxCardAppear() {
   const ac = getCtx()
+  if (!ac) return
   const now = ac.currentTime
   filteredNoise(ac, now, 0.06, 0.03, 1500, 600)
   metallicPing(ac, now, 320 + Math.random() * 120, 0.08, 0.018)
@@ -296,6 +354,7 @@ export function sfxCardAppear() {
 // Módulo seleccionado — lock-on táctico sofisticado
 export function sfxModuleSelect() {
   const ac = getCtx()
+  if (!ac) return
   const now = ac.currentTime
   deepRumble(ac, now, 0.8, 0.14)
   cinematicWhoosh(ac, now, 300, 2200, 0.6, 0.15)
@@ -305,18 +364,29 @@ export function sfxModuleSelect() {
 }
 
 // RADAR PING — sonar real de submarino (archivo WAV)
+let radarAudio = null
 export function sfxRadarPing() {
   const ac = getCtx()
   const now = ac.currentTime
 
-  const audio = new Audio('/submarine_sonar.wav')
-  audio.currentTime = 0
-  audio.play().catch(() => {})
+  // Detener audio anterior si existe
+  if (radarAudio) {
+    radarAudio.pause()
+    radarAudio.currentTime = 0
+  }
+
+  radarAudio = new Audio('/submarine_sonar.wav')
+  radarAudio.volume = 0.1
+  radarAudio.play().catch(() => {})
+  
+  // Limpiar referencia cuando termine
+  radarAudio.onended = () => { radarAudio = null }
 }
 
 // Hover — activación de objetivo
 export function sfxHover() {
   const ac = getCtx()
+  if (!ac) return
   const now = ac.currentTime
   filteredNoise(ac, now, 0.04, 0.02, 2500, 1200)
   metallicPing(ac, now, 800, 0.04, 0.012)
@@ -326,6 +396,7 @@ export function sfxHover() {
 // Reset / volver al selector — powering down
 export function sfxReset() {
   const ac = getCtx()
+  if (!ac) return
   const now = ac.currentTime
   cinematicWhoosh(ac, now, 1000, 40, 0.7, 0.12)
   chord(ac, now, [180, 135, 90], 0.6, 0.08, 0.03)
@@ -352,10 +423,14 @@ export function stopAmbient() {
   if (!ambientAudio) return
   const fadeDuration = 500
   const startVolume = ambientAudio.volume
+  let elapsed = 0
   
   const fadeInterval = setInterval(() => {
-    ambientAudio.volume -= startVolume / (fadeDuration / 50)
-    if (ambientAudio.volume <= 0) {
+    elapsed += 50
+    const newVolume = Math.max(0, startVolume * (1 - elapsed / fadeDuration))
+    ambientAudio.volume = newVolume
+    
+    if (elapsed >= fadeDuration || newVolume <= 0) {
       clearInterval(fadeInterval)
       ambientAudio.pause()
       ambientAudio = null
