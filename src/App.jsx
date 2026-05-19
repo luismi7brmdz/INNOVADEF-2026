@@ -345,6 +345,7 @@ function ModuleSelector({ onSelect, bootStage = 4 }) {
 function ModuleTransition({ active, onDone }) {
   useEffect(() => {
     if (active) {
+      sfxIntroWipe()
       const t = setTimeout(onDone, 1800)
       return () => clearTimeout(t)
     }
@@ -513,6 +514,7 @@ export default function App() {
     setScreen('module')
     setTransitioning(false)
     setPendingModule(null)
+    sfxBootReady()
   }
 
   const handleComplete = (result) => {
@@ -623,14 +625,25 @@ export default function App() {
 
       {/* Content */}
       <div style={{ position: 'relative', zIndex: 2, paddingTop: '78px', paddingBottom: '48px', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '120px 48px 72px' }}>
-        {screen === 'selector' && <ModuleSelector onSelect={selectModule} bootStage={bootStage} />}
-        {screen === 'module' && (
-          <PluginRenderer
-            plugin={MODULES.find(m => m.id === activeModule)}
-            onComplete={handleComplete}
-          />
+        {screen === 'selector' && (
+          <div key="selector" style={{ width: '100%',
+            animation: transitioning ? 'contentFadeOut 0.5s ease-in 0.45s forwards' : 'contentFadeIn 0.6s ease-out both' }}>
+            <ModuleSelector onSelect={selectModule} bootStage={bootStage} />
+          </div>
         )}
-        {screen === 'email' && <EmailScreen sessionId={sessionId} onReset={reset} />}
+        {screen === 'module' && (
+          <div key={`mod-${activeModule}`} style={{ width: '100%', animation: 'contentFadeIn 0.6s ease-out both' }}>
+            <PluginRenderer
+              plugin={MODULES.find(m => m.id === activeModule)}
+              onComplete={handleComplete}
+            />
+          </div>
+        )}
+        {screen === 'email' && (
+          <div key="email" style={{ width: '100%', animation: 'contentFadeIn 0.6s ease-out both' }}>
+            <EmailScreen sessionId={sessionId} onReset={reset} />
+          </div>
+        )}
       </div>
 
       <StatusBar module={activeModCode} onHome={reset} bootStage={bootStage} />
@@ -649,6 +662,8 @@ export default function App() {
         ::-webkit-scrollbar-thumb { background: rgba(0,255,65,0.2); }
         @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
         @keyframes fadeIn { from{opacity:0;transform:translateY(4.01px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes contentFadeIn { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes contentFadeOut { from{opacity:1;transform:translateY(0) scale(1)} to{opacity:0;transform:translateY(-14px) scale(0.97)} }
         @keyframes spin { to{transform:rotate(360deg)} }
         @keyframes hudScan   { 0%{top:0;opacity:1} 85%{opacity:0.7} 100%{top:100vh;opacity:0} }
         @keyframes hudScanUp { 0%{bottom:0;opacity:1} 85%{opacity:0.7} 100%{bottom:100vh;opacity:0} }
