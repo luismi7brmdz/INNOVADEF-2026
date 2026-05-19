@@ -1,47 +1,18 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
-import { useNavigate, useLocation, Routes, Route } from 'react-router-dom'
-import { Send, Cpu, CheckCircle, ChevronRight, Mail, Target, BarChart2, AlertTriangle, Activity, FileText, Shield, Crosshair, Terminal } from 'lucide-react'
+import { useState, useEffect, useRef, useCallback, Suspense } from 'react'
+import { useNavigate, useLocation } from 'react-router-dom'
+import { Send, ChevronRight, Mail } from 'lucide-react'
 import { QRCodeSVG as QRCode } from 'qrcode.react'
 import MilitaryBackground from './MilitaryBackground'
 import IntroScreen, { MilitaryCursor } from './IntroScreen'
 import SleepScreen from './SleepScreen'
-import TacticalSimulator from './modules/TacticalSimulator'
-import MaturityRadar from './modules/MaturityRadar'
-import ThreatClassifier from './modules/ThreatClassifier'
-import PulseSurvey from './modules/PulseSurvey'
-import CyberDefense from './modules/CyberDefense'
-import TacticalMap from './modules/TacticalMap'
-import CovertMission from './modules/CovertMission'
-import { ACCENT, ACCENT2, AMBER, RED, DIM, DIMLO, BORDER, BG, TEXT, TEXT2, FONT, CARD, S } from './theme'
+import { ACCENT, AMBER, RED, BORDER, TEXT2, FONT, S } from './theme'
 import { sfxBootHeader, sfxHudScan, sfxCardAppear, sfxModuleSelect, sfxHover, sfxReset, sfxRadarPing, sfxIntroWipe, startAmbient, stopAmbient, markUserInteracted, hasUserInteracted } from './sfx'
+import { PLUGIN_REGISTRY } from './plugins/registry'
+import PluginRenderer from './plugins/PluginRenderer'
 
 // ─── CONSTANTS ───────────────────────────────────────────────────────────────
 
-const PH = `${ACCENT}` // shorthand for inline phosphor color
-
-const questions = [
-  { id: 1, text: "¿CUÁL CONSIDERA EL MAYOR VECTOR DE TRANSFORMACIÓN EN LA ENSEÑANZA MILITAR EN LOS PRÓXIMOS 3 AÑOS?", category: "transformacion", options: ["INTEGRACIÓN DE IA GENERATIVA EN PROCESOS FORMATIVOS", "SIMULACIÓN AVANZADA Y ENTORNOS INMERSIVOS", "GESTIÓN UNIFICADA DEL CONOCIMIENTO INSTITUCIONAL", "PLATAFORMAS LMS ADAPTATIVAS DE NUEVA GENERACIÓN"] },
-  { id: 2, text: "¿EN QUÉ FASE SE ENCUENTRA SU ORGANIZACIÓN RESPECTO AL DESPLIEGUE CLOUD CON CERTIFICACIÓN ENS?", category: "cloud", options: ["CERTIFICACIÓN ENS CATEGORÍA ALTA OPERATIVA", "EN PROCESO ACTIVO DE CERTIFICACIÓN", "PLANIFICADO PARA EL PRESENTE EJERCICIO", "AÚN EN FASE DE ANÁLISIS Y EVALUACIÓN"] },
-  { id: 3, text: "¿CÓMO DESCRIBIRÍA EL NIVEL DE MADUREZ EN INTELIGENCIA ARTIFICIAL APLICADA?", category: "ia", options: ["IA EN PRODUCCIÓN CON CASOS DE USO CONSOLIDADOS", "PROYECTOS PILOTO ACTIVOS CON RESULTADOS MEDIBLES", "FASE DE EXPLORACIÓN Y EVALUACIÓN TECNOLÓGICA", "PENDIENTE DE DEFINIR HOJA DE RUTA ESTRATÉGICA"] },
-  { id: 4, text: "¿CÓMO VALORA LA SOBERANÍA DEL DATO EN SUS INFRAESTRUCTURAS ACTUALES?", category: "soberania", options: ["CONTROL TOTAL CON MODELO DE NUBE SOBERANA", "MODELO HÍBRIDO CON PROTOCOLOS DE SEGURIDAD", "EN PROCESO DE IMPLEMENTACIÓN DE CONTROLES", "REQUIERE REVISIÓN ESTRATÉGICA URGENTE"] },
-  { id: 5, text: "¿CUÁL ES LA PRINCIPAL BARRERA PARA ACELERAR LA TRANSFORMACIÓN DIGITAL?", category: "barreras", options: ["MARCO REGULATORIO Y PROCESOS DE CERTIFICACIÓN", "DISPONIBILIDAD DE TALENTO ESPECIALIZADO", "PRESUPUESTO Y PRIORIZACIÓN DE INVERSIONES", "RESISTENCIA AL CAMBIO ORGANIZACIONAL"] }
-]
-
-const categoryLabels = {
-  transformacion: "TRANSF. DIGITAL", cloud: "CLOUD & ENS", ia: "INTELIGENCIA ARTIFICIAL",
-  soberania: "SOBERANÍA DEL DATO", barreras: "CAPACIDAD DE CAMBIO"
-}
-
-const MODULES = [
-  { id: 'capacity', code: 'MOD-01', label: 'TEST DE CAPACIDAD DIGITAL', desc: '5 VECTORES DE MADUREZ TECNOLÓGICA — GENERA INFORME CLASIFICADO PERSONALIZADO', icon: FileText, color: ACCENT, duration: '~3 MIN', tag: 'EVALUACIÓN', status: 'ACTIVO' },
-  { id: 'tactical', code: 'MOD-02', label: 'SIMULADOR DE DECISIÓN TÁCTICA', desc: 'ESCENARIO DE CRISIS DIGITAL EN TIEMPO REAL — PERFIL DE LIDERAZGO OPERACIONAL', icon: Target, color: '#FF6644', duration: '~4 MIN', tag: 'SIMULACRO', status: 'ACTIVO' },
-  { id: 'radar', code: 'MOD-03', label: 'RADAR DE MADUREZ ORGANIZACIONAL', desc: '6 VECTORES ESTRATÉGICOS — VISUALIZACIÓN RADAR EN TIEMPO REAL', icon: BarChart2, color: '#0099FF', duration: '~3 MIN', tag: 'DIAGNÓSTICO', status: 'ACTIVO' },
-  { id: 'threats', code: 'MOD-04', label: 'CLASIFICADOR DE AMENAZAS', desc: 'PRIORIZACIÓN DE AMENAZAS ACTIVAS — ASIGNACIÓN DE RECURSOS — ANÁLISIS DE RIESGOS', icon: AlertTriangle, color: RED, duration: '~4 MIN', tag: 'INTELIGENCIA', status: 'ACTIVO' },
-  { id: 'pulse', code: 'MOD-05', label: 'ENCUESTA DE PULSO FOCO 2026', desc: '10 PREGUNTAS — RESULTADOS AGREGADOS EN TIEMPO REAL CON OTROS ASISTENTES', icon: Activity, color: AMBER, duration: '~2 MIN', tag: 'COMUNIDAD', status: 'ACTIVO' },
-  { id: 'cyberdefense', code: 'MOD-06', label: 'OPERACIÓN ESCUDO DIGITAL', desc: 'DEFENSA DE RED EN TIEMPO REAL — NEUTRALIZA AMENAZAS ANTES DE QUE LLEGUEN AL SERVIDOR', icon: Shield, color: '#00FF41', duration: '~4 MIN', tag: 'SIMULADOR', status: 'ACTIVO' },
-  { id: 'tacticalmap', code: 'MOD-07', label: 'SALA DE GUERRA — MANDO TÁCTICO', desc: 'ARRASTRA UNIDADES PARA INTERCEPTAR AMENAZAS — 6 OLEADAS — MANDO EN TIEMPO REAL', icon: Crosshair, color: '#00AAFF', duration: '~4 MIN', tag: 'SIMULADOR', status: 'ACTIVO' },
-  { id: 'covertmission', code: 'MOD-08', label: 'MISIÓN SOMBRA — TERMINAL CLASIFICADO', desc: 'INFILTRA LA RED — DECODIFICA TRANSMISIONES CIFRADAS — NEUTRALIZA AL AGENTE', icon: Terminal, color: '#CC44FF', duration: '~5 MIN', tag: 'OPERACIÓN', status: 'ACTIVO' },
-]
+const MODULES = PLUGIN_REGISTRY
 
 // ─── LIVE CLOCK ──────────────────────────────────────────────────────────────
 
@@ -50,7 +21,7 @@ function LiveClock() {
   useEffect(() => { const i = setInterval(() => setTime(new Date()), 1000); return () => clearInterval(i) }, [])
   const pad = n => String(n).padStart(2, '0')
   return (
-    <span style={{ fontFamily: FONT, fontSize: 'clamp(9px, 1vw, 16.5px)', color: TEXT2, letterSpacing: 'clamp(1px, 0.2vw, 3px)' }}>
+    <span style={{ fontFamily: FONT, fontSize: '16.5px', color: TEXT2, letterSpacing: '3px' }}>
       {pad(time.getHours())}:{pad(time.getMinutes())}:{pad(time.getSeconds())} UTC+2
     </span>
   )
@@ -98,18 +69,18 @@ function StatusBar({ module, onHome, bootStage = 4 }) {
   return (
     <div style={{
       position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100,
-      height: 'clamp(32px, 4vw, 48px)',
+      height: '48px',
       background: '#050505',
       borderTop: `1.5px solid ${BORDER}`,
       display: 'flex', alignItems: 'center',
-      padding: '0 clamp(12px, 3vw, 45px)', gap: '0',
-      fontFamily: FONT, fontSize: 'clamp(9px, 1.3vw, 22.5px)',
+      padding: '0 45px', gap: '0',
+      fontFamily: FONT, fontSize: '22.5px',
       transform: bootStage < 2 ? 'translateY(100%)' : 'translateY(0)',
       opacity: bootStage < 2 ? 0 : 1,
       transition: 'transform 0.45s cubic-bezier(0.22,1,0.36,1), opacity 0.35s ease',
     }}>
       {items.map((item, i) => (
-        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 'clamp(6px, 0.8vw, 13.5px)', paddingRight: 'clamp(8px, 1.5vw, 30px)', marginRight: 'clamp(8px, 1.5vw, 30px)', borderRight: `1.5px solid ${BORDER}` }}>
+        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '13.5px', paddingRight: '30px', marginRight: '30px', borderRight: `1.5px solid ${BORDER}` }}>
           <span style={{ color: TEXT2 }}>{item.label}:</span>
           <span style={{ color: item.color }}>{item.value}</span>
         </div>
@@ -125,218 +96,6 @@ function StatusBar({ module, onHome, bootStage = 4 }) {
   )
 }
 
-// ─── CAPACITY TEST ────────────────────────────────────────────────────────────
-
-function CapacityTest({ onComplete }) {
-  const [step, setStep] = useState(0)
-  const [answers, setAnswers] = useState({})
-  const [phase, setPhase] = useState('questions')
-  const [thinkingLines, setThinkingLines] = useState([])
-  const [report, setReport] = useState(null)
-  const [barWidths, setBarWidths] = useState({})
-
-  const handleAnswer = (qId, answer) => {
-    const updated = { ...answers, [qId]: answer }
-    setAnswers(updated)
-    if (step < questions.length - 1) setTimeout(() => setStep(s => s + 1), 300)
-    else setTimeout(() => runAnalysis(updated), 300)
-  }
-
-  const runAnalysis = (fa) => {
-    setThinkingLines([]); setPhase('thinking')
-    const steps = [
-      "INIT SECURE CHANNEL... ENS-CAT-A",
-      "LOADING ASSESSMENT PROFILE 23JUN2026...",
-      "PROCESSING VECTOR[1/5]: TRANSFORMACIÓN DIGITAL...",
-      "PROCESSING VECTOR[2/5]: CLOUD & ENS...",
-      "PROCESSING VECTOR[3/5]: IA ESTRATÉGICA...",
-      "PROCESSING VECTOR[4/5]: SOBERANÍA DEL DATO...",
-      "PROCESSING VECTOR[5/5]: CAPACIDAD DE CAMBIO...",
-      "CALCULATING ÍNDICE GLOBAL...",
-      "COMPILING CLASSIFIED REPORT >> DONE",
-    ]
-    steps.forEach((txt, i) => setTimeout(() => setThinkingLines(l => [...l, txt]), i * 1050))
-    setTimeout(() => {
-      const scores = {}
-      questions.forEach(q => {
-        const idx = q.options.indexOf(fa[q.id])
-        scores[q.category] = idx === -1 ? 50 : Math.round((4 - idx) / 3 * 100)
-      })
-      const overall = Math.round(Object.values(scores).reduce((a, b) => a + b, 0) / 5)
-      const recs = []
-      if (scores.cloud < 60) recs.push("CERTIFICAR ENS CATEGORÍA ALTA — REQUISITO OPERACIONAL PRIORITARIO")
-      if (scores.ia < 60) recs.push("DESARROLLAR PLAN DE ADOPCIÓN IA CON CASOS DE USO EN FORMACIÓN Y SIMULACIÓN")
-      if (scores.soberania < 60) recs.push("DISEÑAR ARQUITECTURA NUBE SOBERANA — CONTROL TOTAL DEL DATO CLASIFICADO")
-      if (scores.transformacion < 60) recs.push("DEFINIR HOJA DE RUTA ALINEADA CON VECTORES FOCO 2026")
-      if (scores.barreras < 60) recs.push("IMPLEMENTAR PROGRAMA DE GESTIÓN DEL CAMBIO Y CAPACITACIÓN DE TALENTO")
-      if (recs.length === 0) recs.push("ORGANIZACIÓN EN NIVEL DE MADUREZ AVANZADO — LIDERAR ECOSISTEMA DE INNOVACIÓN DEFENSA")
-      setReport({ overall, scores, recs })
-      setPhase('report')
-      setTimeout(() => setBarWidths(scores), 450)
-    }, steps.length * 1050 + 600)
-  }
-
-  if (phase === 'thinking') return (
-    <div style={{ width: '100%', margin: '0 auto' }}>
-      <Panel label="// ANÁLISIS EN CURSO — CLASIFICADO">
-        <div style={{ padding: '54px', fontFamily: FONT, fontSize: '18px' }}>
-          <div style={{ display: 'flex', gap: '18px', marginBottom: '45px', alignItems: 'center' }}>
-            <div style={{ width: '12px', height: '12px', background: '#FF5F57' }} />
-            <div style={{ width: '12px', height: '12px', background: '#FFBD2E' }} />
-            <div style={{ width: '12px', height: '12px', background: '#28C840' }} />
-            <span style={{ color: TEXT2, marginLeft: '12px', letterSpacing: '3px', fontSize: '15.75px' }}>TERMINAL — AES-256 — ENS-CAT-A</span>
-          </div>
-          {thinkingLines.map((l, i) => (
-            <div key={i} style={{ display: 'flex', gap: '15px', marginBottom: '12px', color: i === thinkingLines.length - 1 ? ACCENT : TEXT2, animation: 'fadeIn 0.45s ease' }}>
-              <span style={{ color: ACCENT, opacity: 0.5 }}>{'>'}</span>
-              <span>{l}</span>
-              {i === thinkingLines.length - 1 && <span style={{ color: '#28C840' }}> [OK]</span>}
-            </div>
-          ))}
-          <div style={{ display: 'flex', gap: '15px', color: ACCENT }}>
-            <span style={{ opacity: 0.5 }}>{'>'}</span>
-            <span style={{ animation: 'blink 1.5s infinite' }}>█</span>
-          </div>
-        </div>
-      </Panel>
-    </div>
-  )
-
-  if (phase === 'report') return (
-    <div style={{ width: '100%', margin: '0 auto' }}>
-      {/* Header */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '36px', marginBottom: '24px', alignItems: 'start' }}>
-        <Panel label="// INFORME DE CAPACIDAD DIGITAL — CLASIFICADO">
-          <div style={{ padding: '45px 36px', display: 'flex', alignItems: 'center', gap: '48px' }}>
-            <div style={{ textAlign: 'center', minWidth: '150px' }}>
-              <div style={{ fontFamily: FONT, fontSize: '96px', fontWeight: 400, color: ACCENT, lineHeight: 1, textShadow: `0 0 45px ${ACCENT}44` }}>
-                {report.overall}
-              </div>
-              <div style={{ fontFamily: FONT, fontSize: '20.25px', color: TEXT2, letterSpacing: '3px', marginTop: '27px' }}>ÍNDICE GLOBAL</div>
-            </div>
-            <div style={{ borderLeft: `1.5px solid ${BORDER}`, paddingLeft: '48px', flex: 1 }}>
-              <div style={{ fontFamily: FONT, fontSize: '20.25px', color: TEXT2, letterSpacing: '3px', marginBottom: '12px' }}>CLASIFICACIÓN OPERATIVA</div>
-              <div style={{ fontFamily: FONT, fontSize: '63px', letterSpacing: '3px', color: ACCENT, marginBottom: '12px' }}>
-                {report.overall >= 80 ? 'MADUREZ AVANZADA' : report.overall >= 60 ? 'MADUREZ INTERMEDIA' : report.overall >= 40 ? 'EN DESARROLLO' : 'FASE INICIAL'}
-              </div>
-              <div style={{ fontFamily: FONT, fontSize: '24.75px', color: TEXT2, lineHeight: 1.7 }}>
-                {report.overall >= 80
-                  ? 'SU ORGANIZACIÓN LIDERA LA TRANSFORMACIÓN DIGITAL EN EL ÁMBITO DE LA DEFENSA NACIONAL.'
-                  : report.overall >= 60
-                  ? 'POSICIONAMIENTO SÓLIDO. MARGEN DE MEJORA EN VECTORES TECNOLÓGICOS CLAVE.'
-                  : 'OPORTUNIDADES ESTRATÉGICAS SIGNIFICATIVAS PARA ACELERAR LA TRANSFORMACIÓN.'}
-              </div>
-            </div>
-          </div>
-        </Panel>
-        <Panel label="// FOCO 2026">
-          <div style={{ padding: '45px 36px', fontFamily: FONT, fontSize: '15.75px', color: TEXT2, letterSpacing: '1.5px', lineHeight: 3.2, minWidth: '240px' }}>
-            <div>DATE: 23JUN2026</div>
-            <div>LOC: MADRID</div>
-            <div>ORG: INNOVADEF</div>
-            <div style={{ color: ACCENT }}>STAT: CLASIFICADO</div>
-          </div>
-        </Panel>
-      </div>
-
-      {/* Vectors */}
-      <Panel label="// VECTORES DE CAPACIDAD" style={{ marginBottom: '24px' }}>
-        <div style={{ padding: '45px 36px' }}>
-          {questions.map(q => (
-            <div key={q.category} style={{ display: 'grid', gridTemplateColumns: '270px 1fr 72px', gap: '36px', alignItems: 'center', marginBottom: '27px' }}>
-              <div style={{ fontFamily: FONT, fontSize: '15.75px', color: TEXT2, letterSpacing: '1.5px' }}>{categoryLabels[q.category]}</div>
-              <div style={{ height: '2.25px', background: 'rgba(0,255,65,0.06)', border: `1.5px solid ${BORDER}` }}>
-                <div style={{
-                  height: '100%',
-                  width: `${barWidths[q.category] || 0}%`,
-                  background: `${ACCENT}`,
-                  boxShadow: `0 0 9px ${ACCENT}55`,
-                  transition: 'width 1.8s cubic-bezier(0.4,0,0.2,1)'
-                }} />
-              </div>
-              <div style={{ fontFamily: FONT, fontSize: '19.5px', color: ACCENT, textAlign: 'right', letterSpacing: '1.5px' }}>{report.scores[q.category]}</div>
-            </div>
-          ))}
-        </div>
-      </Panel>
-
-      {/* Recommendations */}
-      <Panel label="// DIRECTIVAS ESTRATÉGICAS" style={{ marginBottom: '45px' }}>
-        <div style={{ padding: '45px 36px' }}>
-          {report.recs.map((rec, i) => (
-            <div key={i} style={{ display: 'flex', gap: '21px', marginBottom: '15px', alignItems: 'flex-start' }}>
-              <div style={{ fontFamily: FONT, fontSize: '15.75px', color: ACCENT, minWidth: '42px', paddingTop: '3px' }}>[{String(i+1).padStart(2,'0')}]</div>
-              <div style={{ fontFamily: FONT, fontSize: '24.75px', color: TEXT2, lineHeight: 1.7, letterSpacing: '0.75px' }}>{rec}</div>
-            </div>
-          ))}
-        </div>
-      </Panel>
-
-      <button onClick={() => onComplete({ type: 'capacity', score: report.overall, report })}
-        style={{ ...S.btnPrimary, width: '100%', justifyContent: 'center' }}>
-        <Mail size={18} /> ENVIAR INFORME AL EMAIL REGISTRADO <ChevronRight size={18} />
-      </button>
-    </div>
-  )
-
-  // Questions phase
-  return (
-    <div style={{ width: '100%', margin: '0 auto' }}>
-      {/* Progress */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '9px', marginBottom: '63px' }}>
-        {questions.map((q, i) => (
-          <div key={i} style={{
-            height: '6px',
-            background: i < step ? ACCENT : i === step ? `${ACCENT}88` : `${ACCENT}12`,
-            transition: 'background 0.45s',
-            boxShadow: i <= step ? `0 0 6px ${ACCENT}44` : 'none'
-          }} />
-        ))}
-      </div>
-      <Panel label={`// VECTOR ${step + 1}/${questions.length} — EVALUACIÓN EN CURSO`} style={{ marginBottom: '45px' }}>
-        <div style={{ padding: '42px 36px 36px' }}>
-          <div style={{ fontFamily: FONT, fontSize: '20.25px', color: TEXT2, letterSpacing: '3px', marginBottom: '24px' }}>
-            CATEGORÍA: {categoryLabels[questions[step].category]}
-          </div>
-          <div style={{ fontFamily: FONT, fontSize: '45px', color: ACCENT, lineHeight: 1.6, letterSpacing: '0.75px', textShadow: `0 0 30px ${ACCENT}22` }}>
-            {questions[step].text}
-          </div>
-        </div>
-      </Panel>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '13.5px' }}>
-        {questions[step].options.map((opt, i) => (
-          <button key={`${step}-${i}`}
-            onClick={() => handleAnswer(questions[step].id, opt)}
-            style={{
-              display: 'flex', alignItems: 'center', gap: '36px',
-              padding: '24px 30px', textAlign: 'left', width: '100%',
-              background: '#070707',
-              border: `1.5px solid ${BORDER}`,
-              color: TEXT2, cursor: 'pointer', transition: 'all 0.18s',
-              fontFamily: FONT, fontSize: '24.75px', letterSpacing: '1.5px'
-            }}
-            onMouseEnter={e => {
-              e.currentTarget.style.background = 'rgba(255,170,0,0.05)'
-              e.currentTarget.style.borderColor = '#ffaa0066'
-              e.currentTarget.style.color = '#ffaa00'
-              e.currentTarget.style.boxShadow = `inset 0 0 30px rgba(0,255,65,0.04)`
-            }}
-            onMouseLeave={e => {
-              e.currentTarget.style.background = '#070707'
-              e.currentTarget.style.borderColor = BORDER
-              e.currentTarget.style.color = TEXT2
-              e.currentTarget.style.boxShadow = 'none'
-            }}
-          >
-            <span style={{ color: ACCENT, minWidth: '42px', fontSize: '22.5px' }}>[{String.fromCharCode(65+i)}]</span>
-            {opt}
-          </button>
-        ))}
-      </div>
-    </div>
-  )
-}
-
 // ─── EMAIL SCREEN ─────────────────────────────────────────────────────────────
 
 function EmailScreen({ sessionId, onReset }) {
@@ -344,7 +103,7 @@ function EmailScreen({ sessionId, onReset }) {
   const [sent, setSent] = useState(false)
 
   return (
-    <div style={{ width: '100%', margin: '0 auto' }}>
+    <div style={{ maxWidth: '900px', width: '100%', margin: '0 auto' }}>
       <Panel label="// ENTREGA DE INFORME CLASIFICADO" style={{ marginBottom: '45px' }}>
         <div style={{ padding: '42px 36px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '48px', alignItems: 'center' }}>
           <div>
@@ -436,23 +195,23 @@ function ModuleSelector({ onSelect, bootStage = 4 }) {
   })
 
   return (
-    <div style={{ width: '100%', margin: '0 auto', padding: '0 clamp(8px, 2vw, 16px)' }}>
+    <div style={{ maxWidth: '1800px', width: '100%', margin: '0 auto' }}>
 
       {/* HUD scan line sweeps screen on entry */}
       <HudScanLine active={bootStage === 3} />
 
       {/* System header panels — staggered */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))', gap: 'clamp(8px, 1vw, 14px)', marginBottom: 'clamp(18px, 2.5vw, 36px)' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '18px', marginBottom: '72px' }}>
         {[
           { label: '// SISTEMA', content: (
-            <div style={{ padding: 'clamp(10px, 1.5vw, 20px) clamp(12px, 1.8vw, 24px)', fontFamily: FONT, fontSize: 'clamp(12px, 1.2vw, 16px)', lineHeight: 2, color: TEXT2 }}>
+            <div style={{ padding: '31.5px 36px', fontFamily: FONT, fontSize: '22.5px', lineHeight: 3, color: TEXT2 }}>
               <div>PLATFORM: <span style={{ color: ACCENT }}>INNOVADEF-KIOSK v2.0</span></div>
               <div>OPERATOR: <span style={{ color: ACCENT }}>FOCO-2026-OPERATOR</span></div>
               <div>LOCATION: <span style={{ color: AMBER }}>MADRID // 40°25'N 3°41'W</span></div>
             </div>
           )},
           { label: '// ESTADO DE SISTEMAS', content: (
-            <div style={{ padding: 'clamp(10px, 1.5vw, 20px) clamp(12px, 1.8vw, 24px)', fontFamily: FONT, fontSize: 'clamp(12px, 1.2vw, 16px)', lineHeight: 2 }}>
+            <div style={{ padding: '31.5px 36px', fontFamily: FONT, fontSize: '22.5px', lineHeight: 3 }}>
               {[
                 { label: 'RED ENS', val: 'CONECTADA', c: ACCENT },
                 { label: 'CIFRADO', val: 'AES-256 OK', c: ACCENT },
@@ -463,7 +222,7 @@ function ModuleSelector({ onSelect, bootStage = 4 }) {
             </div>
           )},
           { label: '// TELEMETRÍA', content: (
-            <div style={{ padding: 'clamp(10px, 1.5vw, 20px) clamp(12px, 1.8vw, 24px)', fontFamily: FONT, fontSize: 'clamp(12px, 1.2vw, 16px)', lineHeight: 2, color: TEXT2 }}>
+            <div style={{ padding: '31.5px 36px', fontFamily: FONT, fontSize: '22.5px', lineHeight: 3, color: TEXT2 }}>
               <div>EVALUACIONES HOY: <span style={{ color: AMBER }}>47</span></div>
               <div>MÓDULO + ACTIVO: <span style={{ color: ACCENT }}>MOD-01</span></div>
               <div>SESIÓN ACTUAL: <span style={{ color: ACCENT }}>FOCO-{Date.now().toString(36).toUpperCase().slice(-6)}</span></div>
@@ -478,75 +237,102 @@ function ModuleSelector({ onSelect, bootStage = 4 }) {
 
       {/* Title */}
       <div style={{ marginBottom: '63px', borderBottom: `1.5px solid ${BORDER}`, paddingBottom: '30px', ...vis(3, 540) }}>
-        <div style={{ fontFamily: FONT, fontSize: 'clamp(11px, 1.4vw, 20.25px)', color: TEXT2, letterSpacing: 'clamp(1px, 0.3vw, 4px)', marginBottom: 'clamp(12px, 2vw, 27px)' }}>
+        <div style={{ fontFamily: FONT, fontSize: '20.25px', color: TEXT2, letterSpacing: '4.01px', marginBottom: '27px' }}>
           // SISTEMA DE EVALUACIÓN INTERACTIVA — SELECCIONE MÓDULO DE OPERACIÓN
         </div>
-        <div style={{ fontFamily: FONT, fontSize: 'clamp(18px, 2.8vw, 33px)', letterSpacing: 'clamp(2px, 0.4vw, 5px)', color: ACCENT, textShadow: `0 0 60px ${ACCENT}33`, lineHeight: 1.1 }}>
+        <div style={{ fontFamily: FONT, fontSize: '33px', letterSpacing: '5px', color: ACCENT, textShadow: `0 0 60px ${ACCENT}33`, lineHeight: 1.1 }}>
           CENTRO DE OPERACIONES<br />
           <span style={{ color: TEXT2, fontSize: '65%' }}>INNOVADEF FOCO 2026 — MADRID</span>
         </div>
       </div>
 
-      {/* Module grid — each card staggers in */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(clamp(280px, 40vw, 480px), 1fr))', gap: 'clamp(8px, 1vw, 14px)', marginBottom: 'clamp(24px, 4vw, 48px)', alignItems: 'stretch' }}>
-        {MODULES.map((mod, idx) => {
-          const Icon = mod.icon
-          const isH = hovered === mod.id
-          const cardDelay = 720 + idx * 150
-          return (
-            <div key={mod.id} style={{ ...vis(3, cardDelay), height: '100%' }}>
-              <button
-                onClick={() => { sfxModuleSelect(); onSelect(mod.id) }}
-                onMouseEnter={() => { sfxHover(); setHovered(mod.id) }}
-                onMouseLeave={() => setHovered(null)}
-                style={{
-                  display: 'flex', flexDirection: 'column', padding: '0', width: '100%', height: '100%',
-                  background: isH ? `rgba(255,170,0,0.03)` : '#070707',
-                  border: `1.5px solid ${isH ? `#ffaa0055` : BORDER}`,
-                  color: ACCENT, cursor: 'pointer', textAlign: 'left',
-                  transition: 'all 0.18s',
-                  boxShadow: isH ? `0 0 0 1.5px #ffaa0022, inset 0 0 45px rgba(255,170,0,0.02)` : 'none'
-                }}
-              >
-                {/* Module header bar */}
-                <div style={{
-                  display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                  padding: 'clamp(8px, 0.8vw, 12px) clamp(10px, 1.2vw, 21px)',
-                  borderBottom: `1.5px solid ${isH ? `#ffaa0033` : BORDER}`,
-                  background: isH ? 'rgba(255,170,0,0.04)' : '#0a0a0a'
-                }}>
-                  <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
-                    <Icon size={21} color={isH ? '#ffaa00' : TEXT2} />
-                    <span style={{ fontFamily: FONT, fontSize: 'clamp(11px, 1.3vw, 20.25px)', color: TEXT2, letterSpacing: 'clamp(1px, 0.2vw, 3px)' }}>{mod.code}</span>
-                  </div>
-                  <div style={{ display: 'flex', gap: '18px', alignItems: 'center' }}>
-                    <span style={{ fontFamily: FONT, fontSize: '18px', letterSpacing: '3px', color: isH ? '#ffaa00' : TEXT2, padding: '3px 9px', border: `1.5px solid ${isH ? `#ffaa0044` : BORDER}` }}>
-                      {mod.tag}
-                    </span>
-                    <span style={{ width: '9px', height: '9px', background: isH ? '#ffaa00' : ACCENT, display: 'inline-block', boxShadow: isH ? `0 0 12px #ffaa00` : `0 0 12px ${ACCENT}`, animation: 'blink 3s infinite' }} />
-                  </div>
-                </div>
-                {/* Body */}
-                <div style={{ padding: 'clamp(12px, 1.5vw, 24px) clamp(10px, 1.2vw, 21px)', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                  <div style={{ fontFamily: FONT, fontSize: 'clamp(11px, 1.3vw, 19.5px)', letterSpacing: 'clamp(0.5px, 0.1vw, 1.5px)', color: isH ? '#ffaa00' : TEXT2, marginBottom: 'clamp(8px, 1vw, 15px)', lineHeight: 1.3 }}>
-                    {mod.label}
-                  </div>
-                  <div style={{ fontFamily: FONT, fontSize: 'clamp(10px, 1.2vw, 22.5px)', color: 'rgba(0,255,65,0.3)', lineHeight: 1.7, letterSpacing: '0.75px', marginBottom: 'clamp(10px, 1.2vw, 21px)' }}>
-                    {mod.desc}
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontFamily: FONT, fontSize: 'clamp(10px, 1.2vw, 20.25px)', color: 'rgba(0,255,65,0.25)', letterSpacing: '1.5px' }}>DURACIÓN: {mod.duration}</span>
-                    <span style={{ fontFamily: FONT, fontSize: 'clamp(10px, 1.3vw, 22.5px)', color: isH ? '#ffaa00' : TEXT2, letterSpacing: '1.5px' }}>{isH ? '[EJECUTAR ▶]' : '[──────]'}</span>
-                  </div>
-                </div>
-              </button>
+      {/* Module grid — grouped by category, each card staggers in */}
+      {(() => {
+        // Group modules by category preserving insertion order
+        const byCategory = {}
+        MODULES.forEach(mod => {
+          if (!byCategory[mod.category]) byCategory[mod.category] = []
+          byCategory[mod.category].push(mod)
+        })
+        let globalIdx = 0
+        return Object.entries(byCategory).map(([cat, mods], catIdx) => (
+          <div key={cat} style={{ marginBottom: '54px' }}>
+            {/* Category header */}
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: '18px',
+              marginBottom: '18px',
+              ...vis(3, 660 + catIdx * 80),
+            }}>
+              <div style={{ height: '1px', background: BORDER, flex: 1 }} />
+              <span style={{ fontFamily: FONT, fontSize: '15px', color: TEXT2, letterSpacing: '4px', textTransform: 'uppercase' }}>
+                // {cat.toUpperCase()}
+              </span>
+              <div style={{ height: '1px', background: BORDER, flex: 1 }} />
             </div>
-          )
-        })}
-      </div>
+            {/* Cards grid */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(465px, 1fr))', gap: '18px', alignItems: 'stretch' }}>
+              {mods.map((mod) => {
+                const idx = globalIdx++
+                const Icon = mod.icon
+                const isH = hovered === mod.id
+                const cardDelay = 720 + idx * 150
+                return (
+                  <div key={mod.id} style={{ ...vis(3, cardDelay), height: '100%' }}>
+                    <button
+                      onClick={() => { sfxModuleSelect(); onSelect(mod.id) }}
+                      onMouseEnter={() => { sfxHover(); setHovered(mod.id) }}
+                      onMouseLeave={() => setHovered(null)}
+                      style={{
+                        display: 'flex', flexDirection: 'column', padding: '0', width: '100%', height: '100%',
+                        background: isH ? `rgba(255,170,0,0.03)` : '#070707',
+                        border: `1.5px solid ${isH ? `#ffaa0055` : BORDER}`,
+                        color: ACCENT, cursor: 'pointer', textAlign: 'left',
+                        transition: 'all 0.18s',
+                        boxShadow: isH ? `0 0 0 1.5px #ffaa0022, inset 0 0 45px rgba(255,170,0,0.02)` : 'none'
+                      }}
+                    >
+                      {/* Module header bar */}
+                      <div style={{
+                        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                        padding: '12px 21px',
+                        borderBottom: `1.5px solid ${isH ? `#ffaa0033` : BORDER}`,
+                        background: isH ? 'rgba(255,170,0,0.04)' : '#0a0a0a'
+                      }}>
+                        <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
+                          <Icon size={21} color={isH ? '#ffaa00' : TEXT2} />
+                          <span style={{ fontFamily: FONT, fontSize: '20.25px', color: TEXT2, letterSpacing: '3px' }}>{mod.code}</span>
+                        </div>
+                        <div style={{ display: 'flex', gap: '18px', alignItems: 'center' }}>
+                          <span style={{ fontFamily: FONT, fontSize: '18px', letterSpacing: '3px', color: isH ? '#ffaa00' : TEXT2, padding: '3px 9px', border: `1.5px solid ${isH ? `#ffaa0044` : BORDER}` }}>
+                            {mod.tag}
+                          </span>
+                          <span style={{ width: '9px', height: '9px', background: isH ? '#ffaa00' : ACCENT, display: 'inline-block', boxShadow: isH ? `0 0 12px #ffaa00` : `0 0 12px ${ACCENT}`, animation: 'blink 3s infinite' }} />
+                        </div>
+                      </div>
+                      {/* Body */}
+                      <div style={{ padding: '24px 21px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                        <div style={{ fontFamily: FONT, fontSize: '19.5px', letterSpacing: '1.5px', color: isH ? '#ffaa00' : TEXT2, marginBottom: '15px', lineHeight: 1.3 }}>
+                          {mod.label}
+                        </div>
+                        <div style={{ fontFamily: FONT, fontSize: '22.5px', color: 'rgba(0,255,65,0.3)', lineHeight: 1.7, letterSpacing: '0.75px', marginBottom: '21px' }}>
+                          {mod.desc}
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <span style={{ fontFamily: FONT, fontSize: '20.25px', color: 'rgba(0,255,65,0.25)', letterSpacing: '1.5px' }}>DURACIÓN: {mod.duration}</span>
+                          <span style={{ fontFamily: FONT, fontSize: '22.5px', color: isH ? '#ffaa00' : TEXT2, letterSpacing: '1.5px' }}>{isH ? '[EJECUTAR ▶]' : '[──────]'}</span>
+                        </div>
+                      </div>
+                    </button>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        ))
+      })()}
 
       {/* Footer */}
-      <div style={{ fontFamily: FONT, fontSize: '12px', color: 'rgba(0,255,65,0.18)', letterSpacing: '2px', textAlign: 'center', ...vis(3, 1500) }}>
+      <div style={{ fontFamily: FONT, fontSize: '20.25px', color: 'rgba(0,255,65,0.18)', letterSpacing: '3px', textAlign: 'center', ...vis(3, 1500) }}>
         INNOVADEF FOCO 2026 // 23.06.2026 // MADRID // SISTEMA CERTIFICADO ENS-CAT-A
       </div>
     </div>
@@ -559,7 +345,6 @@ function ModuleSelector({ onSelect, bootStage = 4 }) {
 function ModuleTransition({ active, onDone }) {
   useEffect(() => {
     if (active) {
-      sfxIntroWipe()
       const t = setTimeout(onDone, 1800)
       return () => clearTimeout(t)
     }
@@ -630,7 +415,6 @@ export default function App() {
   const navigate = useNavigate()
   const location = useLocation()
 
-  // Inicializar screen basado en la URL actual
   const getInitialScreen = () => {
     const path = location.pathname
     if (path === '/') return 'sleep'
@@ -638,14 +422,12 @@ export default function App() {
     else if (path === '/selector') return 'selector'
     else if (path === '/email') return 'email'
     else if (path.startsWith('/module/')) return 'module'
-    return 'sleep' // fallback
+    return 'sleep'
   }
 
   const getInitialActiveModule = () => {
     const path = location.pathname
-    if (path.startsWith('/module/')) {
-      return path.split('/')[2] || null
-    }
+    if (path.startsWith('/module/')) return path.split('/')[2] || null
     return null
   }
 
@@ -659,60 +441,35 @@ export default function App() {
   const [pendingModule, setPendingModule] = useState(null)
   const { overlay, go } = useScreenTransition(750)
 
-  // Sync screen with URL
-  useEffect(() => {
-    const path = location.pathname
-    if (path === '/') setScreen('sleep')
-    else if (path === '/intro') setScreen('intro')
-    else if (path === '/selector') setScreen('selector')
-    else if (path === '/email') setScreen('email')
-    else if (path.startsWith('/module/')) setScreen('module')
-  }, [location.pathname])
-
   // Sync URL with screen
   useEffect(() => {
-    const path = location.pathname
-    if (screen === 'sleep' && path !== '/') navigate('/', { replace: true })
-    else if (screen === 'intro' && path !== '/intro') navigate('/intro')
-    else if (screen === 'selector' && path !== '/selector') navigate('/selector')
-    else if (screen === 'module' && activeModule && path !== `/module/${activeModule}`) navigate(`/module/${activeModule}`)
-    else if (screen === 'email' && path !== '/email') navigate('/email')
-  }, [screen, activeModule, navigate, location.pathname])
+    if (screen === 'sleep') navigate('/', { replace: true })
+    else if (screen === 'intro') navigate('/intro')
+    else if (screen === 'selector') navigate('/selector')
+    else if (screen === 'module' && activeModule) navigate(`/module/${activeModule}`)
+    else if (screen === 'email') navigate('/email')
+  }, [screen, activeModule, navigate])
 
-  // Ambient background sound - TEMPORARILY DISABLED
+  // Ambient background sound — TEMPORARILY DISABLED
   useEffect(() => {
-    // Disabled for testing
     return () => {}
   }, [])
 
   // Inactivity timeout - return to sleep after 60 seconds
-  const screenRef = useRef(screen)
-  useEffect(() => { screenRef.current = screen }, [screen])
-  const goRef = useRef(go)
-  useEffect(() => { goRef.current = go }, [go])
-  const sleepingRef = useRef(false)
-
   useEffect(() => {
     let timeoutId
 
     const resetTimeout = () => {
       clearTimeout(timeoutId)
-      if (screenRef.current !== 'sleep' && !sleepingRef.current) {
+      if (screen !== 'sleep') {
         timeoutId = setTimeout(() => {
-          if (screenRef.current === 'sleep' || sleepingRef.current) return
-          sleepingRef.current = true
-          goRef.current(() => {
-            setScreen('sleep')
-            setActiveModule(null)
-            setModuleResult(null)
-            sleepingRef.current = false
-          })
+          navigate('/')
         }, 60000) // 60 seconds
       }
     }
 
     const handleActivity = () => {
-      if (!sleepingRef.current) resetTimeout()
+      resetTimeout()
     }
 
     // Add event listeners for user activity
@@ -730,7 +487,7 @@ export default function App() {
       window.removeEventListener('click', handleActivity)
       window.removeEventListener('touchstart', handleActivity)
     }
-  }, [])
+  }, [screen, navigate])
 
   const enterDashboard = () => {
     markUserInteracted()
@@ -756,7 +513,6 @@ export default function App() {
     setScreen('module')
     setTransitioning(false)
     setPendingModule(null)
-    sfxBootReady()
   }
 
   const handleComplete = (result) => {
@@ -771,7 +527,7 @@ export default function App() {
   const activeModCode = MODULES.find(m => m.id === activeModule)?.code
 
   return (
-    <div style={{ fontFamily: FONT, background: '#070707', minHeight: '100vh', color: ACCENT, overflowX: 'hidden', fontSize: 'clamp(14px, 1.8vw, 24px)' }}>
+    <div style={{ fontFamily: FONT, background: '#070707', minHeight: '100vh', color: ACCENT, overflowX: 'hidden', fontSize: '24px' }}>
       <MilitaryCursor />
       {screen === 'sleep' && <SleepScreen onWake={() => go(() => setScreen('intro'))} />}
       {screen === 'intro' && <IntroScreen onEnter={enterDashboard} />}
@@ -789,7 +545,7 @@ export default function App() {
       {/* Header */}
       <header style={{
         position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50,
-        height: 'clamp(54px, 8vw, 117px)',
+        height: '117px',
         background: 'rgba(5,5,5,0.96)',
         borderBottom: `1.5px solid ${BORDER}`,
         display: 'flex', alignItems: 'stretch',
@@ -800,13 +556,13 @@ export default function App() {
         {/* Logo block */}
         <button onClick={reset} style={{
           background: 'none', border: 'none', borderRight: `1.5px solid ${BORDER}`,
-          padding: '0 clamp(12px, 3vw, 54px)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '27px'
+          padding: '0 54px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '27px'
         }}>
-          <img src="/logoinnovadef.png" alt="INNOVADEF" style={{ height: 'clamp(36px, 6vw, 108px)'}} />
+          <img src="/logoinnovadef.png" alt="INNOVADEF" style={{ height: '120px'}} />
         </button>
 
         {/* Nav items */}
-        <div style={{ display: 'flex', alignItems: 'center', flex: 1, padding: '0', gap: '0' }}>
+        <div style={{ display: 'flex', alignItems: 'center', flex: 1, padding: '0 45px', gap: '0' }}>
           {[
             { label: 'CENTRO OPS', active: screen === 'selector', action: reset },
             { label: activeModCode || '—', active: screen === 'module', action: null },
@@ -814,7 +570,7 @@ export default function App() {
             <div key={i} style={{
               padding: '0 24px', height: '100%', display: 'flex', alignItems: 'center',
               borderRight: `1.5px solid ${BORDER}`,
-              fontFamily: FONT, fontSize: 'clamp(10px, 1.4vw, 22.5px)', letterSpacing: 'clamp(1px, 0.2vw, 3px)',
+              fontFamily: FONT, fontSize: '22.5px', letterSpacing: '3px',
               color: nav.active ? ACCENT : TEXT2,
               borderBottom: nav.active ? `3px solid ${ACCENT}` : '3px solid transparent',
               cursor: nav.action ? 'pointer' : 'default',
@@ -823,6 +579,27 @@ export default function App() {
               {nav.label}
             </div>
           ))}
+
+          {/* Back-to-menu button — visible only during module execution (kiosk-safe) */}
+          {screen === 'module' && (
+            <button
+              onClick={reset}
+              onMouseEnter={e => { e.currentTarget.style.color = '#ffaa00'; e.currentTarget.style.borderColor = '#ffaa0066' }}
+              onMouseLeave={e => { e.currentTarget.style.color = TEXT2; e.currentTarget.style.borderColor = BORDER }}
+              style={{
+                marginLeft: 'auto',
+                display: 'flex', alignItems: 'center', gap: '12px',
+                padding: '0 27px', height: '100%',
+                background: 'none', border: 'none',
+                borderLeft: `1.5px solid ${BORDER}`,
+                color: TEXT2, cursor: 'pointer',
+                fontFamily: FONT, fontSize: '19.5px', letterSpacing: '3px',
+                transition: 'color 0.18s, border-color 0.18s',
+              }}
+            >
+              ← MENÚ PRINCIPAL
+            </button>
+          )}
         </div>
 
         {/* Right indicators */}
@@ -832,43 +609,28 @@ export default function App() {
             { label: 'NET', val: 'ENS', c: ACCENT },
             { label: 'SEC', val: 'A', c: ACCENT },
           ].map((ind, i) => (
-            <div key={i} style={{ padding: '0 clamp(8px, 1.8vw, 31.5px)', borderRight: `1.5px solid ${BORDER}`, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '4.5px' }}>
-              <div style={{ fontFamily: FONT, fontSize: 'clamp(9px, 1.1vw, 18px)', color: TEXT2, letterSpacing: '1.5px' }}>{ind.label}</div>
-              <div style={{ fontFamily: FONT, fontSize: 'clamp(10px, 1.4vw, 22.5px)', color: ind.c, letterSpacing: '1.5px' }}>{ind.val}</div>
+            <div key={i} style={{ padding: '0 31.5px', borderRight: `1.5px solid ${BORDER}`, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '4.5px' }}>
+              <div style={{ fontFamily: FONT, fontSize: '18px', color: TEXT2, letterSpacing: '1.5px' }}>{ind.label}</div>
+              <div style={{ fontFamily: FONT, fontSize: '22.5px', color: ind.c, letterSpacing: '1.5px' }}>{ind.val}</div>
             </div>
           ))}
-          <div style={{ padding: '0 clamp(8px, 1.5vw, 24px)', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '4.5px' }}>
-            <div style={{ fontFamily: FONT, fontSize: 'clamp(9px, 1.1vw, 18px)', color: TEXT2, letterSpacing: '1.5px' }}>HORA LOCAL</div>
+          <div style={{ padding: '0 24px', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '4.5px' }}>
+            <div style={{ fontFamily: FONT, fontSize: '18px', color: TEXT2, letterSpacing: '1.5px' }}>HORA LOCAL</div>
             <LiveClock />
           </div>
         </div>
       </header>
 
       {/* Content */}
-      <div style={{ position: 'relative', zIndex: 2, minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'clamp(70px, 10vw, 130px) clamp(12px, 3vw, 48px) clamp(42px, 6vw, 72px)' }}>
-        {screen === 'selector' && (
-          <div key="selector" style={{ width: '100%',
-            animation: transitioning ? 'contentFadeOut 0.5s ease-in 0.45s forwards' : 'contentFadeIn 0.6s ease-out both' }}>
-            <ModuleSelector onSelect={selectModule} bootStage={bootStage} />
-          </div>
-        )}
+      <div style={{ position: 'relative', zIndex: 2, paddingTop: '78px', paddingBottom: '48px', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '120px 48px 72px' }}>
+        {screen === 'selector' && <ModuleSelector onSelect={selectModule} bootStage={bootStage} />}
         {screen === 'module' && (
-          <div key={`mod-${activeModule}`} style={{ width: '100%', animation: 'contentFadeIn 0.6s ease-out both' }}>
-            {activeModule === 'capacity' && <CapacityTest onComplete={handleComplete} />}
-            {activeModule === 'tactical' && <TacticalSimulator onComplete={handleComplete} />}
-            {activeModule === 'radar' && <MaturityRadar onComplete={handleComplete} />}
-            {activeModule === 'threats' && <ThreatClassifier onComplete={handleComplete} />}
-            {activeModule === 'pulse' && <PulseSurvey onComplete={handleComplete} />}
-            {activeModule === 'cyberdefense' && <CyberDefense onComplete={handleComplete} />}
-            {activeModule === 'tacticalmap' && <TacticalMap onComplete={handleComplete} />}
-            {activeModule === 'covertmission' && <CovertMission onComplete={handleComplete} />}
-          </div>
+          <PluginRenderer
+            plugin={MODULES.find(m => m.id === activeModule)}
+            onComplete={handleComplete}
+          />
         )}
-        {screen === 'email' && (
-          <div key="email" style={{ width: '100%', animation: 'contentFadeIn 0.6s ease-out both' }}>
-            <EmailScreen sessionId={sessionId} onReset={reset} />
-          </div>
-        )}
+        {screen === 'email' && <EmailScreen sessionId={sessionId} onReset={reset} />}
       </div>
 
       <StatusBar module={activeModCode} onHome={reset} bootStage={bootStage} />
@@ -882,22 +644,11 @@ export default function App() {
           font-display: swap;
         }
         * { box-sizing: border-box; }
-        html, body { max-width: 100vw; overflow-x: hidden; }
         ::selection { background: rgba(0,255,65,0.2); color: #00FF41; }
-        ::-webkit-scrollbar { width: 4px; background: #070707; }
+        ::-webkit-scrollbar { width: 4.01px; background: #070707; }
         ::-webkit-scrollbar-thumb { background: rgba(0,255,65,0.2); }
-        @media (max-width: 600px) {
-          .hdr-indicators { display: none !important; }
-          .hdr-clock { display: none !important; }
-          .status-items { display: none !important; }
-        }
-        @media (max-width: 900px) {
-          .hdr-nav { display: none !important; }
-        }
         @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
         @keyframes fadeIn { from{opacity:0;transform:translateY(4.01px)} to{opacity:1;transform:translateY(0)} }
-        @keyframes contentFadeIn { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
-        @keyframes contentFadeOut { from{opacity:1;transform:translateY(0) scale(1)} to{opacity:0;transform:translateY(-14px) scale(0.97)} }
         @keyframes spin { to{transform:rotate(360deg)} }
         @keyframes hudScan   { 0%{top:0;opacity:1} 85%{opacity:0.7} 100%{top:100vh;opacity:0} }
         @keyframes hudScanUp { 0%{bottom:0;opacity:1} 85%{opacity:0.7} 100%{bottom:100vh;opacity:0} }
