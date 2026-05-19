@@ -1,5 +1,5 @@
 import { lazy } from 'react'
-import { FileText, Target, BarChart2, AlertTriangle, Activity, Brain } from 'lucide-react'
+import { FileText, Target, BarChart2, AlertTriangle, Activity, Brain, Shield, Crosshair, Terminal } from 'lucide-react'
 import { ACCENT, AMBER, RED } from '../theme'
 
 /**
@@ -98,5 +98,44 @@ export const PLUGIN_REGISTRY = [
     category: 'psicotécnica',
     status: 'ACTIVO',
     component: lazy(() => import('@aerocognitio/plugin')),
+  },
+  {
+    id: 'cyberdefense',
+    code: 'MOD-07',
+    label: 'OPERACIÓN ESCUDO DIGITAL',
+    desc: 'DEFENSA DE RED EN TIEMPO REAL — NEUTRALIZA AMENAZAS ANTES DE QUE LLEGUEN AL SERVIDOR',
+    icon: Shield,
+    color: '#00FF41',
+    duration: '~4 MIN',
+    tag: 'SIMULADOR',
+    category: 'simulación',
+    status: 'ACTIVO',
+    component: lazy(() => import('../modules/CyberDefense')),
+  },
+  {
+    id: 'tacticalmap',
+    code: 'MOD-08',
+    label: 'SALA DE GUERRA — MANDO TÁCTICO',
+    desc: 'ARRASTRA UNIDADES PARA INTERCEPTAR AMENAZAS — 6 OLEADAS — MANDO EN TIEMPO REAL',
+    icon: Crosshair,
+    color: '#00AAFF',
+    duration: '~4 MIN',
+    tag: 'SIMULADOR',
+    category: 'simulación',
+    status: 'ACTIVO',
+    component: lazy(() => import('../modules/TacticalMap')),
+  },
+  {
+    id: 'covertmission',
+    code: 'MOD-09',
+    label: 'MISIÓN SOMBRA — TERMINAL CLASIFICADO',
+    desc: 'INFILTRA LA RED — DECODIFICA TRANSMISIONES CIFRADAS — NEUTRALIZA AL AGENTE',
+    icon: Terminal,
+    color: '#CC44FF',
+    duration: '~5 MIN',
+    tag: 'OPERACIÓN',
+    category: 'operaciones',
+    status: 'ACTIVO',
+    component: lazy(() => import('../modules/CovertMission')),
   },
 ]

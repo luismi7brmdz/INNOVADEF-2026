@@ -61,13 +61,13 @@ export default function ThreatClassifier({ onComplete }) {
   }
 
   return (
-    <div style={{ maxWidth: '900px', width: '100%', margin: '0 auto' }}>
+    <div style={{ maxWidth: '1280px', width: '100%', margin: '0 auto' }}>
 
       {phase === 'classify' && (
         <div>
-          <div style={{ fontFamily: FONT, fontSize: '9px', color: RED, letterSpacing: '3px', marginBottom: '12px' }}>// AMENAZAS ACTIVAS DETECTADAS — CLASIFICACIÓN REQUERIDA</div>
-          <div style={{ fontFamily: FONT, fontSize: '18px', letterSpacing: '3px', color: ACCENT, marginBottom: '18px', textTransform: 'uppercase' }}>CENTRO DE OPERACIONES DE SEGURIDAD</div>
-          <div style={{ fontFamily: FONT, fontSize: '11px', color: TEXT2, marginBottom: '36px', lineHeight: 1.7, letterSpacing: '0.5px' }}>
+          <div style={{ fontFamily: FONT, fontSize: '13px', color: RED, letterSpacing: '3px', marginBottom: '12px' }}>// AMENAZAS ACTIVAS DETECTADAS — CLASIFICACIÓN REQUERIDA</div>
+          <div style={{ fontFamily: FONT, fontSize: '28px', letterSpacing: '3px', color: ACCENT, marginBottom: '18px', textTransform: 'uppercase' }}>CENTRO DE OPERACIONES DE SEGURIDAD</div>
+          <div style={{ fontFamily: FONT, fontSize: '15px', color: TEXT2, marginBottom: '36px', lineHeight: 1.7, letterSpacing: '0.5px' }}>
             SE HAN DETECTADO 6 AMENAZAS ACTIVAS EN EL ECOSISTEMA DIGITAL DE DEFENSA.<br/>SELECCIONE LAS 3 QUE REQUIEREN RESPUESTA PRIORITARIA SEGÚN SU CRITERIO ESTRATÉGICO.
           </div>
 
@@ -97,15 +97,15 @@ export default function ThreatClassifier({ onComplete }) {
                     boxShadow: sel ? `inset 0 0 20px rgba(0,255,65,0.03)` : 'none'
                   }}
                 >
-                  <div style={{ width: '28px', height: '28px', flexShrink: 0, border: `1px solid ${sel ? ACCENT : BORDER}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: sel ? '11px' : '14px', color: sel ? ACCENT : TEXT2 }}>
+                  <div style={{ width: '32px', height: '32px', flexShrink: 0, border: `1px solid ${sel ? ACCENT : BORDER}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: sel ? '12px' : '16px', color: sel ? ACCENT : TEXT2 }}>
                     {sel ? `#${r}` : threat.icon}
                   </div>
                   <div style={{ flex: 1 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '6px', flexWrap: 'wrap' }}>
-                      <span style={{ fontSize: '11px', letterSpacing: '1px', color: sel ? ACCENT : TEXT2 }}>{threat.label.toUpperCase()}</span>
-                      <span style={{ fontSize: '8px', padding: '2px 6px', letterSpacing: '1px', color: threat.severity === 'CRÍTICA' ? RED : AMBER, border: `1px solid ${threat.severity === 'CRÍTICA' ? RED : AMBER}44` }}>{threat.severity}</span>
+                      <span style={{ fontSize: '16px', letterSpacing: '1px', color: sel ? ACCENT : TEXT2 }}>{threat.label.toUpperCase()}</span>
+                      <span style={{ fontSize: '12px', padding: '2px 8px', letterSpacing: '1px', color: threat.severity === 'CRÍTICA' ? RED : AMBER, border: `1px solid ${threat.severity === 'CRÍTICA' ? RED : AMBER}44` }}>{threat.severity}</span>
                     </div>
-                    <p style={{ fontSize: '11px', color: 'rgba(0,255,65,0.28)', lineHeight: 1.6, margin: 0, letterSpacing: '0.3px' }}>{threat.desc}</p>
+                    <p style={{ fontSize: '14px', color: 'rgba(0,255,65,0.28)', lineHeight: 1.6, margin: 0, letterSpacing: '0.3px' }}>{threat.desc}</p>
                   </div>
                 </button>
               )
@@ -121,8 +121,8 @@ export default function ThreatClassifier({ onComplete }) {
 
       {phase === 'allocate' && (
         <div>
-          <div style={{ fontFamily: FONT, fontSize: '9px', color: TEXT2, letterSpacing: '3px', marginBottom: '12px' }}>// ASIGNACIÓN DE RECURSOS</div>
-          <div style={{ fontFamily: FONT, fontSize: '18px', letterSpacing: '3px', color: ACCENT, marginBottom: '30px', textTransform: 'uppercase' }}>DESPLIEGUE DE CAPACIDADES</div>
+          <div style={{ fontFamily: FONT, fontSize: '13px', color: TEXT2, letterSpacing: '3px', marginBottom: '12px' }}>// ASIGNACIÓN DE RECURSOS</div>
+          <div style={{ fontFamily: FONT, fontSize: '28px', letterSpacing: '3px', color: ACCENT, marginBottom: '30px', textTransform: 'uppercase' }}>DESPLIEGUE DE CAPACIDADES</div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '28px' }}>
             {priority.map((id, rankIdx) => {
@@ -131,15 +131,15 @@ export default function ThreatClassifier({ onComplete }) {
               return (
                 <div key={id} style={{ ...CARD, borderLeft: `2px solid ${ACCENT}44` }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '18px', marginBottom: '18px', fontFamily: FONT }}>
-                    <span style={{ fontSize: '9px', color: ACCENT, letterSpacing: '2px' }}>PRIORIDAD #{rankIdx + 1}</span>
-                    <span style={{ fontSize: '11px', color: TEXT2, letterSpacing: '1px' }}>{threat.label.toUpperCase()}</span>
+                    <span style={{ fontSize: '13px', color: ACCENT, letterSpacing: '2px' }}>PRIORIDAD #{rankIdx + 1}</span>
+                    <span style={{ fontSize: '16px', color: TEXT2, letterSpacing: '1px' }}>{threat.label.toUpperCase()}</span>
                   </div>
                   <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
                     {resources.map(res => {
                       const sel = alloc.includes(res.id)
                       return (
                         <button key={res.id} onClick={() => toggleAlloc(id, res.id)}
-                          style={{ padding: '12px 14px', fontSize: '15px', letterSpacing: '1px', background: sel ? 'rgba(0,255,65,0.08)' : '#070707', border: `1px solid ${sel ? `${ACCENT}55` : BORDER}`, color: sel ? ACCENT : TEXT2, cursor: 'pointer', transition: 'all 0.12s', fontFamily: FONT }}
+                          style={{ padding: '12px 16px', fontSize: '16px', letterSpacing: '1px', background: sel ? 'rgba(0,255,65,0.08)' : '#070707', border: `1px solid ${sel ? `${ACCENT}55` : BORDER}`, color: sel ? ACCENT : TEXT2, cursor: 'pointer', transition: 'all 0.12s', fontFamily: FONT }}
                         >
                           {res.label.toUpperCase()}
                         </button>

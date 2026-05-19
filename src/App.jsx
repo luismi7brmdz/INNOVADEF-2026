@@ -6,7 +6,7 @@ import MilitaryBackground from './MilitaryBackground'
 import IntroScreen, { MilitaryCursor } from './IntroScreen'
 import SleepScreen from './SleepScreen'
 import { ACCENT, AMBER, RED, BORDER, TEXT2, FONT, S } from './theme'
-import { sfxBootHeader, sfxHudScan, sfxCardAppear, sfxModuleSelect, sfxHover, sfxReset, sfxRadarPing, sfxIntroWipe, startAmbient, stopAmbient } from './sfx'
+import { sfxBootHeader, sfxHudScan, sfxCardAppear, sfxModuleSelect, sfxHover, sfxReset, sfxRadarPing, sfxIntroWipe, startAmbient, stopAmbient, markUserInteracted, hasUserInteracted } from './sfx'
 import { PLUGIN_REGISTRY } from './plugins/registry'
 import PluginRenderer from './plugins/PluginRenderer'
 
@@ -168,19 +168,23 @@ function ModuleSelector({ onSelect, bootStage = 4 }) {
   // SFX: boot stages
   const prevStage = useRef(0)
   useEffect(() => {
-    if (bootStage > prevStage.current) {
-      if (bootStage === 1) sfxBootHeader()
-      if (bootStage === 3) setTimeout(() => sfxHudScan(), 75)
-      if (bootStage === 3) MODULES.forEach((_, i) => setTimeout(() => sfxCardAppear(), 720 + i * 150))
+    if (bootStage > prevStage.current && hasUserInteracted()) {
       prevStage.current = bootStage
+      if (bootStage === 1) sfxBootHeader()
+      if (bootStage === 2) sfxHudScan()
+      if (bootStage === 3) sfxHudScan()
+      if (bootStage === 4) sfxCardAppear()
     }
   }, [bootStage])
 
-  // SFX: radar ping every ~6s
+  // SFX: radar ping every ~15s
   useEffect(() => {
-    const i = setInterval(() => sfxRadarPing(), 6300)
+    if (screen === 'intro' || screen === 'sleep') return
+    const i = setInterval(() => {
+      if (hasUserInteracted()) sfxRadarPing()
+    }, 15000)
     return () => clearInterval(i)
-  }, [])
+  }, [screen])
 
   // Each element gets its own visibility threshold based on bootStage
   const vis = (minStage, delay = 0) => ({
@@ -203,7 +207,7 @@ function ModuleSelector({ onSelect, bootStage = 4 }) {
             <div style={{ padding: '31.5px 36px', fontFamily: FONT, fontSize: '22.5px', lineHeight: 3, color: TEXT2 }}>
               <div>PLATFORM: <span style={{ color: ACCENT }}>INNOVADEF-KIOSK v2.0</span></div>
               <div>OPERATOR: <span style={{ color: ACCENT }}>FOCO-2026-OPERATOR</span></div>
-              <div>LOCATION: <span style={{ color: AMBER }}>EOI MADRID // 40°25'N 3°41'W</span></div>
+              <div>LOCATION: <span style={{ color: AMBER }}>MADRID // 40°25'N 3°41'W</span></div>
             </div>
           )},
           { label: '// ESTADO DE SISTEMAS', content: (
@@ -266,20 +270,20 @@ function ModuleSelector({ onSelect, bootStage = 4 }) {
               <div style={{ height: '1px', background: BORDER, flex: 1 }} />
             </div>
             {/* Cards grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(465px, 1fr))', gap: '18px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(465px, 1fr))', gap: '18px', alignItems: 'stretch' }}>
               {mods.map((mod) => {
                 const idx = globalIdx++
                 const Icon = mod.icon
                 const isH = hovered === mod.id
                 const cardDelay = 720 + idx * 150
                 return (
-                  <div key={mod.id} style={{ ...vis(3, cardDelay) }}>
+                  <div key={mod.id} style={{ ...vis(3, cardDelay), height: '100%' }}>
                     <button
                       onClick={() => { sfxModuleSelect(); onSelect(mod.id) }}
                       onMouseEnter={() => { sfxHover(); setHovered(mod.id) }}
                       onMouseLeave={() => setHovered(null)}
                       style={{
-                        display: 'flex', flexDirection: 'column', padding: '0', width: '100%',
+                        display: 'flex', flexDirection: 'column', padding: '0', width: '100%', height: '100%',
                         background: isH ? `rgba(255,170,0,0.03)` : '#070707',
                         border: `1.5px solid ${isH ? `#ffaa0055` : BORDER}`,
                         color: ACCENT, cursor: 'pointer', textAlign: 'left',
@@ -306,7 +310,7 @@ function ModuleSelector({ onSelect, bootStage = 4 }) {
                         </div>
                       </div>
                       {/* Body */}
-                      <div style={{ padding: '24px 21px' }}>
+                      <div style={{ padding: '24px 21px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                         <div style={{ fontFamily: FONT, fontSize: '19.5px', letterSpacing: '1.5px', color: isH ? '#ffaa00' : TEXT2, marginBottom: '15px', lineHeight: 1.3 }}>
                           {mod.label}
                         </div>
@@ -329,7 +333,7 @@ function ModuleSelector({ onSelect, bootStage = 4 }) {
 
       {/* Footer */}
       <div style={{ fontFamily: FONT, fontSize: '20.25px', color: 'rgba(0,255,65,0.18)', letterSpacing: '3px', textAlign: 'center', ...vis(3, 1500) }}>
-        INNOVADEF FOCO 2026 // 23.06.2026 // EOI MADRID // SISTEMA CERTIFICADO ENS-CAT-A
+        INNOVADEF FOCO 2026 // 23.06.2026 // MADRID // SISTEMA CERTIFICADO ENS-CAT-A
       </div>
     </div>
   )
@@ -410,44 +414,46 @@ function useScreenTransition(duration = 630) {
 export default function App() {
   const navigate = useNavigate()
   const location = useLocation()
-  const [screen, setScreen] = useState('sleep')
-  const [activeModule, setActiveModule] = useState(null)
+
+  const getInitialScreen = () => {
+    const path = location.pathname
+    if (path === '/') return 'sleep'
+    else if (path === '/intro') return 'intro'
+    else if (path === '/selector') return 'selector'
+    else if (path === '/email') return 'email'
+    else if (path.startsWith('/module/')) return 'module'
+    return 'sleep'
+  }
+
+  const getInitialActiveModule = () => {
+    const path = location.pathname
+    if (path.startsWith('/module/')) return path.split('/')[2] || null
+    return null
+  }
+
+  const [screen, setScreen] = useState(getInitialScreen)
+  const [activeModule, setActiveModule] = useState(getInitialActiveModule)
   const [moduleResult, setModuleResult] = useState(null)
   const [sessionId] = useState(() => `FOCO-${Date.now().toString(36).toUpperCase()}`)
-  const [booting, setBooting] = useState(false)
-  const [bootStage, setBootStage] = useState(0)
+  const [booting, setBooting] = useState(() => getInitialScreen() === 'selector')
+  const [bootStage, setBootStage] = useState(() => getInitialScreen() === 'selector' ? 4 : 0)
   const [transitioning, setTransitioning] = useState(false)
   const [pendingModule, setPendingModule] = useState(null)
   const { overlay, go } = useScreenTransition(750)
 
-  // Sync screen with URL
-  useEffect(() => {
-    const path = location.pathname
-    if (path === '/') setScreen('sleep')
-    else if (path === '/intro') setScreen('intro')
-    else if (path === '/selector') setScreen('selector')
-    else if (path === '/email') setScreen('email')
-    else if (path.startsWith('/module/')) setScreen('module')
-  }, [location.pathname])
-
   // Sync URL with screen
   useEffect(() => {
     if (screen === 'sleep') navigate('/', { replace: true })
-    else if (screen === 'intro') navigate('/intro', { replace: true })
-    else if (screen === 'selector') navigate('/selector', { replace: true })
-    else if (screen === 'module' && activeModule) navigate(`/module/${activeModule}`, { replace: true })
-    else if (screen === 'email') navigate('/email', { replace: true })
+    else if (screen === 'intro') navigate('/intro')
+    else if (screen === 'selector') navigate('/selector')
+    else if (screen === 'module' && activeModule) navigate(`/module/${activeModule}`)
+    else if (screen === 'email') navigate('/email')
   }, [screen, activeModule, navigate])
 
-  // Ambient background sound
+  // Ambient background sound — TEMPORARILY DISABLED
   useEffect(() => {
-    if (screen !== 'sleep') {
-      startAmbient()
-    } else {
-      stopAmbient()
-    }
-    return () => stopAmbient()
-  }, [screen])
+    return () => {}
+  }, [])
 
   // Inactivity timeout - return to sleep after 60 seconds
   useEffect(() => {
@@ -484,6 +490,7 @@ export default function App() {
   }, [screen, navigate])
 
   const enterDashboard = () => {
+    markUserInteracted()
     sfxIntroWipe()
     go(() => {
       setScreen('selector')
@@ -512,6 +519,7 @@ export default function App() {
     go(() => { setModuleResult(result); setScreen('email') })
   }
   const reset = () => {
+    markUserInteracted()
     sfxReset()
     go(() => { setScreen('selector'); setActiveModule(null); setModuleResult(null) })
   }
