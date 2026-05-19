@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import * as THREE from 'three'
 import { ACCENT, FONT, TEXT2 } from './theme'
-import { sfxWakeTouch, sfxWakeSweep, sfxWakeExplosion, markUserInteracted } from './sfx'
+import { sfxWakeTouch, sfxWakeSweep, markUserInteracted } from './sfx'
 
 // ─── SLEEP BACKGROUND (DNA STRANDS) ───────────────────────────────────────────────────
 function SleepBackground({ wakeProgress }) {
@@ -175,28 +175,91 @@ function SleepBackground({ wakeProgress }) {
 }
 
 // ─── PLASMA SPHERE (Siri-like interactive orb) ───────────────────────────────────────
+let globalRenderer = null
+let globalScene = null
+let globalCamera = null
+let globalMat = null
+let globalHalo1 = null
+let globalHalo2 = null
+let globalRafId = null
+let globalMouse = new THREE.Vector2(9999, 9999)
+let globalMouseVel = new THREE.Vector2(0, 0)
+let globalLastMouse = new THREE.Vector2(9999, 9999)
+let globalRawStr = 0
+let globalRotX = 0, globalRotY = 0, globalRotVX = 0.0003, globalRotVY = 0.0006
+let globalSmoothStr = 0, globalSmoothVelX = 0, globalSmoothVelY = 0
+let globalLagMouseX = 9999, globalLagMouseY = 9999
+let globalProximityStr = 0
+let globalT0 = Date.now()
+let globalExploding = false
+let globalWakeProgress = 0
+
+function cleanupWebGL() {
+  if (globalRafId) cancelAnimationFrame(globalRafId)
+  if (globalRenderer) {
+    if (globalScene) {
+      globalScene.traverse(obj => {
+        if (obj.geometry) obj.geometry.dispose()
+        if (obj.material) {
+          if (Array.isArray(obj.material)) obj.material.forEach(m => m.dispose())
+          else obj.material.dispose()
+        }
+      })
+      globalScene.clear()
+    }
+    globalRenderer.dispose()
+    globalRenderer = null
+  }
+  globalScene = null
+  globalCamera = null
+  globalMat = null
+  globalHalo1 = null
+  globalHalo2 = null
+  globalRafId = null
+}
+
+function initWebGL(canvas) {
+  // Reuse existing renderer if same canvas
+  if (globalRenderer && globalRenderer.domElement === canvas) {
+    return globalRenderer
+  }
+  cleanupWebGL()
+
+  globalRenderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true })
+  globalRenderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2))
+  globalRenderer.setClearColor(0x000000, 0)
+
+  globalScene = new THREE.Scene()
+  globalCamera = new THREE.PerspectiveCamera(48, 1, 0.1, 100)
+  globalCamera.position.z = 5.5
+
+  globalT0 = Date.now()
+  globalRotX = 0
+  globalRotY = 0
+  globalRotVX = 0.0003
+  globalRotVY = 0.0006
+
+  return globalRenderer
+}
+
 function PlasmaSphere({ exploding = false, wakeProgress = 0 }) {
   const containerRef = useRef(null)
   const canvasRef = useRef(null)
+
+  useEffect(() => {
+    globalExploding = exploding
+  }, [exploding])
+
+  useEffect(() => {
+    globalWakeProgress = wakeProgress
+  }, [wakeProgress])
 
   useEffect(() => {
     const container = containerRef.current
     const canvas = canvasRef.current
     if (!container || !canvas) return
 
-    // Setup Three.js
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true })
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2))
-    renderer.setClearColor(0x000000, 0)
-
-    const scene = new THREE.Scene()
-    const camera = new THREE.PerspectiveCamera(48, 1, 0.1, 100)
-    camera.position.z = 5.5
-
-    const mouse = new THREE.Vector2(9999, 9999)
-    const mouseVel = new THREE.Vector2(0, 0)
-    let lastMouse = new THREE.Vector2(9999, 9999)
-    let rawStr = 0
+    initWebGL(canvas)
 
     const getSide = () => {
       const w = container.clientWidth
@@ -208,25 +271,25 @@ function PlasmaSphere({ exploding = false, wakeProgress = 0 }) {
       const s = getSide()
       canvas.style.width = s + 'px'
       canvas.style.height = s + 'px'
-      renderer.setSize(s, s, false)
-      camera.aspect = 1
-      camera.updateProjectionMatrix()
+      globalRenderer.setSize(s, s, false)
+      globalCamera.aspect = 1
+      globalCamera.updateProjectionMatrix()
     }
 
     const onMove = (cx, cy) => {
       const r = canvas.getBoundingClientRect()
       const nx = ((cx - r.left) / r.width) * 2 - 1
       const ny = -((cy - r.top) / r.height) * 2 + 1
-      const dvx = nx - lastMouse.x
-      const dvy = ny - lastMouse.y
-      lastMouse.set(nx, ny)
-      mouse.set(nx, ny)
-      mouseVel.set(dvx, dvy)
-      rawStr = Math.min(1, Math.sqrt(dvx * dvx + dvy * dvy) * 22)
+      const dvx = nx - globalLastMouse.x
+      const dvy = ny - globalLastMouse.y
+      globalLastMouse.set(nx, ny)
+      globalMouse.set(nx, ny)
+      globalMouseVel.set(dvx, dvy)
+      globalRawStr = Math.min(1, Math.sqrt(dvx * dvx + dvy * dvy) * 22)
     }
 
     const onMouseMove = e => onMove(e.clientX, e.clientY)
-    const onMouseLeave = () => { mouse.set(9999, 9999); rawStr = 0 }
+    const onMouseLeave = () => { globalMouse.set(9999, 9999); globalRawStr = 0 }
     window.addEventListener('mousemove', onMouseMove)
     canvas.addEventListener('touchmove', e => {
       e.preventDefault()
@@ -371,8 +434,7 @@ function PlasmaSphere({ exploding = false, wakeProgress = 0 }) {
       }
     `
 
-    const geo = new THREE.IcosahedronGeometry(1, 80)
-    const mat = new THREE.ShaderMaterial({
+    globalMat = new THREE.ShaderMaterial({
       vertexShader: vs, fragmentShader: fs,
       uniforms: {
         u_time: { value: 0 },
@@ -385,7 +447,7 @@ function PlasmaSphere({ exploding = false, wakeProgress = 0 }) {
       transparent: true, depthWrite: false,
       blending: THREE.AdditiveBlending, side: THREE.DoubleSide
     })
-    scene.add(new THREE.Mesh(geo, mat))
+    globalScene.add(new THREE.Mesh(new THREE.IcosahedronGeometry(1, 80), globalMat))
 
     // Halo effects
     const mkHalo = (r, falloff, a) => {
@@ -395,65 +457,59 @@ function PlasmaSphere({ exploding = false, wakeProgress = 0 }) {
         uniforms: { u_ms: { value: 0 } },
         transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.BackSide
       })
-      scene.add(new THREE.Mesh(new THREE.SphereGeometry(r, 48, 48), m))
+      globalScene.add(new THREE.Mesh(new THREE.SphereGeometry(r, 48, 48), m))
       return m
     }
-    const h1 = mkHalo(1.16, 0.72, 0.55)
-    const h2 = mkHalo(1.35, 0.62, 0.25)
-
-    let t0 = Date.now()
-    let rotX = 0, rotY = 0, rotVX = 0.0003, rotVY = 0.0006
-    let smoothStr = 0, smoothVelX = 0, smoothVelY = 0
-    let lagMouseX = 9999, lagMouseY = 9999
-    let proximityStr = 0
+    globalHalo1 = mkHalo(1.16, 0.72, 0.55)
+    globalHalo2 = mkHalo(1.35, 0.62, 0.25)
 
     const animate = () => {
-      requestAnimationFrame(animate)
-      const elapsed = (Date.now() - t0) * 0.001
+      globalRafId = requestAnimationFrame(animate)
+      const elapsed = (Date.now() - globalT0) * 0.001
 
       const INERTIA = 0.03
       const VEL_INERTIA = 0.06
 
-      smoothStr += (rawStr - smoothStr) * VEL_INERTIA
-      smoothVelX += (mouseVel.x - smoothVelX) * VEL_INERTIA
-      smoothVelY += (mouseVel.y - smoothVelY) * VEL_INERTIA
-      rawStr *= 0.94
+      globalSmoothStr += (globalRawStr - globalSmoothStr) * VEL_INERTIA
+      globalSmoothVelX += (globalMouseVel.x - globalSmoothVelX) * VEL_INERTIA
+      globalSmoothVelY += (globalMouseVel.y - globalSmoothVelY) * VEL_INERTIA
+      globalRawStr *= 0.94
 
-      if (mouse.x < 9.0) {
-        lagMouseX += (mouse.x - lagMouseX) * INERTIA
-        lagMouseY += (mouse.y - lagMouseY) * INERTIA
+      if (globalMouse.x < 9.0) {
+        globalLagMouseX += (globalMouse.x - globalLagMouseX) * INERTIA
+        globalLagMouseY += (globalMouse.y - globalLagMouseY) * INERTIA
 
         // Proximity = how close cursor is to center of orb
-        const px = lagMouseX * lagMouseX + lagMouseY * lagMouseY
+        const px = globalLagMouseX * globalLagMouseX + globalLagMouseY * globalLagMouseY
         const targetProximity = Math.max(0, 1.0 - Math.sqrt(px) * 1.5)
-        proximityStr += (targetProximity - proximityStr) * 0.04
+        globalProximityStr += (targetProximity - globalProximityStr) * 0.04
       } else {
-        lagMouseX = 9999; lagMouseY = 9999
-        proximityStr += (0 - proximityStr) * 0.03
+        globalLagMouseX = 9999; globalLagMouseY = 9999
+        globalProximityStr += (0 - globalProximityStr) * 0.03
       }
 
       // Combined str includes proximity (cursor near center = max effect)
-      const combinedStr = Math.min(1, smoothStr + proximityStr * 0.7)
+      const combinedStr = Math.min(1, globalSmoothStr + globalProximityStr * 0.7)
 
-      mat.uniforms.u_time.value = elapsed
-      mat.uniforms.u_mouse.value.set(lagMouseX, lagMouseY)
-      mat.uniforms.u_mouseStr.value = combinedStr
-      mat.uniforms.u_mouseVel.value.set(smoothVelX, smoothVelY)
-      mat.uniforms.u_exploding.value = exploding ? 1 : 0
-      mat.uniforms.u_wakeProgress.value = wakeProgress
-      h1.uniforms.u_ms.value = combinedStr
-      h2.uniforms.u_ms.value = combinedStr
+      globalMat.uniforms.u_time.value = elapsed
+      globalMat.uniforms.u_mouse.value.set(globalLagMouseX, globalLagMouseY)
+      globalMat.uniforms.u_mouseStr.value = combinedStr
+      globalMat.uniforms.u_mouseVel.value.set(globalSmoothVelX, globalSmoothVelY)
+      globalMat.uniforms.u_exploding.value = globalExploding ? 1 : 0
+      globalMat.uniforms.u_wakeProgress.value = globalWakeProgress
+      globalHalo1.uniforms.u_ms.value = combinedStr
+      globalHalo2.uniforms.u_ms.value = combinedStr
 
-      rotVX += (Math.random() - 0.5) * 0.000012
-      rotVY += (Math.random() - 0.5) * 0.000012
-      rotVX *= 0.999; rotVY *= 0.999
+      globalRotVX += (Math.random() - 0.5) * 0.000012
+      globalRotVY += (Math.random() - 0.5) * 0.000012
+      globalRotVX *= 0.999; globalRotVY *= 0.999
 
       const drag = 1.0 - combinedStr * 0.3
-      rotX += rotVX * drag
-      rotY += rotVY * drag + smoothVelX * 0.006
+      globalRotX += globalRotVX * drag
+      globalRotY += globalRotVY * drag + globalSmoothVelX * 0.006
 
-      scene.children.forEach(c => { c.rotation.x = rotX; c.rotation.y = rotY })
-      renderer.render(scene, camera)
+      globalScene.children.forEach(c => { c.rotation.x = globalRotX; c.rotation.y = globalRotY })
+      globalRenderer.render(globalScene, globalCamera)
     }
 
     resize()
@@ -463,8 +519,8 @@ function PlasmaSphere({ exploding = false, wakeProgress = 0 }) {
     ro.observe(container)
 
     return () => {
+      cleanupWebGL()
       ro.disconnect()
-      renderer.dispose()
       window.removeEventListener('mousemove', onMouseMove)
     }
   }, [])
@@ -509,8 +565,7 @@ export default function SleepScreen({ onWake }) {
       if (p < 1) {
         rafRef.current = requestAnimationFrame(animWake)
       } else {
-        setPhase('exploding')
-        sfxWakeExplosion()
+        setPhase('done')
         setTimeout(() => onWake(), 180)
       }
     }
@@ -519,8 +574,8 @@ export default function SleepScreen({ onWake }) {
 
   useEffect(() => () => rafRef.current && cancelAnimationFrame(rafRef.current), [])
 
-  const isWaking = phase === 'waking' || phase === 'exploding'
-  const isExploding = phase === 'exploding'
+  const isWaking = phase === 'waking'
+  const isExploding = false
 
   return (
     <div
@@ -542,7 +597,7 @@ export default function SleepScreen({ onWake }) {
         transition: 'opacity 0.1s' }} />
 
       {/* ── Plasma Sphere rendered inside the UI column ── */}
-      <PlasmaSphere exploding={isExploding} wakeProgress={wakeProgress} small />
+      <PlasmaSphere key="plasma-sphere" exploding={isExploding} wakeProgress={wakeProgress} small />
 
       {/* ── UI layer ── */}
       <div style={{ position: 'absolute', inset: 0, zIndex: 3, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-between', padding: '48px 0 40px', pointerEvents: 'auto' }}>
@@ -562,15 +617,12 @@ export default function SleepScreen({ onWake }) {
         {/* Spacer with orb — orbe ya renderizado en posición absoluta, este div ocupa el centro */}
         <div style={{ flex: 1 }} />
 
-        {/* Touch button — zona inferior, collapses on wake */}
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '32px' }}>
+        {/* Touch button — zona inferior, hidden once wake starts */}
+        {phase === 'idle' && <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '32px' }}>
           <div style={{
             position: 'relative',
             width: '414px', height: '414px',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            opacity: isWaking ? Math.max(0, 1 - wakeProgress * 3) : 1,
-            transform: isWaking ? `scale(${1 - wakeProgress * 0.5})` : undefined,
-            transition: 'opacity 0.1s, transform 0.1s',
           }}>
             {[0, 1, 2, 3].map(i => (
               <div key={i} style={{
@@ -599,15 +651,14 @@ export default function SleepScreen({ onWake }) {
 
           {/* Status label — footer */}
           <div style={{ fontFamily: FONT, fontSize: '12px', color: 'rgba(255,255,255,0.3)', letterSpacing: '5px',
-            opacity: isWaking ? 0 : 1, transition: 'opacity 0.2s',
             animation: 'sleepBlink 3.5s ease-in-out infinite' }}>
             INNOVADEF FOCO 2026
           </div>
-        </div>
+        </div>}
       </div>
 
       {/* ── HUD scan lines sweep during wake ── */}
-      {isWaking && !isExploding && (
+      {isWaking && (
         <>
           <div style={{ position: 'fixed', left: 0, right: 0, height: '2.25px', zIndex: 6, pointerEvents: 'none',
             background: `linear-gradient(90deg, transparent 0%, ${ACCENT}cc 40%, ${ACCENT} 50%, ${ACCENT}cc 60%, transparent 100%)`,
@@ -620,57 +671,14 @@ export default function SleepScreen({ onWake }) {
         </>
       )}
 
-      {/* ── Explosion: dramatic burst glow with multiple cinematic layers ── */}
-      {isExploding && (
+      {/* ── Simple pointer flash on wake completion ── */}
+      {phase === 'done' && (
         <div style={{ position: 'absolute', left: touchOrigin.x, top: touchOrigin.y, zIndex: 10, pointerEvents: 'none', transform: 'translate(-50%,-50%)' }}>
-          {/* Core burst */}
           <div style={{
-            width: '30px', height: '30px', borderRadius: '112.5px',
-            background: `radial-gradient(circle, white 0%, ${ACCENT} 40%, transparent 70%)`,
-            animation: 'burstExpand 0.6s cubic-bezier(0.1,0.7,0.3,1) forwards',
-            boxShadow: `0 0 150px ${ACCENT}, 0 0 300px ${ACCENT}88`,
-          }} />
-          
-          {/* Concentric energy rings */}
-          {[0, 1, 2, 3, 4].map(i => (
-            <div key={i} style={{
-              position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%,-50%)',
-              width: '0', height: '0', borderRadius: '112.5px',
-              border: `${3 - i * 0.4}px solid ${ACCENT}`,
-              animation: `energyRing 0.5s ease-out ${i * 0.06}s forwards`,
-              opacity: 1 - i * 0.15,
-            }} />
-          ))}
-          
-          {/* Diagonal energy sweep */}
-          <div style={{
-            position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%,-50%)',
-            width: '0', height: '0',
-            background: `linear-gradient(45deg, transparent, ${ACCENT}cc, transparent)`,
-            animation: 'diagSweep 0.4s ease-out forwards',
-          }} />
-          
-          {/* Particle burst */}
-          <div style={{
-            position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%,-50%)',
-            width: '10px', height: '10px', borderRadius: '50%',
-            background: ACCENT,
-            boxShadow: `
-              0 0 20px ${ACCENT}, 0 0 40px ${ACCENT}88,
-              60px 0 15px ${ACCENT}66, -60px 0 15px ${ACCENT}66,
-              0 60px 15px ${ACCENT}66, 0 -60px 15px ${ACCENT}66,
-              42px 42px 12px ${ACCENT}55, -42px 42px 12px ${ACCENT}55,
-              42px -42px 12px ${ACCENT}55, -42px -42px 12px ${ACCENT}55
-            `,
-            animation: 'particleBurst 0.5s ease-out forwards',
-          }} />
-          
-          {/* Glitch overlay */}
-          <div style={{
-            position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%,-50%)',
-            width: '200vmax', height: '200vmax',
-            background: `repeating-linear-gradient(0deg, transparent, transparent 2px, ${ACCENT}22 2px, ${ACCENT}22 4px)`,
-            animation: 'glitchFlash 0.15s ease-out forwards',
+            width: '60px', height: '60px', borderRadius: '50%',
+            background: `radial-gradient(circle, white 0%, ${ACCENT} 30%, transparent 70%)`,
+            animation: 'pointerFlash 0.4s ease-out forwards',
+            boxShadow: `0 0 100px ${ACCENT}, 0 0 200px ${ACCENT}88`,
           }} />
         </div>
       )}
@@ -680,13 +688,7 @@ export default function SleepScreen({ onWake }) {
         @keyframes sleepRing     { 0%{transform:translate(-50%,-50%) scale(0.82);opacity:0.6} 100%{transform:translate(-50%,-50%) scale(1.35);opacity:0} }
         @keyframes sleepBtnPulse { 0%,100%{box-shadow:0 0 40px rgba(0,255,65,0.14),0 0 90px rgba(0,255,65,0.06)} 50%{box-shadow:0 0 70px rgba(0,255,65,0.28),0 0 140px rgba(0,255,65,0.12)} }
         @keyframes sleepBlink    { 0%,100%{opacity:0.35} 50%{opacity:0.85} }
-        @keyframes wakeRipple    { 0%{width:0;height:0;opacity:1} 100%{width:200vmax;height:200vmax;opacity:0} }
-        @keyframes wakeCore      { 0%{transform:translate(-50%,-50%) scale(1);opacity:1} 100%{transform:translate(-50%,-50%) scale(30);opacity:0} }
-        @keyframes burstExpand   { 0%{transform:translate(-50%,-50%) scale(1);opacity:1} 100%{transform:translate(-50%,-50%) scale(200);opacity:0} }
-        @keyframes energyRing    { 0%{width:0;height:0;opacity:1} 100%{width:120vmax;height:120vmax;opacity:0} }
-        @keyframes diagSweep     { 0%{width:0;height:0;transform:translate(-50%,-50%) rotate(45deg)} 100%{width:300vmax;height:300vmax;transform:translate(-50%,-50%) rotate(45deg);opacity:0} }
-        @keyframes particleBurst { 0%{transform:translate(-50%,-50%) scale(1);opacity:1} 100%{transform:translate(-50%,-50%) scale(15);opacity:0} }
-        @keyframes glitchFlash   { 0%{opacity:0.8} 20%{opacity:0.4} 40%{opacity:0.6} 60%{opacity:0.3} 80%{opacity:0.5} 100%{opacity:0} }
+        @keyframes pointerFlash  { 0%{transform:translate(-50%,-50%) scale(0);opacity:1} 100%{transform:translate(-50%,-50%) scale(3);opacity:0} }
       `}</style>
     </div>
   )

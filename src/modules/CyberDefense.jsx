@@ -548,30 +548,30 @@ export default function CyberDefense({ onComplete }) {
 
   // ─────────────────────────────────────────────────────────────────────────
   return (
-    <div style={{ maxWidth: '1280px', width: '100%', margin: '0 auto', fontFamily: FONT }}>
+    <div style={{ maxWidth: '1920px', width: '100%', margin: '0 auto', fontFamily: FONT }}>
 
       {/* ══ INTRO ══ */}
       {phase === 'intro' && (
         <div>
-          <div style={{ fontSize: '13px', letterSpacing: '3px', color: TEXT2, marginBottom: '12px' }}>// MOD-06 — SIMULADOR ARCADE</div>
-          <div style={{ fontSize: 'clamp(26px, 3vw, 44px)', letterSpacing: '4px', color: ACCENT, marginBottom: '8px', textShadow: `0 0 30px ${ACCENT}22` }}>
+          <div style={{ fontSize: '19.5px', letterSpacing: '4.5px', color: TEXT2, marginBottom: '18px' }}>// MOD-06 — SIMULADOR ARCADE</div>
+          <div style={{ fontSize: 'clamp(39px, 4.5vw, 66px)', letterSpacing: '6px', color: ACCENT, marginBottom: '12px', textShadow: `0 0 45px ${ACCENT}22` }}>
             OPERACIÓN ESCUDO DIGITAL
           </div>
-          <div style={{ fontSize: '14px', color: TEXT2, letterSpacing: '2px', marginBottom: '28px' }}>
+          <div style={{ fontSize: '21px', color: TEXT2, letterSpacing: '3px', marginBottom: '42px' }}>
             8 OLEADAS · 5 TIPOS DE AMENAZA · IMPOSIBLE A PARTIR DE OLEADA 6
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '36px' }}>
             {/* Threat types legend */}
             <div style={{ ...CARD }}>
-              <div style={{ fontSize: '13px', color: TEXT2, letterSpacing: '3px', marginBottom: '14px' }}>// TIPOS DE AMENAZA</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <div style={{ fontSize: '19.5px', color: TEXT2, letterSpacing: '4.5px', marginBottom: '21px' }}>// TIPOS DE AMENAZA</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
                 {Object.entries(TYPES).map(([key, t]) => (
-                  <div key={key} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <div style={{ width: t.r * 2.4, height: t.r * 2.4, borderRadius: '50%', background: t.col, opacity: t.alpha, flexShrink: 0, border: `1px solid ${t.col}88` }} />
+                  <div key={key} style={{ display: 'flex', alignItems: 'center', gap: '18px' }}>
+                    <div style={{ width: 15, height: 15, borderRadius: '50%', background: t.col, opacity: t.alpha, flexShrink: 0, border: '1px solid ' + t.col + '88' }} />
                     <div>
-                      <span style={{ fontSize: '14px', color: t.col, letterSpacing: '1px' }}>{t.label}</span>
-                      <span style={{ fontSize: '12px', color: TEXT2, marginLeft: '8px' }}>
+                      <span style={{ fontSize: '21px', color: t.col, letterSpacing: '1.5px' }}>{t.label}</span>
+                      <span style={{ fontSize: '18px', color: TEXT2, marginLeft: '12px' }}>
                         {key === 'normal' && '1 CLICK · VELOCIDAD MEDIA'}
                         {key === 'fast' && '1 CLICK · MUY RÁPIDO · VA DIRECTO AL SERVIDOR'}
                         {key === 'armored' && '3 CLICKS · LENTO · MÁS PUNTOS'}
@@ -585,9 +585,9 @@ export default function CyberDefense({ onComplete }) {
             </div>
 
             {/* Name + leaderboard preview */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
               <div style={{ ...CARD }}>
-                <div style={{ fontSize: '9px', color: TEXT2, letterSpacing: '3px', marginBottom: '10px' }}>// TU NOMBRE DE OPERATIVO</div>
+                <div style={{ fontSize: '13.5px', color: TEXT2, letterSpacing: '4.5px', marginBottom: '15px' }}>// TU NOMBRE DE OPERATIVO</div>
                 <input
                   value={nameInput}
                   onChange={e => setNameInput(e.target.value.toUpperCase().slice(0, 18))}
@@ -597,11 +597,11 @@ export default function CyberDefense({ onComplete }) {
                   style={{
                     width: '100%', padding: '10px 12px', background: '#030303',
                     border: `1px solid ${nameInput ? ACCENT : BORDER}`,
-                    color: ACCENT, fontFamily: FONT, fontSize: '13px',
+                    color: ACCENT, fontFamily: FONT, fontSize: '19.5px',
                     letterSpacing: '2px', outline: 'none', boxSizing: 'border-box',
                   }}
                 />
-                <div style={{ fontSize: '9px', color: TEXT2, marginTop: '6px', opacity: 0.6 }}>
+                <div style={{ fontSize: '13.5px', color: TEXT2, marginTop: '9px', opacity: 0.6 }}>
                   OPCIONAL — SE GUARDARÁ EN EL RANKING LOCAL
                 </div>
               </div>
@@ -628,16 +628,16 @@ export default function CyberDefense({ onComplete }) {
               { label: 'CORTAFUEGOS', val: '█'.repeat(display.fwUses) + '░'.repeat(Math.max(0, 6 - display.fwUses)), color: BL },
               { label: 'EN VUELO', val: display.remaining, color: display.remaining > 8 ? RD : TEXT2 },
             ].map(h => (
-              <div key={h.label} style={{ ...CARD, padding: '12px 14px', textAlign: 'center' }}>
-                <div style={{ fontSize: '11px', color: TEXT2, letterSpacing: '2px', marginBottom: '5px' }}>{h.label}</div>
-                <div style={{ fontSize: '18px', color: h.color, letterSpacing: '2px' }}>{h.val}</div>
-                {h.sub && <div style={{ fontSize: '11px', color: h.color, marginTop: '3px', letterSpacing: '1px' }}>{h.sub}</div>}
+              <div key={h.label} style={{ ...CARD, padding: '18px 21px', textAlign: 'center' }}>
+                <div style={{ fontSize: '16.5px', color: TEXT2, letterSpacing: '3px', marginBottom: '7.5px' }}>{h.label}</div>
+                <div style={{ fontSize: '27px', color: h.color, letterSpacing: '3px' }}>{h.val}</div>
+                {h.sub && <div style={{ fontSize: '16.5px', color: h.color, marginTop: '4.5px', letterSpacing: '1.5px' }}>{h.sub}</div>}
               </div>
             ))}
           </div>
 
           {display.combo > 2 && (
-            <div style={{ textAlign: 'center', fontSize: '20px', color: AM, letterSpacing: '3px', marginBottom: '6px' }}>
+            <div style={{ textAlign: 'center', fontSize: '30px', color: AM, letterSpacing: '4.5px', marginBottom: '9px' }}>
               ⚡ x{display.combo} COMBO
             </div>
           )}

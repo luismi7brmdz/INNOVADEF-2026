@@ -263,94 +263,60 @@ export default function TacticalMap({ onComplete }) {
   const rankColor = finalScore >= 1500 ? GRN : finalScore >= 800 ? AM : finalScore >= 350 ? BL : RD
 
   return (
-    <div style={{ maxWidth: '1280px', width: '100%', margin: '0 auto', fontFamily: FONT }}>
-
-      {phase === 'intro' && (
-        <div>
-          <div style={{ fontSize: '15px', letterSpacing: '3px', color: TEXT2, marginBottom: '12px' }}>// MOD-07 — SIMULADOR DE MANDO</div>
-          <div style={{ fontSize: 'clamp(30px, 3vw, 50px)', letterSpacing: '4px', color: ACCENT, marginBottom: '32px' }}>
-            SALA DE GUERRA — MANDO TÁCTICO
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '32px' }}>
-            <div style={{ ...CARD, borderLeft: `2px solid ${ACCENT}44` }}>
-              <div style={{ fontSize: '9px', color: TEXT2, letterSpacing: '3px', marginBottom: '10px' }}>// MISIÓN</div>
-              <p style={{ fontSize: '15px', color: TEXT2, lineHeight: 1.8, margin: 0 }}>
-                FUERZAS HOSTILES AVANZAN HACIA INSTALACIONES CRÍTICAS. DESPLIEGUE SUS UNIDADES DE INTERCEPTACIÓN. ARRASTRE LAS UNIDADES AZULES PARA BLOQUEAR LAS AMENAZAS ANTES DE QUE ALCANCEN LOS OBJETIVOS.
-              </p>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              {[
-                { label: 'MECÁNICA', val: 'ARRASTRA UNIDADES PARA INTERCEPTAR' },
-                { label: 'OBJETIVOS', val: 'HQ + 4 INSTALACIONES CRÍTICAS' },
-                { label: 'OLEADAS', val: '6 OLEADAS CON ESCALADA PROGRESIVA' },
-                { label: 'VIDAS', val: '5 IMPACTOS PERMITIDOS EN INSTALACIONES' },
-              ].map(r => (
-                <div key={r.label} style={{ ...CARD, padding: '12px 16px', display: 'flex', gap: '12px', alignItems: 'center' }}>
-                  <span style={{ fontSize: '13px', color: TEXT2, letterSpacing: '2px', minWidth: '110px' }}>{r.label}:</span>
-                  <span style={{ fontSize: '14px', color: ACCENT }}>{r.val}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-          <button onClick={() => setPhase('game')} style={{ ...S.btnPrimary, gap: '12px' }}>
-            <Crosshair size={14} /> ASUMIR EL MANDO <ChevronRight size={14} />
-          </button>
+    <>
+    {phase === 'intro' && (
+      <div>
+        <div style={{ fontSize: '19.5px', letterSpacing: '4.5px', color: TEXT2, marginBottom: '18px' }}>// MOD-07 — SIMULADOR TÁCTICO</div>
+        <div style={{ fontSize: 'clamp(39px, 4.5vw, 66px)', letterSpacing: '6px', color: ACCENT, marginBottom: '12px', textShadow: `0 0 45px ${ACCENT}22` }}>
+          DE GUERRA — MANDO TÁCTICO
         </div>
-      )}
-
-      {phase === 'game' && (
-        <div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px', marginBottom: '12px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '32px' }}>
+          <div style={{ ...CARD, borderLeft: `2px solid ${ACCENT}44` }}>
+            <div style={{ fontSize: '19.5px', color: TEXT2, letterSpacing: '4.5px', marginBottom: '21px' }}>// DESPLIEGUE DE UNIDADES</div>
+            <p style={{ fontSize: '15px', color: TEXT2, lineHeight: 1.8, margin: 0 }}>
+              FUERZAS HOSTILES AVANZAN HACIA INSTALACIONES CRÍTICAS. DESPLIEGUE SUS UNIDADES DE INTERCEPTACIÓN. ARRASTRE LAS UNIDADES AZULES PARA BLOQUEAR LAS AMENAZAS ANTES DE QUE ALCANCEN LOS OBJETIVOS.
+            </p>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             {[
-              { label: 'OLEADA', val: `${display.wave}/6`, color: AM },
-              { label: 'PUNTOS', val: display.score, color: ACCENT },
-              { label: 'IMPACTOS', val: '■'.repeat(display.lives) + '□'.repeat(Math.max(0, 5 - display.lives)), color: display.lives <= 2 ? RD : ACCENT },
-              { label: 'INTERCEPTADOS', val: display.intercepted, color: BL },
-            ].map(h => (
-              <div key={h.label} style={{ ...CARD, padding: '12px 14px', textAlign: 'center' }}>
-                <div style={{ fontSize: '12px', color: TEXT2, letterSpacing: '2px', marginBottom: '5px' }}>{h.label}</div>
-                <div style={{ fontSize: '20px', color: h.color, letterSpacing: '2px' }}>{h.val}</div>
+              { label: 'MECÁNICA', val: 'ARRASTRA UNIDADES PARA INTERCEPTAR' },
+              { label: 'OBJETIVOS', val: 'HQ + 4 INSTALACIONES CRÍTICAS' },
+              { label: 'OLEADAS', val: '6 OLEADAS CON ESCALADA PROGRESIVA' },
+              { label: 'VIDAS', val: '5 IMPACTOS PERMITIDOS EN INSTALACIONES' },
+            ].map(r => (
+              <div key={r.label} style={{ ...CARD, padding: '12px 16px', display: 'flex', gap: '12px', alignItems: 'center' }}>
+                <span style={{ fontSize: '13px', color: TEXT2, letterSpacing: '2px', minWidth: '110px' }}>{r.label}:</span>
+                <span style={{ fontSize: '14px', color: ACCENT }}>{r.val}</span>
               </div>
             ))}
           </div>
-          <canvas ref={canvasRef} width={W} height={H}
-            style={{ display: 'block', width: '100%', cursor: 'grab', border: `1px solid ${BORDER}`, background: '#050505' }} />
-          <div style={{ fontSize: '14px', color: TEXT2, letterSpacing: '2px', textAlign: 'center', marginTop: '10px', opacity: 0.7 }}>
-            ARRASTRA LAS UNIDADES VERDES/AZULES PARA INTERCEPTAR LAS AMENAZAS ROJAS
-          </div>
         </div>
-      )}
+        <button onClick={() => setPhase('game')} style={{ ...S.btnPrimary, gap: '12px' }}>
+          <Crosshair size={14} /> ASUMIR EL MANDO <ChevronRight size={14} />
+        </button>
+      </div>
+    )}
 
-      {phase === 'result' && (
-        <div>
-          <div style={{ fontSize: '9px', letterSpacing: '3px', color: TEXT2, marginBottom: '16px' }}>// DEBRIEFING — EVALUACIÓN DE MANDO</div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
-            <div style={{ ...CARD, borderLeft: `2px solid ${rankColor}66`, padding: '24px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <div style={{ fontSize: '9px', color: TEXT2, letterSpacing: '3px' }}>PUNTUACIÓN FINAL</div>
-              <div style={{ fontSize: '56px', color: rankColor, lineHeight: 1, textShadow: `0 0 30px ${rankColor}44` }}>{finalScore}</div>
-              <div style={{ fontSize: '9px', color: TEXT2, letterSpacing: '2px' }}>RANGO ASIGNADO</div>
-              <div style={{ fontSize: '18px', letterSpacing: '3px', color: rankColor }}>{rank}</div>
+    {phase === 'game' && (
+      <div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px', marginBottom: '12px' }}>
+          {[
+            { label: 'OLEADA', val: `${display.wave}/6`, color: AM },
+            { label: 'PUNTOS', val: display.score, color: ACCENT },
+            { label: 'IMPACTOS', val: '■'.repeat(display.lives) + '□'.repeat(Math.max(0, 5 - display.lives)), color: display.lives <= 2 ? RD : ACCENT },
+            { label: 'INTERCEPTADOS', val: display.intercepted, color: BL },
+          ].map(h => (
+            <div key={h.label} style={{ ...CARD, padding: '12px 14px', textAlign: 'center' }}>
+              <div style={{ fontSize: '21px', color: TEXT2, letterSpacing: '3px', marginBottom: '42px' }}>{h.label}</div>
+              <div style={{ fontSize: '20px', color: h.color, letterSpacing: '2px' }}>{h.val}</div>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              {[
-                { label: 'AMENAZAS INTERCEPTADAS', val: finalStats.intercepted },
-                { label: 'OLEADAS COMPLETADAS', val: `${finalStats.wave}/6` },
-                { label: 'INSTALACIONES PROTEGIDAS', val: `${Math.max(0, display.lives)}/5` },
-                { label: 'ÍNDICE DE MANDO', val: `${Math.min(100, Math.round(finalScore / 25))}%` },
-              ].map(r => (
-                <div key={r.label} style={{ ...CARD, padding: '14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: '9px', color: TEXT2, letterSpacing: '2px' }}>{r.label}</span>
-                  <span style={{ fontSize: '14px', color: ACCENT }}>{r.val}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-          <button onClick={() => onComplete({ type: 'tactical-map', score: finalScore, rank })} style={S.btnPrimary}>
-            CONTINUAR AL INFORME <ChevronRight size={14} />
-          </button>
+          ))}
         </div>
-      )}
-    </div>
+        <canvas ref={canvasRef} width={W} height={H}
+          style={{ display: 'block', width: '100%', cursor: 'crosshair', border: `1px solid ${BORDER}`, background: '#050505' }} />
+      </div>
+    )}
+    </>
   )
 }
 

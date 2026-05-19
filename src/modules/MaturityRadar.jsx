@@ -121,7 +121,7 @@ export default function MaturityRadar({ onComplete }) {
     : 0
 
   return (
-    <div style={{ maxWidth: '1280px', width: '100%', margin: '0 auto' }}>
+    <div style={{ maxWidth: '1920px', width: '100%', margin: '0 auto' }}>
       {phase === 'questions' && (
         <div style={{
           opacity: transitioning ? 0 : 1,
@@ -130,8 +130,8 @@ export default function MaturityRadar({ onComplete }) {
         }}>
           <div style={{ marginBottom: '36px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '18px', fontFamily: FONT }}>
-              <span style={{ fontSize: '13px', color: TEXT2, letterSpacing: '3px' }}>EJE {step + 1}/{questions.length} — {axes.find(a => a.key === q.axis)?.label.toUpperCase()}</span>
-              <span style={{ fontSize: '13px', color: ACCENT, letterSpacing: '2px' }}>{Math.round((step / questions.length) * 100)}%</span>
+              <span style={{ fontSize: '19.5px', color: TEXT2, letterSpacing: '4.5px' }}>EJE {step + 1}/{questions.length} — {axes.find(a => a.key === q.axis)?.label.toUpperCase()}</span>
+              <span style={{ fontSize: '19.5px', color: ACCENT, letterSpacing: '3px' }}>{Math.round((step / questions.length) * 100)}%</span>
             </div>
             <div style={{ display: 'flex', gap: '3px' }}>
               {questions.map((_, i) => (
@@ -140,32 +140,32 @@ export default function MaturityRadar({ onComplete }) {
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '60px', alignItems: 'start' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '54px', alignItems: 'center' }}>
             {/* Radar live */}
             <div style={{ display: 'flex', justifyContent: 'center' }}>
-              <RadarChart values={values} size={450} />
+              <RadarChart values={values} size={570} />
             </div>
 
             {/* Question */}
-            <div>
-              <div style={{ fontFamily: FONT, fontSize: '13px', color: TEXT2, letterSpacing: '3px', marginBottom: '10px' }}>// {axes.find(a => a.key === q.axis)?.label.toUpperCase()}</div>
-              <p style={{ fontFamily: FONT, fontSize: '24px', lineHeight: 1.7, color: ACCENT, marginBottom: '30px', letterSpacing: '0.3px' }}>{q.text.toUpperCase()}</p>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            <div style={{ width: '100%' }}>
+              <div style={{ fontFamily: FONT, fontSize: '19.5px', color: TEXT2, letterSpacing: '4.5px', marginBottom: '15px' }}>// {axes.find(a => a.key === q.axis)?.label.toUpperCase()}</div>
+              <p style={{ fontFamily: FONT, fontSize: '30px', lineHeight: 1.6, color: ACCENT, marginBottom: '36px', letterSpacing: '0.45px' }}>{q.text.toUpperCase()}</p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '27px' }}>
                 {q.labels.map((label, i) => (
                   <button
                     key={i}
                     onClick={() => handleSelect(i)}
                     style={{
-                      display: 'flex', alignItems: 'center', gap: '36px',
-                      padding: '20px 18px', textAlign: 'left', width: '100%',
-                      background: '#070707', border: `1px solid ${BORDER}`,
+                      display: 'flex', alignItems: 'center', gap: '24px',
+                      padding: '24px 27px', textAlign: 'left', width: '100%',
+                      background: '#070707', border: `1.5px solid ${BORDER}`,
                       color: TEXT2, cursor: 'pointer', transition: 'all 0.18s',
-                      fontFamily: FONT, fontSize: '15px', letterSpacing: '0.5px'
+                      fontFamily: FONT, fontSize: '21px', letterSpacing: '0.75px'
                     }}
                     onMouseEnter={e => { e.currentTarget.style.borderColor = '#ffaa0055'; e.currentTarget.style.background = 'rgba(255,170,0,0.04)'; e.currentTarget.style.color = '#ffaa00' }}
                     onMouseLeave={e => { e.currentTarget.style.borderColor = BORDER; e.currentTarget.style.background = '#070707'; e.currentTarget.style.color = TEXT2 }}
                   >
-                    <span style={{ color: ACCENT, minWidth: '28px', fontSize: '18px' }}>[{i}]</span>
+                    <span style={{ color: ACCENT, minWidth: '36px', fontSize: '24px' }}>[{i}]</span>
                     {label.toUpperCase()}
                   </button>
                 ))}
@@ -177,25 +177,25 @@ export default function MaturityRadar({ onComplete }) {
 
       {phase === 'result' && (
         <div>
-          <div style={{ fontFamily: FONT, fontSize: '13px', color: TEXT2, letterSpacing: '3px', marginBottom: '18px' }}>// RADAR DE MADUREZ — RESULTADO</div>
-          <div style={{ fontFamily: FONT, fontSize: 'clamp(12px, 2.5vw, 17.33px)', letterSpacing: '3px', color: ACCENT, marginBottom: '18px', textTransform: 'uppercase' }}>MAPA DE CAPACIDAD DIGITAL</div>
-          <div style={{ fontFamily: FONT, fontSize: '15px', color: TEXT2, marginBottom: '72px', letterSpacing: '1px' }}>ÍNDICE GLOBAL DE MADUREZ: <span style={{ color: ACCENT }}>{overallScore}%</span></div>
+          <div style={{ fontFamily: FONT, fontSize: '19.5px', color: TEXT2, letterSpacing: '4.5px', marginBottom: '27px' }}>// RADAR DE MADUREZ — RESULTADO</div>
+          <div style={{ fontFamily: FONT, fontSize: 'clamp(18px, 3.75vw, 26px)', letterSpacing: '4.5px', color: ACCENT, marginBottom: '27px', textTransform: 'uppercase' }}>MAPA DE CAPACIDAD DIGITAL</div>
+          <div style={{ fontFamily: FONT, fontSize: '22.5px', color: TEXT2, marginBottom: '108px', letterSpacing: '1.5px' }}>ÍNDICE GLOBAL DE MADUREZ: <span style={{ color: ACCENT }}>{overallScore}%</span></div>
 
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '60px' }}>
-            <RadarChart values={values} size={570} />
+            <RadarChart values={values} size={855} />
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '18px', marginBottom: '36px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '27px', marginBottom: '54px' }}>
             {axes.map(a => {
               const val = values[a.key] ?? 0
               const pct = Math.round((val / 4) * 100)
               return (
-                <div key={a.key} style={{ ...CARD, padding: '12px 18px', fontFamily: FONT }}>
-                  <div style={{ fontSize: '13px', color: TEXT2, letterSpacing: '2px', marginBottom: '12px' }}>{a.label.toUpperCase()}</div>
+                <div key={a.key} style={{ ...CARD, padding: '18px 27px', fontFamily: FONT }}>
+                  <div style={{ fontSize: '19.5px', color: TEXT2, letterSpacing: '3px', marginBottom: '18px' }}>{a.label.toUpperCase()}</div>
                   <div style={{ height: '3px', background: `${ACCENT}0d`, border: `1px solid ${ACCENT}18`, marginBottom: '6px' }}>
                     <div style={{ height: '100%', background: ACCENT, width: `${pct}%`, transition: 'width 1.5s ease', boxShadow: `0 0 4px ${ACCENT}44` }} />
                   </div>
-                  <div style={{ fontSize: '27px', color: ACCENT }}>{pct}%</div>
+                  <div style={{ fontSize: '40.5px', color: ACCENT }}>{pct}%</div>
                 </div>
               )
             })}

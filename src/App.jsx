@@ -50,7 +50,7 @@ function LiveClock() {
   useEffect(() => { const i = setInterval(() => setTime(new Date()), 1000); return () => clearInterval(i) }, [])
   const pad = n => String(n).padStart(2, '0')
   return (
-    <span style={{ fontFamily: FONT, fontSize: '16.5px', color: TEXT2, letterSpacing: '3px' }}>
+    <span style={{ fontFamily: FONT, fontSize: 'clamp(9px, 1vw, 16.5px)', color: TEXT2, letterSpacing: 'clamp(1px, 0.2vw, 3px)' }}>
       {pad(time.getHours())}:{pad(time.getMinutes())}:{pad(time.getSeconds())} UTC+2
     </span>
   )
@@ -98,18 +98,18 @@ function StatusBar({ module, onHome, bootStage = 4 }) {
   return (
     <div style={{
       position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100,
-      height: '48px',
+      height: 'clamp(32px, 4vw, 48px)',
       background: '#050505',
       borderTop: `1.5px solid ${BORDER}`,
       display: 'flex', alignItems: 'center',
-      padding: '0 45px', gap: '0',
-      fontFamily: FONT, fontSize: '22.5px',
+      padding: '0 clamp(12px, 3vw, 45px)', gap: '0',
+      fontFamily: FONT, fontSize: 'clamp(9px, 1.3vw, 22.5px)',
       transform: bootStage < 2 ? 'translateY(100%)' : 'translateY(0)',
       opacity: bootStage < 2 ? 0 : 1,
       transition: 'transform 0.45s cubic-bezier(0.22,1,0.36,1), opacity 0.35s ease',
     }}>
       {items.map((item, i) => (
-        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '13.5px', paddingRight: '30px', marginRight: '30px', borderRight: `1.5px solid ${BORDER}` }}>
+        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 'clamp(6px, 0.8vw, 13.5px)', paddingRight: 'clamp(8px, 1.5vw, 30px)', marginRight: 'clamp(8px, 1.5vw, 30px)', borderRight: `1.5px solid ${BORDER}` }}>
           <span style={{ color: TEXT2 }}>{item.label}:</span>
           <span style={{ color: item.color }}>{item.value}</span>
         </div>
@@ -177,7 +177,7 @@ function CapacityTest({ onComplete }) {
   }
 
   if (phase === 'thinking') return (
-    <div style={{ maxWidth: '1050px', width: '100%', margin: '0 auto' }}>
+    <div style={{ width: '100%', margin: '0 auto' }}>
       <Panel label="// ANÁLISIS EN CURSO — CLASIFICADO">
         <div style={{ padding: '54px', fontFamily: FONT, fontSize: '18px' }}>
           <div style={{ display: 'flex', gap: '18px', marginBottom: '45px', alignItems: 'center' }}>
@@ -203,7 +203,7 @@ function CapacityTest({ onComplete }) {
   )
 
   if (phase === 'report') return (
-    <div style={{ maxWidth: '1350px', width: '100%', margin: '0 auto' }}>
+    <div style={{ width: '100%', margin: '0 auto' }}>
       {/* Header */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '36px', marginBottom: '24px', alignItems: 'start' }}>
         <Panel label="// INFORME DE CAPACIDAD DIGITAL — CLASIFICADO">
@@ -281,7 +281,7 @@ function CapacityTest({ onComplete }) {
 
   // Questions phase
   return (
-    <div style={{ maxWidth: '1260px', width: '100%', margin: '0 auto' }}>
+    <div style={{ width: '100%', margin: '0 auto' }}>
       {/* Progress */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '9px', marginBottom: '63px' }}>
         {questions.map((q, i) => (
@@ -344,7 +344,7 @@ function EmailScreen({ sessionId, onReset }) {
   const [sent, setSent] = useState(false)
 
   return (
-    <div style={{ maxWidth: '900px', width: '100%', margin: '0 auto' }}>
+    <div style={{ width: '100%', margin: '0 auto' }}>
       <Panel label="// ENTREGA DE INFORME CLASIFICADO" style={{ marginBottom: '45px' }}>
         <div style={{ padding: '42px 36px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '48px', alignItems: 'center' }}>
           <div>
@@ -436,23 +436,23 @@ function ModuleSelector({ onSelect, bootStage = 4 }) {
   })
 
   return (
-    <div style={{ maxWidth: '1800px', width: '100%', margin: '0 auto' }}>
+    <div style={{ width: '100%', margin: '0 auto', padding: '0 clamp(8px, 2vw, 16px)' }}>
 
       {/* HUD scan line sweeps screen on entry */}
       <HudScanLine active={bootStage === 3} />
 
       {/* System header panels — staggered */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '18px', marginBottom: '72px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))', gap: 'clamp(8px, 1vw, 14px)', marginBottom: 'clamp(18px, 2.5vw, 36px)' }}>
         {[
           { label: '// SISTEMA', content: (
-            <div style={{ padding: '31.5px 36px', fontFamily: FONT, fontSize: '22.5px', lineHeight: 3, color: TEXT2 }}>
+            <div style={{ padding: 'clamp(10px, 1.5vw, 20px) clamp(12px, 1.8vw, 24px)', fontFamily: FONT, fontSize: 'clamp(12px, 1.2vw, 16px)', lineHeight: 2, color: TEXT2 }}>
               <div>PLATFORM: <span style={{ color: ACCENT }}>INNOVADEF-KIOSK v2.0</span></div>
               <div>OPERATOR: <span style={{ color: ACCENT }}>FOCO-2026-OPERATOR</span></div>
               <div>LOCATION: <span style={{ color: AMBER }}>MADRID // 40°25'N 3°41'W</span></div>
             </div>
           )},
           { label: '// ESTADO DE SISTEMAS', content: (
-            <div style={{ padding: '31.5px 36px', fontFamily: FONT, fontSize: '22.5px', lineHeight: 3 }}>
+            <div style={{ padding: 'clamp(10px, 1.5vw, 20px) clamp(12px, 1.8vw, 24px)', fontFamily: FONT, fontSize: 'clamp(12px, 1.2vw, 16px)', lineHeight: 2 }}>
               {[
                 { label: 'RED ENS', val: 'CONECTADA', c: ACCENT },
                 { label: 'CIFRADO', val: 'AES-256 OK', c: ACCENT },
@@ -463,7 +463,7 @@ function ModuleSelector({ onSelect, bootStage = 4 }) {
             </div>
           )},
           { label: '// TELEMETRÍA', content: (
-            <div style={{ padding: '31.5px 36px', fontFamily: FONT, fontSize: '22.5px', lineHeight: 3, color: TEXT2 }}>
+            <div style={{ padding: 'clamp(10px, 1.5vw, 20px) clamp(12px, 1.8vw, 24px)', fontFamily: FONT, fontSize: 'clamp(12px, 1.2vw, 16px)', lineHeight: 2, color: TEXT2 }}>
               <div>EVALUACIONES HOY: <span style={{ color: AMBER }}>47</span></div>
               <div>MÓDULO + ACTIVO: <span style={{ color: ACCENT }}>MOD-01</span></div>
               <div>SESIÓN ACTUAL: <span style={{ color: ACCENT }}>FOCO-{Date.now().toString(36).toUpperCase().slice(-6)}</span></div>
@@ -478,17 +478,17 @@ function ModuleSelector({ onSelect, bootStage = 4 }) {
 
       {/* Title */}
       <div style={{ marginBottom: '63px', borderBottom: `1.5px solid ${BORDER}`, paddingBottom: '30px', ...vis(3, 540) }}>
-        <div style={{ fontFamily: FONT, fontSize: '20.25px', color: TEXT2, letterSpacing: '4.01px', marginBottom: '27px' }}>
+        <div style={{ fontFamily: FONT, fontSize: 'clamp(11px, 1.4vw, 20.25px)', color: TEXT2, letterSpacing: 'clamp(1px, 0.3vw, 4px)', marginBottom: 'clamp(12px, 2vw, 27px)' }}>
           // SISTEMA DE EVALUACIÓN INTERACTIVA — SELECCIONE MÓDULO DE OPERACIÓN
         </div>
-        <div style={{ fontFamily: FONT, fontSize: '33px', letterSpacing: '5px', color: ACCENT, textShadow: `0 0 60px ${ACCENT}33`, lineHeight: 1.1 }}>
+        <div style={{ fontFamily: FONT, fontSize: 'clamp(18px, 2.8vw, 33px)', letterSpacing: 'clamp(2px, 0.4vw, 5px)', color: ACCENT, textShadow: `0 0 60px ${ACCENT}33`, lineHeight: 1.1 }}>
           CENTRO DE OPERACIONES<br />
           <span style={{ color: TEXT2, fontSize: '65%' }}>INNOVADEF FOCO 2026 — MADRID</span>
         </div>
       </div>
 
       {/* Module grid — each card staggers in */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(465px, 1fr))', gap: '18px', marginBottom: '72px', alignItems: 'stretch' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(clamp(280px, 40vw, 480px), 1fr))', gap: 'clamp(8px, 1vw, 14px)', marginBottom: 'clamp(24px, 4vw, 48px)', alignItems: 'stretch' }}>
         {MODULES.map((mod, idx) => {
           const Icon = mod.icon
           const isH = hovered === mod.id
@@ -511,13 +511,13 @@ function ModuleSelector({ onSelect, bootStage = 4 }) {
                 {/* Module header bar */}
                 <div style={{
                   display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                  padding: '12px 21px',
+                  padding: 'clamp(8px, 0.8vw, 12px) clamp(10px, 1.2vw, 21px)',
                   borderBottom: `1.5px solid ${isH ? `#ffaa0033` : BORDER}`,
                   background: isH ? 'rgba(255,170,0,0.04)' : '#0a0a0a'
                 }}>
                   <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
                     <Icon size={21} color={isH ? '#ffaa00' : TEXT2} />
-                    <span style={{ fontFamily: FONT, fontSize: '20.25px', color: TEXT2, letterSpacing: '3px' }}>{mod.code}</span>
+                    <span style={{ fontFamily: FONT, fontSize: 'clamp(11px, 1.3vw, 20.25px)', color: TEXT2, letterSpacing: 'clamp(1px, 0.2vw, 3px)' }}>{mod.code}</span>
                   </div>
                   <div style={{ display: 'flex', gap: '18px', alignItems: 'center' }}>
                     <span style={{ fontFamily: FONT, fontSize: '18px', letterSpacing: '3px', color: isH ? '#ffaa00' : TEXT2, padding: '3px 9px', border: `1.5px solid ${isH ? `#ffaa0044` : BORDER}` }}>
@@ -527,16 +527,16 @@ function ModuleSelector({ onSelect, bootStage = 4 }) {
                   </div>
                 </div>
                 {/* Body */}
-                <div style={{ padding: '24px 21px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                  <div style={{ fontFamily: FONT, fontSize: '19.5px', letterSpacing: '1.5px', color: isH ? '#ffaa00' : TEXT2, marginBottom: '15px', lineHeight: 1.3 }}>
+                <div style={{ padding: 'clamp(12px, 1.5vw, 24px) clamp(10px, 1.2vw, 21px)', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                  <div style={{ fontFamily: FONT, fontSize: 'clamp(11px, 1.3vw, 19.5px)', letterSpacing: 'clamp(0.5px, 0.1vw, 1.5px)', color: isH ? '#ffaa00' : TEXT2, marginBottom: 'clamp(8px, 1vw, 15px)', lineHeight: 1.3 }}>
                     {mod.label}
                   </div>
-                  <div style={{ fontFamily: FONT, fontSize: '22.5px', color: 'rgba(0,255,65,0.3)', lineHeight: 1.7, letterSpacing: '0.75px', marginBottom: '21px' }}>
+                  <div style={{ fontFamily: FONT, fontSize: 'clamp(10px, 1.2vw, 22.5px)', color: 'rgba(0,255,65,0.3)', lineHeight: 1.7, letterSpacing: '0.75px', marginBottom: 'clamp(10px, 1.2vw, 21px)' }}>
                     {mod.desc}
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontFamily: FONT, fontSize: '20.25px', color: 'rgba(0,255,65,0.25)', letterSpacing: '1.5px' }}>DURACIÓN: {mod.duration}</span>
-                    <span style={{ fontFamily: FONT, fontSize: '22.5px', color: isH ? '#ffaa00' : TEXT2, letterSpacing: '1.5px' }}>{isH ? '[EJECUTAR ▶]' : '[──────]'}</span>
+                    <span style={{ fontFamily: FONT, fontSize: 'clamp(10px, 1.2vw, 20.25px)', color: 'rgba(0,255,65,0.25)', letterSpacing: '1.5px' }}>DURACIÓN: {mod.duration}</span>
+                    <span style={{ fontFamily: FONT, fontSize: 'clamp(10px, 1.3vw, 22.5px)', color: isH ? '#ffaa00' : TEXT2, letterSpacing: '1.5px' }}>{isH ? '[EJECUTAR ▶]' : '[──────]'}</span>
                   </div>
                 </div>
               </button>
@@ -546,7 +546,7 @@ function ModuleSelector({ onSelect, bootStage = 4 }) {
       </div>
 
       {/* Footer */}
-      <div style={{ fontFamily: FONT, fontSize: '20.25px', color: 'rgba(0,255,65,0.18)', letterSpacing: '3px', textAlign: 'center', ...vis(3, 1500) }}>
+      <div style={{ fontFamily: FONT, fontSize: '12px', color: 'rgba(0,255,65,0.18)', letterSpacing: '2px', textAlign: 'center', ...vis(3, 1500) }}>
         INNOVADEF FOCO 2026 // 23.06.2026 // MADRID // SISTEMA CERTIFICADO ENS-CAT-A
       </div>
     </div>
@@ -559,6 +559,7 @@ function ModuleSelector({ onSelect, bootStage = 4 }) {
 function ModuleTransition({ active, onDone }) {
   useEffect(() => {
     if (active) {
+      sfxIntroWipe()
       const t = setTimeout(onDone, 1800)
       return () => clearTimeout(t)
     }
@@ -670,12 +671,13 @@ export default function App() {
 
   // Sync URL with screen
   useEffect(() => {
-    if (screen === 'sleep') navigate('/', { replace: true })
-    else if (screen === 'intro') navigate('/intro')
-    else if (screen === 'selector') navigate('/selector')
-    else if (screen === 'module' && activeModule) navigate(`/module/${activeModule}`)
-    else if (screen === 'email') navigate('/email')
-  }, [screen, activeModule, navigate])
+    const path = location.pathname
+    if (screen === 'sleep' && path !== '/') navigate('/', { replace: true })
+    else if (screen === 'intro' && path !== '/intro') navigate('/intro')
+    else if (screen === 'selector' && path !== '/selector') navigate('/selector')
+    else if (screen === 'module' && activeModule && path !== `/module/${activeModule}`) navigate(`/module/${activeModule}`)
+    else if (screen === 'email' && path !== '/email') navigate('/email')
+  }, [screen, activeModule, navigate, location.pathname])
 
   // Ambient background sound - TEMPORARILY DISABLED
   useEffect(() => {
@@ -684,20 +686,33 @@ export default function App() {
   }, [])
 
   // Inactivity timeout - return to sleep after 60 seconds
+  const screenRef = useRef(screen)
+  useEffect(() => { screenRef.current = screen }, [screen])
+  const goRef = useRef(go)
+  useEffect(() => { goRef.current = go }, [go])
+  const sleepingRef = useRef(false)
+
   useEffect(() => {
     let timeoutId
 
     const resetTimeout = () => {
       clearTimeout(timeoutId)
-      if (screen !== 'sleep') {
+      if (screenRef.current !== 'sleep' && !sleepingRef.current) {
         timeoutId = setTimeout(() => {
-          navigate('/')
+          if (screenRef.current === 'sleep' || sleepingRef.current) return
+          sleepingRef.current = true
+          goRef.current(() => {
+            setScreen('sleep')
+            setActiveModule(null)
+            setModuleResult(null)
+            sleepingRef.current = false
+          })
         }, 60000) // 60 seconds
       }
     }
 
     const handleActivity = () => {
-      resetTimeout()
+      if (!sleepingRef.current) resetTimeout()
     }
 
     // Add event listeners for user activity
@@ -715,7 +730,7 @@ export default function App() {
       window.removeEventListener('click', handleActivity)
       window.removeEventListener('touchstart', handleActivity)
     }
-  }, [screen, navigate])
+  }, [])
 
   const enterDashboard = () => {
     markUserInteracted()
@@ -741,6 +756,7 @@ export default function App() {
     setScreen('module')
     setTransitioning(false)
     setPendingModule(null)
+    sfxBootReady()
   }
 
   const handleComplete = (result) => {
@@ -755,7 +771,7 @@ export default function App() {
   const activeModCode = MODULES.find(m => m.id === activeModule)?.code
 
   return (
-    <div style={{ fontFamily: FONT, background: '#070707', minHeight: '100vh', color: ACCENT, overflowX: 'hidden', fontSize: '24px' }}>
+    <div style={{ fontFamily: FONT, background: '#070707', minHeight: '100vh', color: ACCENT, overflowX: 'hidden', fontSize: 'clamp(14px, 1.8vw, 24px)' }}>
       <MilitaryCursor />
       {screen === 'sleep' && <SleepScreen onWake={() => go(() => setScreen('intro'))} />}
       {screen === 'intro' && <IntroScreen onEnter={enterDashboard} />}
@@ -773,7 +789,7 @@ export default function App() {
       {/* Header */}
       <header style={{
         position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50,
-        height: '117px',
+        height: 'clamp(54px, 8vw, 117px)',
         background: 'rgba(5,5,5,0.96)',
         borderBottom: `1.5px solid ${BORDER}`,
         display: 'flex', alignItems: 'stretch',
@@ -784,13 +800,13 @@ export default function App() {
         {/* Logo block */}
         <button onClick={reset} style={{
           background: 'none', border: 'none', borderRight: `1.5px solid ${BORDER}`,
-          padding: '0 54px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '27px'
+          padding: '0 clamp(12px, 3vw, 54px)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '27px'
         }}>
-          <img src="/logoinnovadef.png" alt="INNOVADEF" style={{ height: '120px'}} />
+          <img src="/logoinnovadef.png" alt="INNOVADEF" style={{ height: 'clamp(36px, 6vw, 108px)'}} />
         </button>
 
         {/* Nav items */}
-        <div style={{ display: 'flex', alignItems: 'center', flex: 1, padding: '0 45px', gap: '0' }}>
+        <div style={{ display: 'flex', alignItems: 'center', flex: 1, padding: '0', gap: '0' }}>
           {[
             { label: 'CENTRO OPS', active: screen === 'selector', action: reset },
             { label: activeModCode || '—', active: screen === 'module', action: null },
@@ -798,7 +814,7 @@ export default function App() {
             <div key={i} style={{
               padding: '0 24px', height: '100%', display: 'flex', alignItems: 'center',
               borderRight: `1.5px solid ${BORDER}`,
-              fontFamily: FONT, fontSize: '22.5px', letterSpacing: '3px',
+              fontFamily: FONT, fontSize: 'clamp(10px, 1.4vw, 22.5px)', letterSpacing: 'clamp(1px, 0.2vw, 3px)',
               color: nav.active ? ACCENT : TEXT2,
               borderBottom: nav.active ? `3px solid ${ACCENT}` : '3px solid transparent',
               cursor: nav.action ? 'pointer' : 'default',
@@ -816,23 +832,28 @@ export default function App() {
             { label: 'NET', val: 'ENS', c: ACCENT },
             { label: 'SEC', val: 'A', c: ACCENT },
           ].map((ind, i) => (
-            <div key={i} style={{ padding: '0 31.5px', borderRight: `1.5px solid ${BORDER}`, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '4.5px' }}>
-              <div style={{ fontFamily: FONT, fontSize: '18px', color: TEXT2, letterSpacing: '1.5px' }}>{ind.label}</div>
-              <div style={{ fontFamily: FONT, fontSize: '22.5px', color: ind.c, letterSpacing: '1.5px' }}>{ind.val}</div>
+            <div key={i} style={{ padding: '0 clamp(8px, 1.8vw, 31.5px)', borderRight: `1.5px solid ${BORDER}`, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '4.5px' }}>
+              <div style={{ fontFamily: FONT, fontSize: 'clamp(9px, 1.1vw, 18px)', color: TEXT2, letterSpacing: '1.5px' }}>{ind.label}</div>
+              <div style={{ fontFamily: FONT, fontSize: 'clamp(10px, 1.4vw, 22.5px)', color: ind.c, letterSpacing: '1.5px' }}>{ind.val}</div>
             </div>
           ))}
-          <div style={{ padding: '0 24px', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '4.5px' }}>
-            <div style={{ fontFamily: FONT, fontSize: '18px', color: TEXT2, letterSpacing: '1.5px' }}>HORA LOCAL</div>
+          <div style={{ padding: '0 clamp(8px, 1.5vw, 24px)', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '4.5px' }}>
+            <div style={{ fontFamily: FONT, fontSize: 'clamp(9px, 1.1vw, 18px)', color: TEXT2, letterSpacing: '1.5px' }}>HORA LOCAL</div>
             <LiveClock />
           </div>
         </div>
       </header>
 
       {/* Content */}
-      <div style={{ position: 'relative', zIndex: 2, paddingTop: '78px', paddingBottom: '48px', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '120px 48px 72px' }}>
-        {screen === 'selector' && <ModuleSelector onSelect={selectModule} bootStage={bootStage} />}
+      <div style={{ position: 'relative', zIndex: 2, minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'clamp(70px, 10vw, 130px) clamp(12px, 3vw, 48px) clamp(42px, 6vw, 72px)' }}>
+        {screen === 'selector' && (
+          <div key="selector" style={{ width: '100%',
+            animation: transitioning ? 'contentFadeOut 0.5s ease-in 0.45s forwards' : 'contentFadeIn 0.6s ease-out both' }}>
+            <ModuleSelector onSelect={selectModule} bootStage={bootStage} />
+          </div>
+        )}
         {screen === 'module' && (
-          <>
+          <div key={`mod-${activeModule}`} style={{ width: '100%', animation: 'contentFadeIn 0.6s ease-out both' }}>
             {activeModule === 'capacity' && <CapacityTest onComplete={handleComplete} />}
             {activeModule === 'tactical' && <TacticalSimulator onComplete={handleComplete} />}
             {activeModule === 'radar' && <MaturityRadar onComplete={handleComplete} />}
@@ -841,9 +862,13 @@ export default function App() {
             {activeModule === 'cyberdefense' && <CyberDefense onComplete={handleComplete} />}
             {activeModule === 'tacticalmap' && <TacticalMap onComplete={handleComplete} />}
             {activeModule === 'covertmission' && <CovertMission onComplete={handleComplete} />}
-          </>
+          </div>
         )}
-        {screen === 'email' && <EmailScreen sessionId={sessionId} onReset={reset} />}
+        {screen === 'email' && (
+          <div key="email" style={{ width: '100%', animation: 'contentFadeIn 0.6s ease-out both' }}>
+            <EmailScreen sessionId={sessionId} onReset={reset} />
+          </div>
+        )}
       </div>
 
       <StatusBar module={activeModCode} onHome={reset} bootStage={bootStage} />
@@ -857,11 +882,22 @@ export default function App() {
           font-display: swap;
         }
         * { box-sizing: border-box; }
+        html, body { max-width: 100vw; overflow-x: hidden; }
         ::selection { background: rgba(0,255,65,0.2); color: #00FF41; }
-        ::-webkit-scrollbar { width: 4.01px; background: #070707; }
+        ::-webkit-scrollbar { width: 4px; background: #070707; }
         ::-webkit-scrollbar-thumb { background: rgba(0,255,65,0.2); }
+        @media (max-width: 600px) {
+          .hdr-indicators { display: none !important; }
+          .hdr-clock { display: none !important; }
+          .status-items { display: none !important; }
+        }
+        @media (max-width: 900px) {
+          .hdr-nav { display: none !important; }
+        }
         @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
         @keyframes fadeIn { from{opacity:0;transform:translateY(4.01px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes contentFadeIn { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes contentFadeOut { from{opacity:1;transform:translateY(0) scale(1)} to{opacity:0;transform:translateY(-14px) scale(0.97)} }
         @keyframes spin { to{transform:rotate(360deg)} }
         @keyframes hudScan   { 0%{top:0;opacity:1} 85%{opacity:0.7} 100%{top:100vh;opacity:0} }
         @keyframes hudScanUp { 0%{bottom:0;opacity:1} 85%{opacity:0.7} 100%{bottom:100vh;opacity:0} }

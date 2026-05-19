@@ -287,8 +287,8 @@ export default function IntroScreen({ onEnter }) {
     markUserInteracted()
     sfxEnterFiring()
     setPhase('firing')
-    setTimeout(() => setPhase('transition'), 450)
-    setTimeout(() => onEnter(), 2100)
+    setTimeout(() => setPhase('transition'), 300)
+    setTimeout(() => onEnter(), 900)
   }
 
   return (
@@ -299,7 +299,7 @@ export default function IntroScreen({ onEnter }) {
       display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
       // wipe-out animation
       ...(phase === 'transition' ? {
-        animation: 'introWipe 1.65s ease-in forwards'
+        animation: 'introWipe 0.6s ease-in forwards'
       } : {})
     }}>
       {/* Giant Radar behind everything */}
@@ -328,24 +328,24 @@ export default function IntroScreen({ onEnter }) {
           />
           {/* Líneas de escáner debajo del logo */}
           <div style={{ marginTop: '18px', display: 'flex', flexDirection: 'column', gap: '6px', alignItems: 'center' }}>
-            <div style={{ width: '360px', height: '3px', background: `linear-gradient(90deg, transparent, ${ACCENT}, transparent)`, animation: 'scanPulse 3s ease-in-out infinite' }} />
-            <div style={{ width: '420px', height: '3px', background: `linear-gradient(90deg, transparent, ${ACCENT}66, transparent)`, animation: 'scanPulse 3s ease-in-out infinite 0.45s' }} />
+            <div style={{ width: 'clamp(200px, 50vw, 360px)', height: '3px', background: `linear-gradient(90deg, transparent, ${ACCENT}, transparent)`, animation: 'scanPulse 3s ease-in-out infinite' }} />
+            <div style={{ width: 'clamp(240px, 60vw, 420px)', height: '3px', background: `linear-gradient(90deg, transparent, ${ACCENT}66, transparent)`, animation: 'scanPulse 3s ease-in-out infinite 0.45s' }} />
           </div>
         </div>
 
         {/* Nombre del sistema */}
-        <div style={{ fontFamily: FONT, fontSize: 'clamp(15px, 2.1vw, 21px)', letterSpacing: '6px', color: TEXT2, marginBottom: '12px', animation: 'fadeInUp 0.9s ease 0.3s both' }}>
+        <div style={{ fontFamily: FONT, fontSize: 'clamp(11px, 2.1vw, 21px)', letterSpacing: 'clamp(2px, 0.6vw, 6px)', color: TEXT2, marginBottom: '12px', animation: 'fadeInUp 0.9s ease 0.3s both' }}>
           SISTEMA DE EVALUACIÓN TÁCTICA
         </div>
         <div style={{ fontFamily: FONT, fontSize: 'clamp(33px, 6vw, 78px)', letterSpacing: '9px', color: ACCENT, marginBottom: '6px', animation: 'fadeInUp 0.9s ease 0.6s both', textShadow: `0 0 30px ${ACCENT}66` }}>
           FOCO 2026
         </div>
-        <div style={{ fontFamily: FONT, fontSize: 'clamp(12px, 1.5vw, 16.5px)', letterSpacing: '5px', color: TEXT2, opacity: 0.75, marginBottom: '18px', animation: 'fadeInUp 0.9s ease 0.9s both' }}>
+        <div style={{ fontFamily: FONT, fontSize: 'clamp(10px, 1.5vw, 16.5px)', letterSpacing: 'clamp(2px, 0.5vw, 5px)', color: TEXT2, opacity: 0.75, marginBottom: '18px', animation: 'fadeInUp 0.9s ease 0.9s both' }}>
           23.06.2026 · MADRID · ENS CAT-A CERTIFICADO
         </div>
 
         {/* Boot sequence */}
-        <div style={{ fontFamily: FONT, fontSize: '21px', color: `${ACCENT}55`, letterSpacing: '1px', lineHeight: 3, textAlign: 'left', minHeight: '120px', marginBottom: '30px', width: 'clamp(280px, 75vw, 520px)', animation: 'fadeInUp 0.75s ease 1.2s both' }}>
+        <div style={{ fontFamily: FONT, fontSize: 'clamp(11px, 1.8vw, 21px)', color: `${ACCENT}55`, letterSpacing: '1px', lineHeight: 2.5, textAlign: 'left', minHeight: 'clamp(80px, 15vw, 120px)', marginBottom: '30px', width: 'clamp(240px, 75vw, 520px)', animation: 'fadeInUp 0.75s ease 1.2s both' }}>
           {bootLines.map((line, i) => (
             <div key={i} style={{ color: i === bootLines.length - 1 ? ACCENT : `${ACCENT}55`, animation: 'lineIn 0.3s ease' }}>
               {line}{i === bootLines.length - 1 ? <span style={{ animation: 'blink 1.2s infinite' }}>_</span> : ''}
@@ -358,8 +358,8 @@ export default function IntroScreen({ onEnter }) {
           <button
             onClick={handleEnter}
             style={{
-              fontFamily: FONT, fontSize: '27px', letterSpacing: '9px',
-              padding: '18px 48px',
+              fontFamily: FONT, fontSize: 'clamp(14px, 2.5vw, 27px)', letterSpacing: 'clamp(3px, 0.8vw, 9px)',
+              padding: 'clamp(12px, 2vw, 18px) clamp(24px, 5vw, 48px)',
               background: 'transparent',
               border: `1.5px solid #ffaa0055`,
               color: '#ffaa00',
@@ -375,21 +375,26 @@ export default function IntroScreen({ onEnter }) {
             {/* Corner brackets */}
             <span style={{ position: 'absolute', top: 4.5, left: 4.5, width: 15, height: 15, borderTop: `1px solid ${ACCENT}`, borderLeft: `1px solid ${ACCENT}` }} />
             <span style={{ position: 'absolute', top: 4.5, right: 4.5, width: 15, height: 15, borderTop: `1px solid ${ACCENT}`, borderRight: `1px solid ${ACCENT}` }} />
-            <span style={{ position: 'absolute', bottom: 4.5, left: 4.5, width: 15, height: 15, borderBottom: `1px solid ${ACCENT}`, borderLeft: `1px solid ${ACCENT}` }} />
-            <span style={{ position: 'absolute', bottom: 4.5, right: 4.5, width: 15, height: 15, borderBottom: `1px solid ${ACCENT}`, borderRight: `1px solid ${ACCENT}` }} />
+            <span style={{ position: 'absolute', bottom: 4.5, left: 4.5, width: 15, height: 15, borderBottom: '1px solid #ffaa00', borderLeft: '1px solid #ffaa00' }} />
+            <span style={{ position: 'absolute', bottom: 4.5, right: 4.5, width: 15, height: 15, borderBottom: '1px solid #ffaa00', borderRight: '1px solid #ffaa00' }} />
             INICIAR SISTEMA
           </button>
         )}
 
         {/* Session ID */}
-        <div style={{ fontFamily: FONT, fontSize: '13.5px', color: `${ACCENT}30`, letterSpacing: '3px', marginTop: '36px' }}>
+        <div style={{ fontFamily: FONT, fontSize: 'clamp(9px, 1vw, 13.5px)', color: `${ACCENT}30`, letterSpacing: 'clamp(1px, 0.2vw, 3px)', marginTop: 'clamp(18px, 3vw, 36px)' }}>
           ID: FOCO-{Date.now().toString(36).toUpperCase().slice(-6)} · v2.6.0
         </div>
       </div>
 
-      {/* Transition overlay (flash on enter) */}
+      {/* Transition overlay — military scanner wipe */}
       {phase === 'transition' && (
-        <div style={{ position: 'absolute', inset: 0, zIndex: 10, background: ACCENT, animation: 'flashOut 1.65s ease-out forwards', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', inset: 0, zIndex: 10, pointerEvents: 'none' }}>
+          {/* Scanner line sweep */}
+          <div style={{ position: 'absolute', left: 0, right: 0, height: '4px', background: `linear-gradient(90deg, transparent, ${ACCENT}, transparent)`, boxShadow: `0 0 40px ${ACCENT}, 0 0 80px ${ACCENT}66`, animation: 'scanWipe 0.6s ease-in-out forwards' }} />
+          {/* Fade to black */}
+          <div style={{ position: 'absolute', inset: 0, background: '#070707', animation: 'fadeToBlack 0.6s ease-in forwards' }} />
+        </div>
       )}
 
       <style>{`
@@ -417,15 +422,18 @@ export default function IntroScreen({ onEnter }) {
           0%,100% { opacity: 1; }
           50%      { opacity: 0; }
         }
-        @keyframes flashOut {
-          0%   { opacity: 0.9; }
-          22.5%  { opacity: 0.675; }
-          100% { opacity: 0; }
+        @keyframes scanWipe {
+          0%   { top: 0; opacity: 1; }
+          100% { top: 100%; opacity: 0.3; }
+        }
+        @keyframes fadeToBlack {
+          0%   { opacity: 0; }
+          60%  { opacity: 0; }
+          100% { opacity: 1; }
         }
         @keyframes introWipe {
           0%   { opacity: 1; transform: scale(1); }
-          45%  { opacity: 1; transform: scale(1.045); }
-          100% { opacity: 0; transform: scale(1.1); }
+          100% { opacity: 0; transform: scale(1.02); }
         }
       `}</style>
     </div>

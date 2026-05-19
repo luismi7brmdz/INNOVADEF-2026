@@ -135,42 +135,44 @@ function chord(ac, startTime, freqs, duration, gain, stagger = 0.02) {
 
 // ── SFX CINEMÁTICOS IMF ─────────────────────────────────────────────────────────
 
-// SleepScreen: activación de sistemas — power-up militar sofisticado
+// SleepScreen: activación de sistemas — alarma militar de activación
 export function sfxWakeTouch() {
   const ac = getCtx()
   if (!ac) return
   const now = ac.currentTime
-  deepRumble(ac, now, 2.0, 0.22)
-  cinematicWhoosh(ac, now, 40, 600, 1.2, 0.15)
-  chord(ac, now, [55, 82, 110, 165], 0.8, 0.06, 0.03)
-  filteredNoise(ac, now + 0.2, 0.6, 0.04, 2000, 400)
+  // Sub-bass profundo de sistema encendiendo
+  deepRumble(ac, now, 2.5, 0.35)
+  // Sweep ascendente tipo radar encendiendo
+  cinematicWhoosh(ac, now, 30, 800, 2.0, 0.2)
+  // Tono grave militar — como sirena de submarino
+  sine(ac, 55, now, 2.0, 0.15, 220)
+  sine(ac, 110, now + 0.3, 1.5, 0.08, 440)
+  // Ruido de estática de radio militar
+  filteredNoise(ac, now + 0.1, 1.0, 0.06, 1200, 200)
 }
 
-// Wake sweep — sistema arrancando, sweep de frecuencia sofisticado
+// Wake sweep — barrido sonar militar ascendente
 export function sfxWakeSweep() {
   const ac = getCtx()
   if (!ac) return
   const now = ac.currentTime
+  // Barrido sonar tipo CIC naval
   const o = ac.createOscillator()
   const g = ac.createGain()
-  const lfo = ac.createOscillator()
-  const lfoG = ac.createGain()
-  o.type = 'sawtooth'
-  o.frequency.setValueAtTime(30, now)
-  o.frequency.exponentialRampToValueAtTime(280, now + 1.6)
-  lfo.type = 'sine'
-  lfo.frequency.value = 4
-  lfoG.gain.value = 15
-  lfo.connect(lfoG); lfoG.connect(o.frequency)
+  o.type = 'sine'
+  o.frequency.setValueAtTime(200, now)
+  o.frequency.exponentialRampToValueAtTime(2000, now + 1.8)
   g.gain.setValueAtTime(0.0001, now)
-  g.gain.linearRampToValueAtTime(0.12, now + 0.4)
-  g.gain.linearRampToValueAtTime(0.06, now + 1.2)
-  g.gain.exponentialRampToValueAtTime(0.0001, now + 1.6)
+  g.gain.linearRampToValueAtTime(0.18, now + 0.2)
+  g.gain.linearRampToValueAtTime(0.12, now + 1.2)
+  g.gain.exponentialRampToValueAtTime(0.0001, now + 1.8)
   o.connect(g); g.connect(ac.destination)
-  o.start(now); o.stop(now + 1.7)
-  lfo.start(now); lfo.stop(now + 1.7)
-  filteredNoise(ac, now, 1.6, 0.05, 400, 80)
-  metallicPing(ac, now + 0.8, 880, 0.4, 0.03)
+  o.start(now); o.stop(now + 1.9)
+  // Rumble de maquinaria pesada
+  deepRumble(ac, now, 1.8, 0.18)
+  // Eco metálico de sala de mando
+  metallicPing(ac, now + 1.0, 1200, 0.6, 0.04)
+  metallicPing(ac, now + 1.3, 1800, 0.4, 0.03)
 }
 
 // Explosión energética wake→intro — impacto imponente y respetable
@@ -277,14 +279,18 @@ export function sfxBootLine() {
   sine(ac, 1200, now, 0.025, 0.015, 800, 'triangle')
 }
 
-// Botón de sistema listo — chord de confirmación profesional
+// Sistema listo — confirmación de mando táctico
 export function sfxBootReady() {
   const ac = getCtx()
   if (!ac) return
   const now = ac.currentTime
-  chord(ac, now, [130, 164, 196, 261, 329], 1.4, 0.07, 0.04)
-  filteredNoise(ac, now + 0.15, 0.6, 0.025, 8000, 3000)
-  metallicPing(ac, now + 0.3, 1568, 0.8, 0.03)
+  // Tono de confirmación grave — como sistema de armas confirmado
+  sine(ac, 220, now, 0.3, 0.12, 220)
+  sine(ac, 330, now + 0.15, 0.4, 0.10, 330)
+  // Ping de sistema operativo
+  metallicPing(ac, now + 0.35, 880, 0.5, 0.04)
+  // Estática suave de radio
+  filteredNoise(ac, now + 0.1, 0.3, 0.02, 3000, 1000)
 }
 
 // Cursor — click de sistema HUD táctico
@@ -297,27 +303,37 @@ export function sfxShot() {
   sine(ac, 800, now, 0.04, 0.025, 400, 'square')
 }
 
-// Botón INICIAR SISTEMA — power-up cinematográfico sofisticado
+// Botón INICIAR — activación de mando con autoridad
 export function sfxEnterFiring() {
   const ac = getCtx()
   if (!ac) return
   const now = ac.currentTime
-  deepRumble(ac, now, 1.8, 0.25)
-  cinematicWhoosh(ac, now, 60, 1500, 1.0, 0.18)
-  chord(ac, now, [65, 98, 130, 196, 260], 1.2, 0.08, 0.05)
-  filteredNoise(ac, now + 0.2, 0.7, 0.08, 1500, 300)
-  metallicPing(ac, now + 0.5, 2093, 0.6, 0.04)
+  // Impacto grave de puerta blindada cerrando
+  deepRumble(ac, now, 2.2, 0.4)
+  // Whoosh de escáner pasando de izquierda a derecha
+  cinematicWhoosh(ac, now + 0.05, 100, 3000, 1.5, 0.22)
+  // Tono descendente de sirena militar
+  sine(ac, 600, now + 0.1, 1.0, 0.10, 150)
+  // Estática de comunicaciones
+  filteredNoise(ac, now + 0.15, 0.8, 0.06, 2000, 400)
+  // Ping de confirmación final
+  metallicPing(ac, now + 0.8, 1600, 0.8, 0.05)
 }
 
-// Transición intro → dashboard — wipe cinematográfico
+// Transición intro → dashboard — barrido escáner militar
 export function sfxIntroWipe() {
   const ac = getCtx()
   if (!ac) return
   const now = ac.currentTime
-  cinematicWhoosh(ac, now, 2500, 60, 0.8, 0.18)
-  deepRumble(ac, now, 1.0, 0.18)
-  filteredNoise(ac, now, 0.5, 0.12, 800, 100)
-  sine(ac, 200, now, 0.6, 0.06, 80)
+  // Barrido descendente tipo CIC — escáner cerrando
+  cinematicWhoosh(ac, now, 3000, 40, 1.2, 0.25)
+  // Impacto sub-bass de compuerta
+  deepRumble(ac, now + 0.1, 1.5, 0.3)
+  // Tono grave de sistema cargado
+  sine(ac, 80, now + 0.15, 1.0, 0.12, 40)
+  // Eco metálico final
+  metallicPing(ac, now + 0.4, 600, 0.8, 0.05)
+  filteredNoise(ac, now + 0.1, 0.6, 0.08, 500, 80)
 }
 
 // Dashboard: header materializa

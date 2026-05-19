@@ -117,19 +117,19 @@ function DecoderPuzzle({ intercept, onSolved, onClose }) {
   let charIdx = 0
   return (
     <div style={{ ...CARD, borderColor: `${ACCENT}44`, marginTop: '16px' }}>
-      <div style={{ fontSize: '13px', color: TEXT2, letterSpacing: '3px', marginBottom: '12px' }}>
+      <div style={{ fontSize: '19.5px', color: TEXT2, letterSpacing: '4.5px', marginBottom: '18px' }}>
         // {intercept.label} — DECODIFICADOR ACTIVO
       </div>
-      <div style={{ fontSize: '13px', color: TEXT2, letterSpacing: '1px', marginBottom: '16px', lineHeight: 1.8 }}>
+      <div style={{ fontSize: '29.25px', color: TEXT2, letterSpacing: '2.25px', marginBottom: '36px', lineHeight: 2.7 }}>
         {intercept.hint}
       </div>
 
       {/* Encoded message display */}
-      <div style={{ background: '#030303', border: `1px solid ${BORDER}`, padding: '16px', marginBottom: '16px', fontFamily: FONT }}>
-        <div style={{ fontSize: '12px', color: TEXT2, letterSpacing: '2px', marginBottom: '10px' }}>TRANSMISIÓN CIFRADA:</div>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+      <div style={{ background: '#030303', border: `1px solid ${BORDER}`, padding: '24px', marginBottom: '24px', fontFamily: FONT }}>
+        <div style={{ fontFamily: FONT, fontSize: '40.5px', color: ACCENT, letterSpacing: '6.75px', marginBottom: '60.75px' }}>TRANSMISIÓN CIFRADA:</div>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '9px' }}>
           {words.map((word, wi) => (
-            <span key={wi} style={{ display: 'inline-flex', gap: '2px', marginRight: '12px' }}>
+            <span key={wi} style={{ display: 'inline-flex', gap: '3px', marginRight: '18px' }}>
               {word.split('').map((char, ci) => {
                 const idx = charIdx++
                 const isRevealed = revealed[idx]
@@ -139,14 +139,14 @@ function DecoderPuzzle({ intercept, onSolved, onClose }) {
                     display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: '2px'
                   }}>
                     <span style={{
-                      fontSize: '18px', fontFamily: FONT, letterSpacing: '1px',
+                      fontSize: '27px', fontFamily: FONT, letterSpacing: '1.5px',
                       color: isRevealed ? ACCENT : isKeyword && solved ? ACCENT : TEXT2,
                       borderBottom: isKeyword ? `1px solid ${ACCENT}55` : '1px solid transparent',
                       minWidth: '12px', textAlign: 'center',
                     }}>
                       {isRevealed ? revealed[idx] : (solved && isKeyword ? intercept.keyword[idx - intercept.keywordPos] : char)}
                     </span>
-                    <span style={{ fontSize: '10px', color: 'rgba(0,255,65,0.2)', fontFamily: FONT }}>{idx}</span>
+                    <span style={{ fontSize: '15px', color: 'rgba(0,255,65,0.2)', fontFamily: FONT }}>{idx}</span>
                   </span>
                 )
               })}
@@ -157,14 +157,14 @@ function DecoderPuzzle({ intercept, onSolved, onClose }) {
 
       {/* Cipher reference */}
       <div style={{ background: '#030303', border: `1px solid ${BORDER}`, padding: '10px', marginBottom: '16px' }}>
-        <div style={{ fontSize: '12px', color: TEXT2, letterSpacing: '2px', marginBottom: '8px' }}>TABLA DE CIFRADO PARCIAL:</div>
+        <div style={{ fontSize: '18px', color: TEXT2, letterSpacing: '3px', marginBottom: '12px' }}>TABLA DE CIFRADO PARCIAL:</div>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
           {Object.entries(DECIPHER).slice(0, 16).map(([enc, dec]) => (
-            <span key={enc} style={{ fontSize: '13px', fontFamily: FONT, color: TEXT2 }}>
+            <span key={enc} style={{ fontSize: '19.5px', fontFamily: FONT, color: TEXT2 }}>
               <span style={{ color: ACCENT }}>{enc}</span>→<span style={{ color: AMBER }}>{dec}</span>
             </span>
           ))}
-          <span style={{ fontSize: '13px', color: TEXT2, opacity: 0.4 }}>... [CLASIFICADO]</span>
+          <span style={{ fontSize: '19.5px', color: TEXT2, opacity: 0.4 }}>... [CLASIFICADO]</span>
         </div>
       </div>
 
@@ -180,7 +180,7 @@ function DecoderPuzzle({ intercept, onSolved, onClose }) {
             placeholder={`INGRESE PALABRA CLAVE (POS. ${intercept.keywordPos}-${intercept.keywordPos + intercept.keyword.length - 1})`}
             style={{
               flex: 1, padding: '12px', background: '#030303', border: `1px solid ${error ? RED : BORDER}`,
-              color: ACCENT, fontFamily: FONT, fontSize: '14px', letterSpacing: '2px', outline: 'none',
+              color: ACCENT, fontFamily: FONT, fontSize: '21px', letterSpacing: '3px', outline: 'none',
             }}
           />
           <button onClick={tryDecode} disabled={!input.trim()}
@@ -190,12 +190,12 @@ function DecoderPuzzle({ intercept, onSolved, onClose }) {
         </div>
       ) : (
         <div style={{ padding: '16px', background: 'rgba(0,255,65,0.06)', border: `1px solid ${ACCENT}44`, textAlign: 'center' }}>
-          <div style={{ color: ACCENT, fontSize: '15px', letterSpacing: '3px' }}>✓ TRANSMISIÓN DECODIFICADA — PALABRA CLAVE: {intercept.keyword}</div>
+          <div style={{ color: ACCENT, fontSize: '22.5px', letterSpacing: '4.5px' }}>✓ TRANSMISIÓN DECODIFICADA — PALABRA CLAVE: {intercept.keyword}</div>
         </div>
       )}
-      {error && <div style={{ marginTop: '8px', fontSize: '13px', color: RED, letterSpacing: '2px' }}>{error}</div>}
+      {error && <div style={{ marginTop: '12px', fontSize: '19.5px', color: RED, letterSpacing: '3px' }}>{error}</div>}
       {!solved && (
-        <button onClick={onClose} style={{ marginTop: '12px', background: 'none', border: 'none', color: TEXT2, cursor: 'pointer', fontFamily: FONT, fontSize: '12px', letterSpacing: '2px' }}>
+        <button onClick={onClose} style={{ marginTop: '18px', background: 'none', border: 'none', color: TEXT2, cursor: 'pointer', fontFamily: FONT, fontSize: '18px', letterSpacing: '3px' }}>
           [ CERRAR ]
         </button>
       )}
@@ -396,19 +396,19 @@ export default function CovertMission({ onComplete }) {
   const rank = finalScore >= 1000 ? 'AGENTE FANTASMA' : finalScore >= 700 ? 'OPERATIVO ÉLITE' : 'AGENTE EN CAMPO'
 
   return (
-    <div style={{ maxWidth: '1280px', width: '100%', margin: '0 auto', fontFamily: FONT }}>
+    <div style={{ maxWidth: '1920px', width: '100%', margin: '0 auto', fontFamily: FONT }}>
 
       {/* ── INTRO ── */}
       {phase === 'intro' && (
         <div>
-          <div style={{ fontSize: '13px', letterSpacing: '3px', color: TEXT2, marginBottom: '12px' }}>// MOD-08 — OPERACIÓN ENCUBIERTA</div>
-          <div style={{ fontSize: 'clamp(26px, 3vw, 44px)', letterSpacing: '4px', color: ACCENT, marginBottom: '32px' }}>
+          <div style={{ fontSize: '19.5px', letterSpacing: '4.5px', color: TEXT2, marginBottom: '18px' }}>// MOD-08 — OPERACIÓN ENCUBIERTA</div>
+          <div style={{ fontSize: 'clamp(39px, 4.5vw, 66px)', letterSpacing: '6px', color: ACCENT, marginBottom: '48px' }}>
             MISIÓN SOMBRA — TERMINAL CLASIFICADO
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '32px' }}>
             <div style={{ ...CARD, borderLeft: `2px solid ${ACCENT}44` }}>
-              <div style={{ fontSize: '9px', color: TEXT2, letterSpacing: '3px', marginBottom: '10px' }}>// OBJETIVO</div>
-              <p style={{ fontSize: '15px', color: TEXT2, lineHeight: 1.8, margin: 0 }}>
+              <div style={{ fontSize: '13.5px', color: TEXT2, letterSpacing: '4.5px', marginBottom: '15px' }}>// OBJETIVO</div>
+              <p style={{ fontSize: '22.5px', color: TEXT2, lineHeight: 1.8, margin: 0 }}>
                 INFILTRE UNA RED COMPROMETIDA, INTERCEPTE TRANSMISIONES CIFRADAS Y DECODIFÍQUELAS PARA IDENTIFICAR AL AGENTE INFILTRADO Y NEUTRALIZAR LA AMENAZA.
               </p>
             </div>
@@ -420,8 +420,8 @@ export default function CovertMission({ onComplete }) {
                 { label: 'DURACIÓN', val: '~5 MIN' },
               ].map(r => (
                 <div key={r.label} style={{ ...CARD, padding: '12px 16px', display: 'flex', gap: '12px', alignItems: 'center' }}>
-                  <span style={{ fontSize: '13px', color: TEXT2, letterSpacing: '2px', minWidth: '100px' }}>{r.label}:</span>
-                  <span style={{ fontSize: '14px', color: ACCENT }}>{r.val}</span>
+                  <span style={{ fontSize: '19.5px', color: TEXT2, letterSpacing: '3px', minWidth: '150px' }}>{r.label}:</span>
+                  <span style={{ fontSize: '21px', color: ACCENT }}>{r.val}</span>
                 </div>
               ))}
             </div>
@@ -443,8 +443,8 @@ export default function CovertMission({ onComplete }) {
               { label: 'FASE', val: missionPhase.toUpperCase(), color: ACCENT },
             ].map(h => (
               <div key={h.label} style={{ ...CARD, padding: '12px 14px', textAlign: 'center' }}>
-                <div style={{ fontSize: '12px', color: TEXT2, letterSpacing: '2px', marginBottom: '5px' }}>{h.label}</div>
-                <div style={{ fontSize: '16px', color: h.color, letterSpacing: '2px' }}>{h.val}</div>
+                <div style={{ fontSize: '18px', color: TEXT2, letterSpacing: '3px', marginBottom: '7.5px' }}>{h.label}</div>
+                <div style={{ fontSize: '24px', color: h.color, letterSpacing: '3px' }}>{h.val}</div>
               </div>
             ))}
           </div>
@@ -458,7 +458,7 @@ export default function CovertMission({ onComplete }) {
                   <div key={i} style={{ width: '10px', height: '10px', borderRadius: '50%', background: c }} />
                 ))}
               </div>
-              <span style={{ fontSize: '10px', color: TEXT2, letterSpacing: '3px', flex: 1, textAlign: 'center' }}>
+              <span style={{ fontSize: '15px', color: TEXT2, letterSpacing: '4.5px', flex: 1, textAlign: 'center' }}>
                 TERMINAL SEGURO — OP-SOMBRA-7 — ENS-CAT-A
               </span>
               <div style={{ display: 'flex', gap: '6px' }}>
@@ -475,12 +475,12 @@ export default function CovertMission({ onComplete }) {
             {/* Output */}
             <div ref={terminalRef} style={{ height: '480px', overflowY: 'auto', padding: '20px', display: 'flex', flexDirection: 'column', gap: '5px' }}>
               {lines.map((line, i) => (
-                <div key={i} style={{ fontSize: '14px', color: lineColor(line.type), fontFamily: FONT, letterSpacing: '0.5px', lineHeight: 1.7 }}>
+                <div key={i} style={{ fontSize: '21px', color: lineColor(line.type), fontFamily: FONT, letterSpacing: '0.75px', lineHeight: 1.7 }}>
                   {line.text}
                 </div>
               ))}
               {!briefingDone && (
-                <div style={{ fontSize: '14px', color: ACCENT, animation: 'blink 1s infinite' }}>█</div>
+                <div style={{ fontSize: '21px', color: ACCENT, animation: 'blink 1s infinite' }}>█</div>
               )}
             </div>
 
@@ -498,7 +498,7 @@ export default function CovertMission({ onComplete }) {
             {/* Input */}
             {briefingDone && !activeDecoder && missionPhase !== 'exfil' && missionPhase !== 'done' && (
               <div style={{ borderTop: `1px solid ${BORDER}`, padding: '12px 16px', display: 'flex', gap: '10px', alignItems: 'center', background: '#030303' }}>
-                <span style={{ color: ACCENT, fontSize: '16px', fontFamily: FONT }}>{'>'}</span>
+                <span style={{ color: ACCENT, fontSize: '24px', fontFamily: FONT }}>{'>'}</span>
                 <input
                   ref={inputRef}
                   value={input}
@@ -508,10 +508,10 @@ export default function CovertMission({ onComplete }) {
                   autoFocus
                   style={{
                     flex: 1, background: 'transparent', border: 'none', outline: 'none',
-                    color: ACCENT, fontFamily: FONT, fontSize: '15px', letterSpacing: '2px',
+                    color: ACCENT, fontFamily: FONT, fontSize: '22.5px', letterSpacing: '3px',
                   }}
                 />
-                <button onClick={() => handleCommand(input)} style={{ ...S.btnPrimary, padding: '10px 20px', fontSize: '13px' }}>
+                <button onClick={() => handleCommand(input)} style={{ ...S.btnPrimary, padding: '15px 30px', fontSize: '19.5px' }}>
                   EJECUTAR
                 </button>
               </div>
@@ -523,7 +523,7 @@ export default function CovertMission({ onComplete }) {
             <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '8px' }}>
               {['CONECTAR', 'SCAN', 'ACCEDER', 'ANALIZAR', 'TRANSMISION 1', 'TRANSMISION 2', 'TRANSMISION 3', 'EXFILTRAR'].map(cmd => (
                 <button key={cmd} onClick={() => handleCommand(cmd)}
-                  style={{ ...S.btnPrimary, padding: '8px 16px', fontSize: '12px', opacity: 0.8 }}>
+                  style={{ ...S.btnPrimary, padding: '12px 24px', fontSize: '18px', opacity: 0.8 }}>
                   {cmd}
                 </button>
               ))}
@@ -535,13 +535,13 @@ export default function CovertMission({ onComplete }) {
       {/* ── RESULT ── */}
       {phase === 'result' && (
         <div>
-          <div style={{ fontSize: '13px', letterSpacing: '3px', color: TEXT2, marginBottom: '16px' }}>// MISIÓN COMPLETADA — INFORME DE OPERACIONES</div>
+          <div style={{ fontSize: '19.5px', letterSpacing: '4.5px', color: TEXT2, marginBottom: '24px' }}>// MISIÓN COMPLETADA — INFORME DE OPERACIONES</div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
             <div style={{ ...CARD, borderLeft: `2px solid ${ACCENT}66`, padding: '24px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <div style={{ fontSize: '9px', color: TEXT2, letterSpacing: '3px' }}>PUNTUACIÓN OPERATIVA</div>
-              <div style={{ fontSize: '56px', color: ACCENT, lineHeight: 1, textShadow: `0 0 30px ${ACCENT}44` }}>{finalScore}</div>
-              <div style={{ fontSize: '9px', color: TEXT2, letterSpacing: '2px' }}>CLASIFICACIÓN</div>
-              <div style={{ fontSize: '18px', letterSpacing: '3px', color: ACCENT }}>{rank}</div>
+              <div style={{ fontSize: '13.5px', color: TEXT2, letterSpacing: '4.5px' }}>PUNTUACIÓN OPERATIVA</div>
+              <div style={{ fontSize: '84px', color: ACCENT, lineHeight: 1, textShadow: `0 0 45px ${ACCENT}44` }}>{finalScore}</div>
+              <div style={{ fontSize: '13.5px', color: TEXT2, letterSpacing: '3px' }}>CLASIFICACIÓN</div>
+              <div style={{ fontSize: '27px', letterSpacing: '4.5px', color: ACCENT }}>{rank}</div>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               {[
@@ -550,9 +550,9 @@ export default function CovertMission({ onComplete }) {
                 { label: 'AGENTE NEUTRALIZADO', val: solvedIntercepts.includes(2) ? 'FALCON ✓' : 'EN FUGA' },
                 { label: 'EXFILTRACIÓN PLANIFICADA', val: solvedIntercepts.includes(3) ? 'MARTES ✓' : 'DESCONOCIDA' },
               ].map(r => (
-                <div key={r.label} style={{ ...CARD, padding: '14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: '9px', color: TEXT2, letterSpacing: '1px' }}>{r.label}</span>
-                  <span style={{ fontSize: '11px', color: r.val.includes('✓') ? ACCENT : RED }}>{r.val}</span>
+                <div key={r.label} style={{ ...CARD, padding: '21px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: '13.5px', color: TEXT2, letterSpacing: '1.5px' }}>{r.label}</span>
+                  <span style={{ fontSize: '16.5px', color: r.val.includes('✓') ? ACCENT : RED }}>{r.val}</span>
                 </div>
               ))}
             </div>
