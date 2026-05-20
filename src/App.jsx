@@ -434,7 +434,7 @@ function EmailScreen({ sessionId, moduleResult, onReset, qrToken, emailToken }) 
     fetch(`/api/session/${sessionId}/email`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email }),
+      body: JSON.stringify({ email, emailToken }),
     }).catch(() => {})
     const reportUrl = emailToken
       ? `${window.location.origin}/report/${emailToken}`
@@ -932,11 +932,12 @@ export default function App() {
     sfxBootReady()
   }
 
-  const handleComplete = (result) => {
+  const handleComplete = async (result) => {
     const mod = MODULES.find(m => m.id === activeModule)
     const fullResult = { ...result, _moduleId: activeModule, _moduleTitle: mod?.label || activeModule }
     // reportId was set in commitModule when the module started
-    fetch('/api/session', {
+    // Await the session save so qrToken/emailToken are ready before the QR renders
+    await fetch('/api/session', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: reportId, moduleId: activeModule, moduleTitle: mod?.label, result: fullResult }),
