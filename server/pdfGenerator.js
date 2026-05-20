@@ -33,63 +33,153 @@ function fetchBuffer (url) {
   })
 }
 
-// ─── Module metadata ─────────────────────────────────────────────────────────
+// ─── Threat label lookup (ThreatClassifier) ──────────────────────────────────
+const THREAT_LABELS = {
+  apt:       'APT Patrocinada por Estado',
+  ransomware:'Ransomware en GICEN',
+  insider:   'Amenaza Interna',
+  supply:    'Compromiso Cadena de Suministro',
+  phishing:  'Spear-Phishing Dirigido',
+  desinf:    'Operación de Desinformación',
+}
+
+// ─── Module metadata ──────────────────────────────────────────────────────────
+// Keys match registry IDs exactly (src/plugins/registry.js).
 const MODULE_META = {
-  'tactical-map': {
-    code:     'MOD-07',
-    title:    'MAPA TÁCTICO',
-    subtitle: 'SALA DE CRISIS — EJERCICIO SIERRA-26',
+
+  capacity: {
+    code:     'MOD-01',
+    title:    'TEST DE CAPACIDAD DIGITAL',
+    subtitle: 'MADUREZ TECNOLÓGICA — FOCO 2026',
+    color:    C.accent,
+    getDetails: (result) => {
+      const s = result.score ?? result.report?.overall ?? 0
+      const grade = s >= 80 ? 'MADUREZ AVANZADA' : s >= 60 ? 'MADUREZ INTERMEDIA' : s >= 40 ? 'EN DESARROLLO' : 'FASE INICIAL'
+      return [
+        { label: 'ÍNDICE GLOBAL',      value: `${s} / 100`, color: C.accent },
+        { label: 'NIVEL DE MADUREZ',   value: grade,        color: C.amber  },
+        { label: 'VECTORES EVALUADOS', value: '5',          color: C.grey   },
+      ]
+    },
+    getPhases: (result) => {
+      const scores = result.report?.scores || {}
+      const labels = { cloud: 'Cloud ENS', ia: 'IA & Datos', soberania: 'Soberanía Digital', transformacion: 'Transformación Digital', barreras: 'Superación de Barreras' }
+      return Object.entries(scores).map(([k, v]) => ({ label: labels[k] || k.toUpperCase(), value: `${v} / 100` }))
+    },
+  },
+
+  tactical: {
+    code:     'MOD-02',
+    title:    'SIMULADOR DE DECISIÓN TÁCTICA',
+    subtitle: 'PERFIL DE LIDERAZGO OPERACIONAL',
+    color:    '#FF6644',
+    getDetails: (result) => {
+      const s = result.score ?? 0
+      return [
+        { label: 'PUNTUACIÓN',  value: `${s} / 100`,                                                   color: '#FF6644' },
+        { label: 'PERFIL',      value: result.profile ?? '—',                                           color: C.amber  },
+        { label: 'EVALUACIÓN',  value: s >= 80 ? 'EXCELENTE' : s >= 50 ? 'CORRECTO' : 'A MEJORAR',     color: C.grey   },
+      ]
+    },
+    getPhases: () => [],
+  },
+
+  radar: {
+    code:     'MOD-03',
+    title:    'RADAR DE MADUREZ ORGANIZACIONAL',
+    subtitle: '6 VECTORES ESTRATÉGICOS',
+    color:    '#0099FF',
+    getDetails: (result) => {
+      const s = result.score ?? 0
+      return [
+        { label: 'ÍNDICE GLOBAL', value: `${s}%`,                                                                 color: '#0099FF' },
+        { label: 'VECTORES',      value: '6 / 6',                                                                 color: C.grey   },
+        { label: 'NIVEL',         value: s >= 75 ? 'AVANZADO' : s >= 50 ? 'INTERMEDIO' : 'EN DESARROLLO',        color: C.amber  },
+      ]
+    },
+    getPhases: (result) => {
+      const labels = { ia: 'IA & Machine Learning', cloud: 'Cloud Soberano', sim: 'Simulación & XR', cyber: 'Ciberseguridad', talento: 'Talento Digital', dato: 'Soberanía del Dato' }
+      return Object.entries(result.values || {}).map(([k, v]) => ({
+        label: labels[k] || k.toUpperCase(),
+        value: `${Math.round((v / 4) * 100)}%`,
+      }))
+    },
+  },
+
+  threats: {
+    code:     'MOD-04',
+    title:    'CLASIFICADOR DE AMENAZAS',
+    subtitle: 'PRIORIZACIÓN DE AMENAZAS ACTIVAS',
+    color:    C.red,
+    getDetails: (result) => {
+      const s = result.score ?? 0
+      return [
+        { label: 'PUNTUACIÓN',            value: `${s} / 100`,                               color: C.accent },
+        { label: 'AMENAZAS PRIORIZADAS',  value: `${(result.priorities || []).length} / 3`,  color: C.red    },
+        { label: 'EFICACIA',              value: s >= 80 ? 'ALTA' : s >= 50 ? 'MEDIA' : 'BAJA', color: C.amber },
+      ]
+    },
+    getPhases: (result) =>
+      (result.priorities || []).map((id, i) => ({ label: `PRIORIDAD #${i + 1}`, value: THREAT_LABELS[id] || id })),
+  },
+
+  pulse: {
+    code:     'MOD-05',
+    title:    'ENCUESTA DE PULSO FOCO 2026',
+    subtitle: 'RESULTADOS AGREGADOS DE ASISTENTES',
     color:    C.amber,
     getDetails: (result) => [
-      { label: 'PUNTUACIÓN',     value: `${result.score ?? 0} / 400`, color: C.accent },
-      { label: 'CLASIFICACIÓN',  value: result.classification ?? '—',  color: C.amber  },
-      { label: 'EFICIENCIA',     value: result.efficiency    ?? '—',   color: C.grey   },
-    ],
-    getPhases: (result) => result.phases || [],
-  },
-  'covert-mission': {
-    code:     'MOD-09',
-    title:    'MISIÓN ENCUBIERTA',
-    subtitle: 'OPERACIÓN CÓDIGO AURORA',
-    color:    C.accent,
-    getDetails: (result) => [
-      { label: 'PUNTUACIÓN',   value: `${result.score ?? 0} / 300`,   color: C.accent },
-      { label: 'RANGO',        value: result.rank  ?? '—',            color: C.amber  },
-      { label: 'DESCIFRADOS',  value: `${result.decoded ?? 0} / 3`,   color: C.grey   },
-    ],
-    getPhases: (result) =>
-      (result.keywords || []).map((kw, i) => ({ label: `INTERCEPCIÓN ${i + 1}`, value: kw })),
-  },
-  'cyberdefense': {
-    code:     'MOD-05',
-    title:    'CIBERDEFENSA',
-    subtitle: 'ANÁLISIS DE AMENAZAS DIGITALES',
-    color:    '#3B82F6',
-    getDetails: (result) => [
-      { label: 'PUNTUACIÓN',     value: `${result.score ?? 0}`,  color: C.accent },
-      { label: 'CALIFICACIÓN',   value: result.grade ?? '—',      color: C.amber  },
-      { label: 'RESPUESTAS OK',  value: `${result.correct ?? 0}`, color: C.grey   },
+      { label: 'PREGUNTAS RESPONDIDAS', value: `${Object.keys(result.answers || {}).length} / 10`, color: C.amber  },
+      { label: 'TOTAL ASISTENTES',      value: `${result.respondents ?? '—'}`,                     color: C.accent },
+      { label: 'PARTICIPACIÓN',         value: 'COMPLETADA',                                       color: C.grey   },
     ],
     getPhases: () => [],
   },
-  'threats': {
-    code:     'MOD-06',
-    title:    'ANÁLISIS DE AMENAZAS',
-    subtitle: 'EVALUACIÓN DE PRIORIDADES ESTRATÉGICAS',
-    color:    C.red,
+
+  cyberdefense: {
+    code:     'MOD-07',
+    title:    'OPERACIÓN ESCUDO DIGITAL',
+    subtitle: 'DEFENSA DE RED EN TIEMPO REAL',
+    color:    C.accent,
     getDetails: (result) => [
-      { label: 'PUNTUACIÓN',    value: `${result.score ?? 0}`,     color: C.accent },
-      { label: 'CALIFICACIÓN',  value: result.grade ?? '—',         color: C.amber  },
-      { label: 'PRIORIDADES',   value: result.priorities ?? '—',    color: C.grey   },
+      { label: 'PUNTUACIÓN',        value: `${result.score ?? 0}`,  color: C.accent },
+      { label: 'RANGO',             value: result.rank  ?? '—',      color: C.amber  },
+      { label: 'OLEADA ALCANZADA',  value: `${result.wave ?? '—'}`,  color: C.grey   },
+    ],
+    getPhases: () => [],
+  },
+
+  tacticalmap: {
+    code:     'MOD-08',
+    title:    'SALA DE GUERRA — MANDO TÁCTICO',
+    subtitle: 'EJERCICIO SIERRA-26',
+    color:    '#00AAFF',
+    getDetails: (result) => [
+      { label: 'PUNTUACIÓN',   value: `${result.score ?? 0}`, color: '#00AAFF' },
+      { label: 'CLASIFICACIÓN', value: result.clasif ?? '—',  color: C.amber  },
+      { label: 'EVALUACIÓN',   value: (result.score ?? 0) >= 350 ? 'SOBRESALIENTE' : (result.score ?? 0) >= 260 ? 'NOTABLE' : 'CORRECTO', color: C.grey },
+    ],
+    getPhases: () => [],
+  },
+
+  covertmission: {
+    code:     'MOD-09',
+    title:    'MISIÓN SOMBRA — TERMINAL CLASIFICADO',
+    subtitle: 'OPERACIÓN CÓDIGO AURORA',
+    color:    '#CC44FF',
+    getDetails: (result) => [
+      { label: 'PUNTUACIÓN',              value: `${result.score ?? 0}`, color: '#CC44FF' },
+      { label: 'RANGO',                   value: result.rank ?? '—',     color: C.amber   },
+      { label: 'TRANSMISIONES DESCIFRADAS', value: `${result.decoded ?? 0} / 3`, color: C.grey },
     ],
     getPhases: () => [],
   },
 }
 
-// Fallback for unknown modules
+// Fallback for external plugins (demo-aerocognitio, demo-recruitment, etc.)
 function getMeta (moduleId, moduleTitle) {
   return MODULE_META[moduleId] || {
-    code:       'MOD-XX',
+    code:       'MOD-EXT',
     title:      (moduleTitle || moduleId || 'MÓDULO').toUpperCase(),
     subtitle:   'INFORME DE PARTICIPANTE',
     color:      C.accent,
@@ -104,20 +194,60 @@ function getMeta (moduleId, moduleTitle) {
 function getAnalysis (moduleId, result) {
   const score = result.score ?? 0
 
-  if (moduleId === 'tactical-map') {
-    if (score >= 350) return 'El participante ha demostrado un dominio sobresaliente de los principios doctrinales de mando y control. Sus decisiones reflejan un sólido entendimiento del entorno operativo, aplicando correctamente procedimientos STANAG y protocolos IFF. Perfil altamente recomendado para puestos de responsabilidad en entornos de alta complejidad táctica.'
-    if (score >= 260) return 'El participante muestra una sólida comprensión del ciclo de toma de decisiones en entornos de crisis. Se observa capacidad para aplicar medidas de seguridad básicas y gestionar el espectro electromagnético. Se recomienda profundizar en doctrina de contrainteligencia y gestión de la cadena de mando en escenarios degradados.'
-    if (score >= 160) return 'El participante conoce los fundamentos doctrinales pero muestra vacíos en la aplicación bajo presión. Las decisiones tomadas indican necesidad de formación adicional en gestión del C2 y en el uso de sistemas de comunicaciones de respaldo (PACE). Se recomienda ciclos de ejercitación adicionales.'
-    return 'Los resultados indican oportunidades de mejora significativas en doctrina táctica y toma de decisiones bajo presión. Se recomienda un programa de formación intensivo en fundamentos de mando y control, gestión del espectro electromagnético y análisis de inteligencia en tiempo real.'
+  if (moduleId === 'capacity') {
+    if (score >= 80) return 'El participante refleja una organización con madurez digital avanzada, con vectores clave como cloud soberano, IA y soberanía del dato en un estado operativo consolidado. Se recomienda mantener el liderazgo explorando casos de uso emergentes en simulación avanzada y gemelos digitales.'
+    if (score >= 60) return 'La organización presenta una madurez digital intermedia con bases sólidas en varios vectores. Existen oportunidades claras de mejora, especialmente en la certificación ENS Categoría Alta y en la definición de una estrategia de soberanía del dato. Se recomienda priorizar una hoja de ruta de 18 meses con hitos concretos.'
+    if (score >= 40) return 'Los resultados indican una organización en fase de desarrollo de su capacidad digital. Se identifican brechas significativas que requieren un plan de acción estructurado. La prioridad inmediata debe ser la certificación ENS y la adopción de un plan de adopción de IA con casos de uso de bajo riesgo.'
+    return 'La organización se encuentra en fase inicial de transformación digital. Se recomienda un diagnóstico profundo y la definición de un plan estratégico plurianual alineado con los vectores FOCO 2026, con especial atención a la formación del talento y la reducción de barreras organizacionales.'
   }
 
-  if (moduleId === 'covert-mission') {
-    if (score >= 270) return 'El participante ha demostrado excepcionales capacidades de análisis criptográfico y extracción de inteligencia. La identificación precisa de palabras clave en mensajes cifrados refleja un pensamiento analítico estructurado, esencial para operaciones de inteligencia en entornos adversos.'
-    if (score >= 180) return 'El participante muestra aptitud para el análisis de señales cifradas con algunas áreas de mejora. La capacidad de descifrar intercomunicaciones es adecuada pero requiere mayor velocidad y precisión para entornos operativos reales.'
-    return 'Se recomienda formación adicional en análisis criptográfico básico y técnicas de extracción de inteligencia a partir de comunicaciones interceptadas.'
+  if (moduleId === 'tactical') {
+    if (score >= 80) return 'El participante demuestra un perfil de liderazgo digital estratégico consolidado. Sus decisiones reflejan una comprensión profunda del entorno tecnológico y una capacidad de respuesta madura ante escenarios de crisis. Recomendado para roles de dirección en procesos de transformación digital institucional.'
+    if (score >= 50) return 'El participante muestra capacidades de gestión en transición hacia el liderazgo digital. Buen instinto técnico con áreas de mejora en comunicación institucional y toma de decisiones bajo incertidumbre. Se recomienda formación específica en gestión del cambio y liderazgo en entornos VUCA.'
+    return 'El perfil indica oportunidades de desarrollo en competencias de liderazgo digital. Se recomienda un programa de formación en fundamentos de transformación digital, gestión de proyectos tecnológicos y comunicación estratégica en entornos de alta presión.'
   }
 
-  if (score >= 80) return 'Resultados satisfactorios. El participante demuestra comprensión sólida de los conceptos evaluados y capacidad de respuesta apropiada en entornos complejos.'
+  if (moduleId === 'radar') {
+    if (score >= 75) return 'La organización presenta un índice de madurez avanzado con capacidades consolidadas en la mayoría de los vectores estratégicos. Se recomienda identificar los ejes con menor puntuación para convertirlos en áreas de excelencia diferencial dentro del sector Defensa.'
+    if (score >= 50) return 'El perfil radar revela una organización en transición hacia la madurez digital plena. Existen vectores sólidos que pueden actuar como palancas para el desarrollo de los más débiles. Se recomienda un plan de nivelación con objetivos trimestrales por eje.'
+    return 'El diagnóstico indica una organización en etapas iniciales de madurez en la mayoría de los vectores estratégicos. Se recomienda priorizar los ejes de mayor impacto operacional — ciberseguridad y cloud soberano — como base para el desarrollo progresivo de los restantes.'
+  }
+
+  if (moduleId === 'threats') {
+    if (score >= 80) return 'El participante demuestra una capacidad de priorización de amenazas sobresaliente, identificando correctamente los vectores de mayor riesgo y asignando recursos de forma eficiente. Este perfil es esencial para roles de dirección en centros de operaciones de seguridad y gestión de crisis.'
+    if (score >= 50) return 'La priorización refleja un buen entendimiento del panorama de amenazas con algunas áreas de mejora en la asignación óptima de recursos. Se recomienda profundizar en inteligencia de amenazas avanzadas (APT) y en la doctrina de respuesta a incidentes de cadena de suministro.'
+    return 'Los resultados indican necesidad de reforzar los fundamentos de análisis de riesgos y priorización de amenazas. Se recomienda formación específica en marcos de ciberseguridad (NIST, ENS) y ejercicios de simulación de crisis con escenarios de amenazas híbridas.'
+  }
+
+  if (moduleId === 'pulse') {
+    return 'Gracias por participar en la Encuesta de Pulso FOCO 2026. Sus respuestas han sido incorporadas al agregado de asistentes y contribuyen a generar una imagen colectiva del estado de la transformación digital en Defensa. Los resultados completos serán compartidos al cierre del evento.'
+  }
+
+  if (moduleId === 'cyberdefense') {
+    const rank = result.rank ?? ''
+    if (rank === 'LEYENDA')   return 'Rendimiento excepcional. El participante ha demostrado capacidades de defensa de red de nivel élite, neutralizando oleadas de amenazas con una precisión y velocidad sobresalientes. Perfil ideal para roles de liderazgo en Centros de Operaciones de Seguridad (SOC) y equipos CERT-Defensa.'
+    if (rank === 'ÉLITE')     return 'Rendimiento muy alto. El participante demuestra sólidas competencias en defensa activa de redes, con capacidad para gestionar múltiples vectores de ataque simultáneos. Se recomienda profundizar en técnicas de threat hunting y respuesta avanzada a incidentes.'
+    if (rank === 'VETERANO')  return 'Buen desempeño en la defensa de la infraestructura. El participante gestiona correctamente las amenazas más frecuentes con algunas dificultades ante ataques compuestos. Se recomienda formación adicional en detección de anomalías y correlación de eventos de seguridad.'
+    return 'El participante demuestra comprensión básica de los principios de defensa de red. Se recomienda un programa de formación estructurado en fundamentos de ciberseguridad operacional, gestión de firewalls y análisis de logs en tiempo real.'
+  }
+
+  if (moduleId === 'tacticalmap') {
+    const clasif = result.clasif ?? ''
+    if (clasif === 'GENERAL DE BRIGADA') return 'Mando excepcional. El participante ha demostrado un dominio sobresaliente de los principios doctrinales de mando y control, gestionando las seis oleadas con precisión táctica y eficiencia de recursos superior. Perfil altamente recomendado para puestos de responsabilidad en entornos de alta complejidad operacional.'
+    if (clasif === 'CORONEL')            return 'Mando competente con visión estratégica consolidada. Las decisiones tomadas reflejan una sólida comprensión del ciclo C2 y la gestión del espectro de amenazas. Se recomienda profundizar en escenarios de mando degradado y coordinación interoperable con fuerzas aliadas.'
+    if (clasif === 'TENIENTE CORONEL')   return 'El participante conoce los fundamentos tácticos y aplica correctamente la doctrina básica de mando. Se observan vacíos en situaciones de alta presión y oleadas de amenaza compuesta. Se recomienda ciclos de ejercitación adicionales en entornos de toma de decisión bajo incertidumbre.'
+    return 'Los resultados indican oportunidades de mejora en doctrina táctica y gestión de recursos bajo presión. Se recomienda un programa de formación intensivo en fundamentos de C2, asignación de prioridades en combate y gestión de la saturación del mando.'
+  }
+
+  if (moduleId === 'covertmission') {
+    if (score >= 800) return 'El participante ha demostrado excepcionales capacidades de análisis criptográfico e inteligencia de señales. La infiltración precisa en sistemas clasificados y la identificación de agentes encubiertos refleja un pensamiento analítico estructurado, esencial para operaciones de inteligencia en entornos adversos de alta complejidad.'
+    if (score >= 600) return 'El participante muestra aptitud para el análisis de señales cifradas con algunas áreas de mejora. La capacidad de descifrar intercomunicaciones es adecuada pero requiere mayor velocidad y precisión para entornos operativos reales. Se recomienda formación adicional en criptoanálisis y técnicas OSINT avanzadas.'
+    return 'Se recomienda formación adicional en análisis criptográfico básico, técnicas de extracción de inteligencia a partir de comunicaciones interceptadas y fundamentos de operaciones encubiertas en entornos digitales.'
+  }
+
+  // Generic fallback (external plugins)
+  if (score >= 80) return 'Resultados sobresalientes. El participante demuestra una comprensión sólida y avanzada de los conceptos evaluados, con capacidad de respuesta eficaz ante escenarios complejos.'
+  if (score >= 60) return 'Resultados satisfactorios. El participante demuestra comprensión sólida de los conceptos evaluados y capacidad de respuesta apropiada en entornos complejos.'
   return 'Se recomienda reforzar los conceptos evaluados mediante formación específica para mejorar la capacidad de respuesta en situaciones de alta presión.'
 }
 
