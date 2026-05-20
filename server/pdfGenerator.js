@@ -174,6 +174,59 @@ const MODULE_META = {
     ],
     getPhases: () => [],
   },
+
+  // ── External plugins ──────────────────────────────────────────────────────
+
+  aerocognitio: {
+    code:     'MOD-06',
+    title:    'AEROCOGNITIO',
+    subtitle: 'BATERÍA PSICOTÉCNICA RPAS — EVALUACIÓN COGNITIVO-ESPACIAL',
+    color:    '#FFB547',
+    getDetails: (result) => {
+      const acc  = Math.round((result.metrics?.overallAccuracy ?? 0) * 100)
+      const roles = { rpas_pilot_class_ii: 'Piloto RPAS Clase II', sensor_operator: 'Operador Sensor RPAS', image_analyst: 'Analista de Imagen', mission_controller: 'Controlador de Misión' }
+      const accColor = acc >= 75 ? C.accent : acc >= 50 ? C.amber : C.red
+      return [
+        { label: 'PRECISIÓN GLOBAL',  value: `${acc}%`,                              color: accColor },
+        { label: 'ROL EVALUADO',      value: roles[result.role] ?? result.role ?? '—', color: C.amber },
+        { label: 'DURACIÓN',          value: `${Math.round((result.metrics?.sessionDurationMs ?? 0) / 60000)} min`, color: C.grey },
+      ]
+    },
+    getPhases: (result) => {
+      const ds  = result.report?.dimensionScores ?? {}
+      const lbl = { low: 'BAJO', medium: 'MEDIO', high: 'ALTO' }
+      return [
+        { label: 'ROTACIÓN MENTAL',     value: lbl[ds.mentalRotation?.level]    ?? `${Math.round((result.metrics?.mr_accuracy ?? 0) * 100)}%` },
+        { label: 'ORIENTACIÓN ESPACIAL', value: lbl[ds.spatialOrientation?.level] ?? `${Math.round((result.metrics?.so_accuracy ?? 0) * 100)}%` },
+        { label: 'MEMORIA ESPACIAL',    value: lbl[ds.spatialMemory?.level]     ?? `${Math.round((result.metrics?.sm_changeDetectionRate ?? 0) * 100)}%` },
+      ]
+    },
+  },
+
+  recruitment: {
+    code:     'MOD-10',
+    title:    'SELECCIÓN DE PERSONAL — ARA',
+    subtitle: 'ORIENTACIÓN VOCACIONAL MILITAR — FUERZAS ARMADAS ESPAÑOLAS',
+    color:    '#22C55E',
+    getDetails: (result) => {
+      const primary = result.recomendacion?.primary ?? result.report?.specialtyMatch?.primary
+      const gti     = result.gti ?? 0
+      const gtiColor = gti >= 70 ? C.accent : gti >= 40 ? C.amber : C.red
+      return [
+        { label: 'GTI',                    value: `${gti} / 100`,        color: gtiColor  },
+        { label: 'ESPECIALIDAD RECOMENDADA', value: primary?.name ?? '—', color: '#22C55E' },
+        { label: 'RAMA',                   value: primary?.branch ?? '—', color: C.grey   },
+      ]
+    },
+    getPhases: (result) => {
+      const famLabels = { F1: 'Combate', F2: 'Técnica/Mecánica', F3: 'Tecnología/Cyber', F4: 'Sanidad/Cuidado', F5: 'Logística/Admin', F6: 'Mando/Liderazgo', F7: 'Marítimo/Aéreo', F8: 'Creativo/Artístico' }
+      const intereses = result.intereses || {}
+      return Object.entries(intereses)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 4)
+        .map(([k, v]) => ({ label: `INTERÉS · ${famLabels[k] || k}`, value: `${Math.round(v * 100)}%` }))
+    },
+  },
 }
 
 // Fallback for external plugins (demo-aerocognitio, demo-recruitment, etc.)
@@ -245,7 +298,24 @@ function getAnalysis (moduleId, result) {
     return 'Se recomienda formación adicional en análisis criptográfico básico, técnicas de extracción de inteligencia a partir de comunicaciones interceptadas y fundamentos de operaciones encubiertas en entornos digitales.'
   }
 
-  // Generic fallback (external plugins)
+  if (moduleId === 'aerocognitio') {
+    // Use AI-generated narrative if available
+    if (result.report?.narrative) return result.report.narrative
+    const acc = Math.round((result.metrics?.overallAccuracy ?? 0) * 100)
+    if (acc >= 75) return 'El rendimiento cognitivo-espacial del participante es sobresaliente. Los indicadores de rotación mental, orientación espacial y memoria táctica se sitúan en niveles compatibles con los requisitos de las especialidades RPAS de mayor exigencia. Se recomienda continuar el proceso oficial de selección.'
+    if (acc >= 50) return 'El participante demuestra capacidades cognitivo-espaciales adecuadas para roles RPAS estándar. Se identifican áreas de mejora que pueden desarrollarse mediante entrenamiento específico en simuladores de vuelo y ejercicios de orientación cartográfica.'
+    return 'Los resultados indican un perfil cognitivo-espacial con margen de desarrollo. Se recomienda un programa de preparación específica antes de continuar el proceso de selección para roles RPAS.'
+  }
+
+  if (moduleId === 'recruitment') {
+    // Use AI-generated narrative if available
+    if (result.report?.narrative) return result.report.narrative
+    const primary = result.recomendacion?.primary
+    if (primary?.name) return `El perfil del candidato muestra una afinidad destacada con la especialidad de ${primary.name} (${primary.branch ?? 'Fuerzas Armadas'}). Los vectores de intereses vocacionales, aptitudes cognitivas (GTI) y perfil de personalidad convergen hacia este destino. Se recomienda consultar los requisitos específicos de acceso en el Centro de Reclutamiento correspondiente.`
+    return 'La evaluación ha sido completada. El sistema ARA ha procesado los perfiles de intereses, aptitudes cognitivas y personalidad del candidato. Consulte los resultados completos con el orientador vocacional asignado.'
+  }
+
+  // Generic fallback (other external plugins)
   if (score >= 80) return 'Resultados sobresalientes. El participante demuestra una comprensión sólida y avanzada de los conceptos evaluados, con capacidad de respuesta eficaz ante escenarios complejos.'
   if (score >= 60) return 'Resultados satisfactorios. El participante demuestra comprensión sólida de los conceptos evaluados y capacidad de respuesta apropiada en entornos complejos.'
   return 'Se recomienda reforzar los conceptos evaluados mediante formación específica para mejorar la capacidad de respuesta en situaciones de alta presión.'
