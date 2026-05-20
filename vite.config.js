@@ -18,6 +18,16 @@ export default defineConfig(({ mode }) => ({
   },
   server: {
     historyApiFallback: true,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3001',
+        changeOrigin: true,
+      },
+      '/reports': {
+        target: 'http://localhost:3001',
+        changeOrigin: true,
+      },
+    },
   },
   preview: {
     historyApiFallback: true,

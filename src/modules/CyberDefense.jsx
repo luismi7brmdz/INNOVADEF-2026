@@ -610,7 +610,7 @@ export default function CyberDefense({ onComplete }) {
             </div>
           </div>
 
-          <button onClick={() => setPhase('game')} style={{ ...S.btnPrimary, gap: '12px' }}>
+          <button onClick={() => setPhase('game')} style={{ ...S.btnPrimary, gap: '12px', opacity: nameInput ? 1 : 0.35, background: nameInput ? 'rgba(0,255,65,0.07)' : 'rgba(0,255,65,0.02)', border: nameInput ? '1px solid rgba(0,255,65,0.5)' : '1px solid rgba(0,255,65,0.2)', boxShadow: nameInput ? 'inset 0 0 12px rgba(0,255,65,0.04)' : 'none' }}>
             <Shield size={14} /> INICIAR DEFENSA <ChevronRight size={14} />
           </button>
         </div>

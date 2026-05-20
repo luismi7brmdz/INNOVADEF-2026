@@ -2,11 +2,12 @@ import { useState, useEffect, useRef, useCallback, Suspense } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { Send, ChevronRight, Mail } from 'lucide-react'
 import { QRCodeSVG as QRCode } from 'qrcode.react'
+import { jsPDF } from 'jspdf'
 import MilitaryBackground from './MilitaryBackground'
 import IntroScreen, { MilitaryCursor } from './IntroScreen'
 import SleepScreen from './SleepScreen'
 import { ACCENT, AMBER, RED, BORDER, TEXT2, FONT, S } from './theme'
-import { sfxBootHeader, sfxHudScan, sfxCardAppear, sfxModuleSelect, sfxHover, sfxReset, sfxRadarPing, sfxIntroWipe, startAmbient, stopAmbient, markUserInteracted, hasUserInteracted } from './sfx'
+import { sfxBootHeader, sfxHudScan, sfxCardAppear, sfxModuleSelect, sfxHover, sfxReset, sfxRadarPing, sfxIntroWipe, sfxBootReady, startAmbient, stopAmbient, markUserInteracted, hasUserInteracted } from './sfx'
 import { PLUGIN_REGISTRY } from './plugins/registry'
 import PluginRenderer from './plugins/PluginRenderer'
 
@@ -98,49 +99,372 @@ function StatusBar({ module, onHome, bootStage = 4 }) {
 
 // ─── EMAIL SCREEN ─────────────────────────────────────────────────────────────
 
-function EmailScreen({ sessionId, onReset }) {
-  const [email, setEmail] = useState('')
-  const [sent, setSent] = useState(false)
+// Module metadata for PDF (from server/pdfGenerator.js)
+const MODULE_META = {
+  'tactical-map': {
+    code:     'MOD-07',
+    title:    'MAPA TÁCTICO',
+    subtitle: 'SALA DE CRISIS — EJERCICIO SIERRA-26',
+    color:    '#F59E0B',
+    getDetails: (result) => [
+      { label: 'PUNTUACIÓN',     value: `${result.score ?? 0} / 400`, color: '#00FF41' },
+      { label: 'CLASIFICACIÓN',  value: result.classification ?? '—',  color: '#F59E0B' },
+      { label: 'EFICIENCIA',     value: result.efficiency    ?? '—',   color: '#9CA3AF' },
+    ],
+    getPhases: (result) => result.phases || [],
+  },
+  'covert-mission': {
+    code:     'MOD-09',
+    title:    'MISIÓN ENCUBIERTA',
+    subtitle: 'OPERACIÓN CÓDIGO AURORA',
+    color:    '#00FF41',
+    getDetails: (result) => [
+      { label: 'PUNTUACIÓN',   value: `${result.score ?? 0} / 300`,   color: '#00FF41' },
+      { label: 'RANGO',        value: result.rank  ?? '—',            color: '#F59E0B' },
+      { label: 'DESCIFRADOS',  value: `${result.decoded ?? 0} / 3`,   color: '#9CA3AF' },
+    ],
+    getPhases: (result) =>
+      (result.keywords || []).map((kw, i) => ({ label: `INTERCEPCIÓN ${i + 1}`, value: kw })),
+  },
+  'cyberdefense': {
+    code:     'MOD-05',
+    title:    'CIBERDEFENSA',
+    subtitle: 'ANÁLISIS DE AMENAZAS DIGITALES',
+    color:    '#3B82F6',
+    getDetails: (result) => [
+      { label: 'PUNTUACIÓN',     value: `${result.score ?? 0}`,  color: '#00FF41' },
+      { label: 'CALIFICACIÓN',   value: result.grade ?? '—',      color: '#F59E0B' },
+      { label: 'RESPUESTAS OK',  value: `${result.correct ?? 0}`, color: '#9CA3AF' },
+    ],
+    getPhases: () => [],
+  },
+  'threats': {
+    code:     'MOD-06',
+    title:    'ANÁLISIS DE AMENAZAS',
+    subtitle: 'EVALUACIÓN DE PRIORIDADES ESTRATÉGICAS',
+    color:    '#EF4444',
+    getDetails: (result) => [
+      { label: 'PUNTUACIÓN',    value: `${result.score ?? 0}`,     color: '#00FF41' },
+      { label: 'CALIFICACIÓN',  value: result.grade ?? '—',         color: '#F59E0B' },
+      { label: 'PRIORIDADES',   value: result.priorities ?? '—',    color: '#9CA3AF' },
+    ],
+    getPhases: () => [],
+  },
+}
+
+function getMeta(moduleId, moduleTitle) {
+  return MODULE_META[moduleId] || {
+    code:       'MOD-XX',
+    title:      (moduleTitle || moduleId || 'MÓDULO').toUpperCase(),
+    subtitle:   'INFORME DE PARTICIPANTE',
+    color:      '#00FF41',
+    getDetails: (result) => [
+      { label: 'PUNTUACIÓN', value: `${result.score ?? 0}`, color: '#00FF41' },
+    ],
+    getPhases: () => [],
+  }
+}
+
+function getAnalysis(moduleId, result) {
+  const score = result.score ?? 0
+  if (moduleId === 'tactical-map') {
+    if (score >= 350) return 'El participante ha demostrado un dominio sobresaliente de los principios doctrinales de mando y control. Sus decisiones reflejan un sólido entendimiento del entorno operativo, aplicando correctamente procedimientos STANAG y protocolos IFF. Perfil altamente recomendado para puestos de responsabilidad en entornos de alta complejidad táctica.'
+    if (score >= 260) return 'El participante muestra una sólida comprensión del ciclo de toma de decisiones en entornos de crisis. Se observa capacidad para aplicar medidas de seguridad básicas y gestionar el espectro electromagnético. Se recomienda profundizar en doctrina de contrainteligencia y gestión de la cadena de mando en escenarios degradados.'
+    if (score >= 160) return 'El participante conoce los fundamentos doctrinales pero muestra vacíos en la aplicación bajo presión. Las decisiones tomadas indican necesidad de formación adicional en gestión del C2 y en el uso de sistemas de comunicaciones de respaldo (PACE). Se recomienda ciclos de ejercitación adicionales.'
+    return 'Los resultados indican oportunidades de mejora significativas en doctrina táctica y toma de decisiones bajo presión. Se recomienda un programa de formación intensivo en fundamentos de mando y control, gestión del espectro electromagnético y análisis de inteligencia en tiempo real.'
+  }
+  if (moduleId === 'covert-mission') {
+    if (score >= 270) return 'El participante ha demostrado excepcionales capacidades de análisis criptográfico y extracción de inteligencia. La identificación precisa de palabras clave en mensajes cifrados refleja un pensamiento analítico estructurado, esencial para operaciones de inteligencia en entornos adversos.'
+    if (score >= 180) return 'El participante muestra aptitud para el análisis de señales cifradas con algunas áreas de mejora. La capacidad de descifrar intercomunicaciones es adecuada pero requiere mayor velocidad y precisión para entornos operativos reales.'
+    return 'Se recomienda formación adicional en análisis criptográfico básico y técnicas de extracción de inteligencia a partir de comunicaciones interceptadas.'
+  }
+  if (score >= 80) return 'Resultados satisfactorios. El participante demuestra comprensión sólida de los conceptos evaluados y capacidad de respuesta apropiada en entornos complejos.'
+  return 'Se recomienda reforzar los conceptos evaluados mediante formación específica para mejorar la capacidad de respuesta en situaciones de alta presión.'
+}
+
+// Helper: hex to rgb array
+function hexToRgb(hex) {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
+  return result ? [
+    parseInt(result[1], 16),
+    parseInt(result[2], 16),
+    parseInt(result[3], 16)
+  ] : [0, 0, 0]
+}
+
+function EmailScreen({ sessionId, moduleResult, onReset }) {
+  const [email, setEmail]           = useState('')
+  const [pdfData, setPdfData]       = useState(null)
+  const [sending, setSending]       = useState(false)
+  const [sent, setSent]             = useState(false)
+
+  // Generate PDF locally on mount with design from server/pdfGenerator.js
+  useEffect(() => {
+    const doc = new jsPDF()
+    const moduleId = moduleResult?._moduleId || 'unknown'
+    const moduleTitle = moduleResult?._moduleTitle || 'Módulo de Evaluación'
+    const { _moduleId, _moduleTitle, ...result } = moduleResult || {}
+    const meta = getMeta(moduleId, moduleTitle)
+    const details = meta.getDetails(result)
+    const phases = meta.getPhases(result)
+    const analysis = getAnalysis(moduleId, result)
+    const dateStr = new Date().toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' }).toUpperCase()
+
+    const W = 210 // A4 width in mm
+    const H = 297 // A4 height in mm
+    const C = { bg: '#070707', panel: '#0d0d0d', accent: '#00FF41', amber: '#F59E0B', red: '#EF4444', white: '#FFFFFF', grey: '#9CA3AF', grey2: '#4B5563', header: '#0a0a0a' }
+
+    // Background
+    doc.setFillColor(7, 7, 7)
+    doc.rect(0, 0, W, H, 'F')
+
+    // Header bar
+    doc.setFillColor(10, 10, 10)
+    doc.rect(0, 0, W, 25, 'F')
+
+    // Logo text (left)
+    doc.setTextColor(0, 255, 65)
+    doc.setFontSize(14)
+    doc.setFont('helvetica', 'bold')
+    doc.text('INNOVADEF', 10, 10)
+    doc.setTextColor(156, 163, 175)
+    doc.setFontSize(8)
+    doc.setFont('helvetica', 'normal')
+    doc.text('FOCO 2026', 10, 16)
+
+    // Header right
+    doc.setTextColor(156, 163, 175)
+    doc.setFontSize(7)
+    doc.text('INFORME DE PARTICIPANTE', W - 10, 10, { align: 'right' })
+    doc.setTextColor(255, 255, 255)
+    doc.setFontSize(9)
+    doc.setFont('helvetica', 'bold')
+    doc.text('INNOVADEF FOCO 2026', W - 10, 16, { align: 'right' })
+    doc.setTextColor(156, 163, 175)
+    doc.setFontSize(6.5)
+    doc.setFont('helvetica', 'normal')
+    doc.text(`REF: ${sessionId.split('-')[0].toUpperCase()} · ${dateStr}`, W - 10, 22, { align: 'right' })
+
+    // Accent bar
+    doc.setFillColor(...hexToRgb(meta.color))
+    doc.rect(0, 25, W, 2, 'F')
+
+    // Module header
+    let y = 35
+
+    // Badge
+    doc.setFillColor(...hexToRgb(meta.color))
+    doc.roundedRect(10, y, 18, 8, 1, 1, 'F')
+    doc.setTextColor(7, 7, 7)
+    doc.setFontSize(6)
+    doc.setFont('helvetica', 'bold')
+    doc.text(meta.code, 10, y + 5.5, { align: 'center' })
+
+    // Title
+    doc.setTextColor(255, 255, 255)
+    doc.setFontSize(14)
+    doc.text(meta.title, 32, y + 2)
+    doc.setTextColor(156, 163, 175)
+    doc.setFontSize(7)
+    doc.setFont('helvetica', 'normal')
+    doc.text(meta.subtitle, 32, y + 7)
+
+    y = 50
+
+    // Metric boxes (3 columns)
+    const boxW = (W - 20 - 8) / 3
+    details.forEach((d, i) => {
+      const bx = 10 + i * (boxW + 4)
+      const by = y
+
+      doc.setFillColor(13, 13, 13)
+      doc.rect(bx, by, boxW, 22, 'F')
+      doc.setFillColor(...hexToRgb(d.color))
+      doc.rect(bx, by, boxW, 1.5, 'F')
+
+      doc.setTextColor(...hexToRgb(d.color))
+      doc.setFontSize(10)
+      doc.setFont('helvetica', 'bold')
+      doc.text(d.value, bx + boxW / 2, by + 12, { align: 'center' })
+      doc.setTextColor(156, 163, 175)
+      doc.setFontSize(6)
+      doc.setFont('helvetica', 'normal')
+      doc.text(d.label, bx + boxW / 2, by + 18, { align: 'center' })
+    })
+
+    y = 78
+
+    // Doctrinal analysis header
+    doc.setFillColor(...hexToRgb(meta.color))
+    doc.rect(10, y, W - 20, 5, 'F')
+    doc.setTextColor(7, 7, 7)
+    doc.setFontSize(6)
+    doc.setFont('helvetica', 'bold')
+    doc.text('ANÁLISIS DOCTRINAL', 12, y + 3.5)
+
+    y += 7
+    doc.setFillColor(75, 85, 99)
+    doc.rect(10, y, W - 20, 0.5, 'F')
+    y += 4
+
+    doc.setTextColor(255, 255, 255)
+    doc.setFontSize(7)
+    doc.setFont('helvetica', 'normal')
+    const splitAnalysis = doc.splitTextToSize(analysis, W - 20)
+    doc.text(splitAnalysis, 10, y, { maxWidth: W - 20 })
+
+    y += splitAnalysis.length * 4 + 8
+
+    // Module-specific details
+    if (phases.length > 0) {
+      doc.setFillColor(75, 85, 99)
+      doc.rect(10, y, W - 20, 5, 'F')
+      doc.setTextColor(255, 255, 255)
+      doc.setFontSize(6)
+      doc.setFont('helvetica', 'bold')
+      doc.text('DETALLE DE EJECUCIÓN', 12, y + 3.5)
+      y += 7
+
+      phases.forEach((phase) => {
+        doc.setFillColor(13, 13, 13)
+        doc.rect(10, y, W - 20, 10, 'F')
+        doc.setTextColor(...hexToRgb(meta.color))
+        doc.setFontSize(6)
+        doc.setFont('helvetica', 'bold')
+        doc.text(phase.label || '', 12, y + 4)
+        doc.setTextColor(255, 255, 255)
+        doc.setFontSize(6.5)
+        doc.setFont('helvetica', 'normal')
+        doc.text(String(phase.value || ''), W / 2, y + 4)
+        doc.setFillColor(75, 85, 99)
+        doc.rect(10, y + 10, W - 20, 0.5, 'F')
+        y += 10.5
+      })
+      y += 5
+    }
+
+    // Footer
+    const footerY = H - 20
+    doc.setFillColor(10, 10, 10)
+    doc.rect(0, footerY, W, 20, 'F')
+    doc.setFillColor(...hexToRgb(meta.color))
+    doc.rect(0, footerY, W, 1, 'F')
+
+    doc.setTextColor(0, 255, 65)
+    doc.setFontSize(7)
+    doc.setFont('helvetica', 'bold')
+    doc.text('INNOVADEF FOCO 2026', 10, footerY + 7)
+    doc.setTextColor(156, 163, 175)
+    doc.setFontSize(5.5)
+    doc.setFont('helvetica', 'normal')
+    doc.text('23 de Junio · EOI Madrid · Av. de Gregorio del Amo, 6 · innovadef.es', 10, footerY + 13)
+    doc.setTextColor(75, 85, 99)
+    doc.setFontSize(5)
+    doc.text('Pumpun Dixital S.L. — Documento generado automáticamente. Confidencial.', W - 10, footerY + 13, { align: 'right' })
+
+    // Save PDF as base64
+    const pdfBase64 = doc.output('datauristring')
+    setPdfData(pdfBase64)
+  }, [moduleResult, sessionId])
+
+  // Encode report data for QR - use portal URL instead of base64 data
+  const qrValue = `https://innovadef.es/?informe=${sessionId}`
+
+  const handleDownloadPdf = () => {
+    if (pdfData) {
+      const link = document.createElement('a')
+      link.href = pdfData
+      link.download = `informe-innovadef-${sessionId}.pdf`
+      link.click()
+    }
+  }
+
+  const handleSendEmail = () => {
+    if (!email.includes('@')) return
+    const subject = encodeURIComponent(`INNOVADEF 2026 - Informe ${sessionId}`)
+    const body = encodeURIComponent(`Informe de evaluación INNOVADEF 2026\n\nSesión: ${sessionId}\n\nEl PDF adjunto contiene los resultados completos.`)
+    window.location.href = `mailto:${email}?subject=${subject}&body=${body}`
+    setSent(true)
+  }
+
 
   return (
     <div style={{ width: '100%', margin: '0 auto' }}>
       <Panel label="// ENTREGA DE INFORME CLASIFICADO" style={{ marginBottom: 'clamp(27px, 5vw, 45px)' }}>
-        <div style={{ padding: 'clamp(24px, 5vw, 42px) clamp(18px, 4vw, 36px)', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'clamp(24px, 5vw, 48px)', alignItems: 'center' }}>
+        <div style={{ padding: 'clamp(24px, 5vw, 42px) clamp(18px, 4vw, 36px)', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'clamp(24px, 5vw, 48px)', alignItems: 'start' }}>
+
+          {/* QR Column */}
           <div>
-            <div style={{ fontFamily: FONT, fontSize: 'clamp(14px, 2.5vw, 20.25px)', color: TEXT2, letterSpacing: 'clamp(2px, 0.6vw, 3px)', marginBottom: 'clamp(15px, 4vw, 27px)' }}>CÓDIGO QR — ACCESO SEGURO</div>
-            <div style={{ background: '#fff', padding: 'clamp(18px, 4vw, 36px)', display: 'inline-block' }}>
-              <QRCode value={`https://innovadef.es/?informe=${sessionId}`} size={200} level="H" />
+            <div style={{ fontFamily: FONT, fontSize: 'clamp(14px, 2.5vw, 20.25px)', color: TEXT2, letterSpacing: 'clamp(2px, 0.6vw, 3px)', marginBottom: 'clamp(15px, 4vw, 27px)' }}>
+              CÓDIGO QR — ACCESO AL PORTAL
             </div>
+            <div style={{ background: '#fff', padding: 'clamp(12px, 3vw, 24px)', display: 'inline-block', marginBottom: 12 }}>
+              <QRCode value={qrValue} size={192} level="H" />
+            </div>
+            <div style={{ fontFamily: FONT, fontSize: 10, color: TEXT2, marginTop: 6 }}>
+              Escanea para acceder a tu informe en innovadef.es
+            </div>
+            {pdfData && (
+              <button
+                onClick={handleDownloadPdf}
+                style={{ marginTop: 12, ...S.btnPrimary, fontSize: '11px', padding: '10px 20px', gap: 8 }}
+              >
+                <Mail size={14} /> DESCARGAR PDF
+              </button>
+            )}
           </div>
+
+          {/* Email Column */}
           <div>
-            <div style={{ fontFamily: FONT, fontSize: 'clamp(14px, 2.5vw, 20.25px)', color: TEXT2, letterSpacing: 'clamp(2px, 0.6vw, 3px)', marginBottom: 'clamp(15px, 4vw, 27px)' }}>ENVÍO A EMAIL REGISTRADO</div>
+            <div style={{ fontFamily: FONT, fontSize: 'clamp(14px, 2.5vw, 20.25px)', color: TEXT2, letterSpacing: 'clamp(2px, 0.6vw, 3px)', marginBottom: 'clamp(15px, 4vw, 27px)' }}>
+              ENVÍO POR EMAIL
+            </div>
             {!sent ? (
               <>
-                <input type="email" value={email} onChange={e => setEmail(e.target.value)}
-                  onKeyDown={e => e.key === 'Enter' && email.includes('@') && setSent(true)}
+                <input
+                  type="email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && handleSendEmail()}
                   placeholder="USUARIO@ORGANIZACION.ES"
                   style={{ width: '100%', padding: 'clamp(15px, 3vw, 27px)', background: '#0a0a0a', border: `1.5px solid ${BORDER}`, color: ACCENT, fontFamily: FONT, fontSize: 'clamp(16px, 3vw, 24.75px)', letterSpacing: 'clamp(1px, 0.3vw, 1.5px)', outline: 'none', marginBottom: 'clamp(9px, 2vw, 15px)', boxSizing: 'border-box' }}
                   onFocus={e => e.target.style.borderColor = ACCENT}
                   onBlur={e => e.target.style.borderColor = BORDER}
                 />
-                <button onClick={() => email.includes('@') && setSent(true)}
+                <button
+                  onClick={handleSendEmail}
                   disabled={!email.includes('@')}
-                  style={{ ...S.btnPrimary, width: '100%', justifyContent: 'center', opacity: email.includes('@') ? 1 : 0.35 }}>
-                  <Send size={16} /> TRANSMITIR
+                  style={{ ...S.btnPrimary, width: '100%', justifyContent: 'center', opacity: !email.includes('@') ? 0.35 : 1, gap: 10 }}
+                >
+                  <Send size={16} /> ENVIAR INFORME
                 </button>
+                <div style={{ fontFamily: FONT, fontSize: 10, color: TEXT2, marginTop: 14, lineHeight: 1.8 }}>
+                  Se abrirá tu cliente de correo. Adjunta el PDF descargado.
+                </div>
               </>
             ) : (
               <div style={{ border: `1.5px solid ${ACCENT}44`, padding: 'clamp(18px, 4vw, 36px)', background: 'rgba(0,255,65,0.04)' }}>
-                <div style={{ fontFamily: FONT, fontSize: 'clamp(15px, 2.5vw, 22.5px)', color: ACCENT, letterSpacing: 'clamp(2px, 0.6vw, 3px)', marginBottom: 'clamp(6px, 1.5vw, 9px)' }}>TRANSMISIÓN EXITOSA</div>
-                <div style={{ fontFamily: FONT, fontSize: 'clamp(16px, 3vw, 24.75px)', color: TEXT2 }}>DEST: {email.toUpperCase()}</div>
+                <div style={{ fontFamily: FONT, fontSize: 'clamp(15px, 2.5vw, 22.5px)', color: ACCENT, letterSpacing: 'clamp(2px, 0.6vw, 3px)', marginBottom: 'clamp(6px, 1.5vw, 9px)' }}>
+                  CLIENTE DE CORREO ABIERTO
+                </div>
+                <div style={{ fontFamily: FONT, fontSize: 'clamp(16px, 3vw, 24.75px)', color: TEXT2, marginBottom: 8 }}>
+                  DEST: {email.toUpperCase()}
+                </div>
+                <div style={{ fontFamily: FONT, fontSize: 11, color: TEXT2 }}>
+                  Adjunta el PDF descargado antes de enviar.
+                </div>
               </div>
             )}
           </div>
         </div>
       </Panel>
-      <button onClick={onReset} style={{ background: 'none', border: 'none', color: TEXT2, cursor: 'pointer', fontFamily: FONT, fontSize: 'clamp(15px, 2.5vw, 22.5px)', letterSpacing: 'clamp(2px, 0.6vw, 3px)', textTransform: 'uppercase', display: 'block', margin: '0 auto' }}
+
+      <button
+        onClick={onReset}
+        style={{ background: 'none', border: 'none', color: TEXT2, cursor: 'pointer', fontFamily: FONT, fontSize: 'clamp(15px, 2.5vw, 22.5px)', letterSpacing: 'clamp(2px, 0.6vw, 3px)', textTransform: 'uppercase', display: 'block', margin: '0 auto' }}
         onMouseEnter={e => e.currentTarget.style.color = '#ffaa00'}
-        onMouseLeave={e => e.currentTarget.style.color = TEXT2}>
+        onMouseLeave={e => e.currentTarget.style.color = TEXT2}
+      >
         [ NUEVA EVALUACIÓN ]
       </button>
     </div>
@@ -541,7 +865,11 @@ export default function App() {
   }
 
   const handleComplete = (result) => {
-    go(() => { setModuleResult(result); setScreen('email') })
+    const mod = MODULES.find(m => m.id === activeModule)
+    go(() => {
+      setModuleResult({ ...result, _moduleId: activeModule, _moduleTitle: mod?.label || activeModule })
+      setScreen('email')
+    })
   }
   const reset = () => {
     markUserInteracted()
@@ -664,7 +992,7 @@ export default function App() {
         )}
         {screen === 'email' && (
           <div key="email" style={{ width: '100%', animation: 'contentFadeIn 0.6s ease-out both' }}>
-            <EmailScreen sessionId={sessionId} onReset={reset} />
+            <EmailScreen sessionId={sessionId} moduleResult={moduleResult} onReset={reset} />
           </div>
         )}
       </div>
