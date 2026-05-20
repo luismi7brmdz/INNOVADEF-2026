@@ -95,6 +95,14 @@ export default function PulseSurvey({ onComplete }) {
         setTransitioning(false)
       }, 400)
     } else {
+      // Save answers to DB
+      fetch('/api/pulse', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ answers: updated }),
+      })
+        .then(r => r.json().then(d => console.log('[pulse] saved:', d)))
+        .catch(err => console.error('[pulse] fetch error:', err))
       setPhase('results')
     }
   }

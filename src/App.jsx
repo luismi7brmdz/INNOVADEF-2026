@@ -192,9 +192,9 @@ function hexToRgb(hex) {
   ] : [0, 0, 0]
 }
 
-function EmailScreen({ sessionId, moduleResult, onReset }) {
+function EmailScreen({ sessionId, moduleResult, onReset, qrToken, emailToken }) {
   const [email, setEmail]           = useState('')
-  const [pdfData, setPdfData]       = useState(null)
+  const [pdfUrl, setPdfUrl]         = useState(null)   // blob URL — preview + download
   const [sending, setSending]       = useState(false)
   const [sent, setSent]             = useState(false)
 
@@ -362,18 +362,21 @@ function EmailScreen({ sessionId, moduleResult, onReset }) {
     doc.setFontSize(5)
     doc.text('Pumpun Dixital S.L. — Documento generado automáticamente. Confidencial.', W - 10, footerY + 13, { align: 'right' })
 
-    // Save PDF as base64
-    const pdfBase64 = doc.output('datauristring')
-    setPdfData(pdfBase64)
+    // Blob URL — works for both inline preview and download
+    const blob = doc.output('blob')
+    const url = URL.createObjectURL(blob)
+    setPdfUrl(url)
+    return () => URL.revokeObjectURL(url)
   }, [moduleResult, sessionId])
 
   // Encode report data for QR - use portal URL instead of base64 data
-  const qrValue = `https://innovadef.es/?informe=${sessionId}`
+  // QR uses the 30-min token; falls back to sessionId if server is offline
+  const qrValue = `${window.location.origin}/report/${qrToken || sessionId}`
 
   const handleDownloadPdf = () => {
-    if (pdfData) {
+    if (pdfUrl) {
       const link = document.createElement('a')
-      link.href = pdfData
+      link.href = pdfUrl
       link.download = `informe-innovadef-${sessionId}.pdf`
       link.click()
     }
@@ -381,8 +384,17 @@ function EmailScreen({ sessionId, moduleResult, onReset }) {
 
   const handleSendEmail = () => {
     if (!email.includes('@')) return
+    // Attach email to session in DB (fire-and-forget)
+    fetch(`/api/session/${sessionId}/email`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    }).catch(() => {})
+    const reportUrl = emailToken
+      ? `${window.location.origin}/report/${emailToken}`
+      : `${window.location.origin}/report/${sessionId}`
     const subject = encodeURIComponent(`INNOVADEF 2026 - Informe ${sessionId}`)
-    const body = encodeURIComponent(`Informe de evaluación INNOVADEF 2026\n\nSesión: ${sessionId}\n\nEl PDF adjunto contiene los resultados completos.`)
+    const body = encodeURIComponent(`Informe de evaluación INNOVADEF 2026\n\nSesión: ${sessionId}\n\nAccede a tu informe aquí:\n${reportUrl}\n\nEste enlace es permanente.`)
     window.location.href = `mailto:${email}?subject=${subject}&body=${body}`
     setSent(true)
   }
@@ -404,7 +416,7 @@ function EmailScreen({ sessionId, moduleResult, onReset }) {
             <div style={{ fontFamily: FONT, fontSize: 10, color: TEXT2, marginTop: 6 }}>
               Escanea para acceder a tu informe en innovadef.es
             </div>
-            {pdfData && (
+            {pdfUrl && (
               <button
                 onClick={handleDownloadPdf}
                 style={{ marginTop: 12, ...S.btnPrimary, fontSize: '11px', padding: '10px 20px', gap: 8 }}
@@ -767,18 +779,24 @@ export default function App() {
   const [sessionId] = useState(() => `FOCO-${Date.now().toString(36).toUpperCase()}`)
   const [booting, setBooting] = useState(() => getInitialScreen() === 'selector')
   const [bootStage, setBootStage] = useState(() => getInitialScreen() === 'selector' ? 4 : 0)
+  const [qrToken, setQrToken] = useState(null)
+  const [emailToken, setEmailToken] = useState(null)
+  const [reportId, setReportId] = useState(null)
   const [transitioning, setTransitioning] = useState(false)
   const [pendingModule, setPendingModule] = useState(null)
   const { overlay, go } = useScreenTransition(750)
 
-  // Sync URL with screen
+  // Sync URL with screen — guard /email: if no result, bounce to selector
   useEffect(() => {
     if (screen === 'sleep') navigate('/', { replace: true })
     else if (screen === 'intro') navigate('/intro')
     else if (screen === 'selector') navigate('/selector')
     else if (screen === 'module' && activeModule) navigate(`/module/${activeModule}`)
-    else if (screen === 'email') navigate('/email')
-  }, [screen, activeModule, navigate])
+    else if (screen === 'email') {
+      if (!moduleResult) { setScreen('selector'); return }
+      navigate('/email')
+    }
+  }, [screen, activeModule, moduleResult, navigate])
 
   // Handle browser back/forward buttons
   useEffect(() => {
@@ -866,15 +884,33 @@ export default function App() {
 
   const handleComplete = (result) => {
     const mod = MODULES.find(m => m.id === activeModule)
+    // New unique ID per completion — prevents .onConflict().ignore() skipping subsequent saves
+    const newReportId = `FOCO-${Date.now().toString(36).toUpperCase()}`
+    setReportId(newReportId)
+    setQrToken(null)
+    setEmailToken(null)
+    const fullResult = { ...result, _moduleId: activeModule, _moduleTitle: mod?.label || activeModule }
+    // Persist session — server returns qrToken (30min) and emailToken (permanent)
+    fetch('/api/session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: newReportId, moduleId: activeModule, moduleTitle: mod?.label, result: fullResult }),
+    })
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (data?.qrToken) setQrToken(data.qrToken)
+        if (data?.emailToken) setEmailToken(data.emailToken)
+      })
+      .catch(() => {}) // kiosk keeps working offline — QR falls back to reportId
     go(() => {
-      setModuleResult({ ...result, _moduleId: activeModule, _moduleTitle: mod?.label || activeModule })
+      setModuleResult(fullResult)
       setScreen('email')
     })
   }
   const reset = () => {
     markUserInteracted()
     sfxReset()
-    go(() => { setScreen('selector'); setActiveModule(null); setModuleResult(null) })
+    go(() => { setScreen('selector'); setActiveModule(null); setModuleResult(null); setQrToken(null); setEmailToken(null); setReportId(null) })
   }
 
   const activeModCode = MODULES.find(m => m.id === activeModule)?.code
@@ -990,9 +1026,9 @@ export default function App() {
             />
           </div>
         )}
-        {screen === 'email' && (
+        {screen === 'email' && moduleResult && (
           <div key="email" style={{ width: '100%', animation: 'contentFadeIn 0.6s ease-out both' }}>
-            <EmailScreen sessionId={sessionId} moduleResult={moduleResult} onReset={reset} />
+            <EmailScreen sessionId={reportId || sessionId} moduleResult={moduleResult} onReset={reset} qrToken={qrToken} emailToken={emailToken} />
           </div>
         )}
       </div>

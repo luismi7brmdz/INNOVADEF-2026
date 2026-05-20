@@ -10,14 +10,18 @@
     "preview": "vite preview",
     "server": "node --env-file=server/.env server/index.js",
     "dev:full": "concurrently -n VITE,API -c cyan,green \"vite\" \"node --env-file=server/.env server/index.js\"",
+    "dev:network": "concurrently -n VITE,API -c cyan,green \"vite --host\" \"node --env-file=server/.env server/index.js\"",
     "start": "npm run build && concurrently -n PREVIEW,API -c cyan,green \"vite preview\" \"node --env-file=server/.env server/index.js\""
   },
   "dependencies": {
+    "better-sqlite3": "^12.10.0",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^4.21.2",
     "jspdf": "^4.2.1",
+    "knex": "^3.2.10",
     "lucide-react": "^1.16.0",
+    "mysql2": "^3.22.3",
     "nodemailer": "^7.0.3",
     "openai": "^6.38.0",
     "pdfkit": "^0.15.2",
@@ -26,7 +30,8 @@
     "react-dom": "^19.2.6",
     "react-router-dom": "^7.15.1",
     "three": "^0.184.0",
-    "uuid": "^11.1.0"
+    "uuid": "^11.1.0",
+    "ws": "^8.20.1"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
