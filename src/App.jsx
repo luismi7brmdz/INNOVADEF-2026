@@ -875,6 +875,10 @@ export default function App() {
   }
 
   const commitModule = () => {
+    // Generate the session ID now so plugins can use it for intermediate saves
+    setReportId(`FOCO-${Date.now().toString(36).toUpperCase()}`)
+    setQrToken(null)
+    setEmailToken(null)
     setActiveModule(pendingModule)
     setScreen('module')
     setTransitioning(false)
@@ -884,17 +888,12 @@ export default function App() {
 
   const handleComplete = (result) => {
     const mod = MODULES.find(m => m.id === activeModule)
-    // New unique ID per completion — prevents .onConflict().ignore() skipping subsequent saves
-    const newReportId = `FOCO-${Date.now().toString(36).toUpperCase()}`
-    setReportId(newReportId)
-    setQrToken(null)
-    setEmailToken(null)
     const fullResult = { ...result, _moduleId: activeModule, _moduleTitle: mod?.label || activeModule }
-    // Persist session — server returns qrToken (30min) and emailToken (permanent)
+    // reportId was set in commitModule when the module started
     fetch('/api/session', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: newReportId, moduleId: activeModule, moduleTitle: mod?.label, result: fullResult }),
+      body: JSON.stringify({ id: reportId, moduleId: activeModule, moduleTitle: mod?.label, result: fullResult }),
     })
       .then(r => r.ok ? r.json() : null)
       .then(data => {
@@ -1023,6 +1022,7 @@ export default function App() {
             <PluginRenderer
               plugin={MODULES.find(m => m.id === activeModule)}
               onComplete={handleComplete}
+              sessionId={reportId}
             />
           </div>
         )}

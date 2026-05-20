@@ -194,6 +194,47 @@ app.post('/api/xai/v1/*', async (req, res) => {
   }
 })
 
+// ─── Module answers (intermediate) ───────────────────────────────────────────
+
+/**
+ * POST /api/answers
+ * Body: { sessionId?, moduleId, steps: [{ stepId, questionId?, answer }] }
+ *    OR { sessionId?, moduleId, stepId, questionId?, answer }  ← single step
+ *
+ * Plugins call this as users progress through questions.
+ * sessionId is available from the start via usePluginSDK().
+ */
+app.post('/api/answers', async (req, res) => {
+  const { sessionId, moduleId, steps, stepId, questionId, answer } = req.body
+  if (!moduleId) return res.status(400).json({ error: 'moduleId required' })
+  try {
+    const now = Date.now()
+    const rows = Array.isArray(steps)
+      ? steps.map(s => ({
+          session_id:  sessionId || null,
+          module_id:   moduleId,
+          step_id:     s.stepId     || null,
+          question_id: s.questionId || null,
+          answer:      JSON.stringify(s.answer ?? null),
+          created_at:  now,
+        }))
+      : [{
+          session_id:  sessionId || null,
+          module_id:   moduleId,
+          step_id:     stepId     || null,
+          question_id: questionId || null,
+          answer:      JSON.stringify(answer ?? null),
+          created_at:  now,
+        }]
+
+    await db('module_answers').insert(rows)
+    res.json({ ok: true, saved: rows.length })
+  } catch (err) {
+    console.error('[answers] error:', err.message)
+    res.status(500).json({ error: err.message })
+  }
+})
+
 // ─── Sessions ────────────────────────────────────────────────────────────────
 
 /**
@@ -208,16 +249,6 @@ app.post('/api/session', async (req, res) => {
     await db('sessions')
       .insert({ id, module_id: moduleId, module_title: moduleTitle, result: JSON.stringify(result), created_at: Date.now() })
       .onConflict('id').ignore()
-
-    // Generate PDF server-side before returning — ensures it's ready when QR is scanned
-    const pdfPath = join(REPORTS_DIR, `${id}.pdf`)
-    const { _moduleId, _moduleTitle, ...cleanResult } = result || {}
-    try {
-      await generateReport({ id, moduleId, moduleTitle, result: cleanResult, pdfPath })
-    } catch (err) {
-      console.error('[session] PDF generation failed:', err.message)
-      // PDF failure is non-fatal — session and tokens still created
-    }
 
     // QR token: 30 min — scan it now or lose it
     const qrToken = await createToken(id, 30)
@@ -297,6 +328,27 @@ app.get('/api/pulse/aggregates', async (req, res) => {
   }
 })
 
+// ─── PDF lazy generation ──────────────────────────────────────────────────────
+
+/**
+ * Generates the PDF for a session if it doesn't exist yet.
+ * Called on-demand when the report page or PDF endpoint is hit.
+ */
+async function ensurePdf(session) {
+  const pdfPath = join(REPORTS_DIR, `${session.id}.pdf`)
+  if (existsSync(pdfPath)) return pdfPath
+  const result = typeof session.result === 'string' ? JSON.parse(session.result) : session.result
+  const { _moduleId, _moduleTitle, ...cleanResult } = result || {}
+  await generateReport({
+    id: session.id,
+    moduleId: session.module_id,
+    moduleTitle: session.module_title,
+    result: cleanResult,
+    pdfPath,
+  })
+  return pdfPath
+}
+
 // ─── Report PDF download ──────────────────────────────────────────────────────
 
 /**
@@ -310,11 +362,14 @@ app.get('/report/:token/pdf', async (req, res) => {
     if (tokenRow.expires_at && tokenRow.expires_at < Date.now()) {
       return res.status(410).send('Link expired')
     }
-    const pdfPath = join(REPORTS_DIR, `${tokenRow.session_id}.pdf`)
-    if (!existsSync(pdfPath)) return res.status(404).send('PDF not found')
+    const session = await db('sessions').where({ id: tokenRow.session_id }).first()
+    if (!session) return res.status(404).send('Session not found')
+
+    const pdfPath = await ensurePdf(session).catch(() => null)
+    if (!pdfPath) return res.status(404).send('PDF generation failed')
 
     res.setHeader('Content-Type', 'application/pdf')
-    res.setHeader('Content-Disposition', `attachment; filename="informe-innovadef-${tokenRow.session_id}.pdf"`)
+    res.setHeader('Content-Disposition', `attachment; filename="informe-innovadef-${session.id}.pdf"`)
     res.sendFile(pdfPath)
   } catch (err) {
     console.error('[report/pdf] error:', err.message)
@@ -350,10 +405,8 @@ app.get('/report/:token', async (req, res) => {
     const session = await db('sessions').where({ id: tokenRow.session_id }).first()
     if (!session) return res.status(404).send(reportErrorPage('Sesión no encontrada.'))
 
-    const result = typeof session.result === 'string' ? JSON.parse(session.result) : session.result
-    const pdfPath = join(REPORTS_DIR, `${session.id}.pdf`)
-    const hasPdf = existsSync(pdfPath)
-    const pdfUrl = hasPdf ? `/reports/${session.id}.pdf` : null
+    const pdfPath = await ensurePdf(session).catch(() => null)
+    const hasPdf = !!pdfPath
 
     res.send(`<!DOCTYPE html>
 <html lang="es">
@@ -385,10 +438,7 @@ app.get('/report/:token', async (req, res) => {
     <div style="color:#4B5563;font-size:.7rem;letter-spacing:2px;margin-bottom:.5rem;">VISTA PREVIA</div>
     <iframe src="/reports/${session.id}.pdf" title="Informe PDF"
       style="width:100%;height:80vh;border:1px solid #1f2937;display:block;background:#fff;"></iframe>
-  </div>` : `
-  <p style="color:#4B5563;margin-top:2rem;font-size:.85rem;">Generando informe...</p>
-  <meta http-equiv="refresh" content="3">
-  `}
+  </div>` : '<p style="color:#4B5563;margin-top:2rem;font-size:.85rem;">PDF no disponible para esta sesión.</p>'}
   <footer>Pumpún Dixital S.L. · pumpun.cloud · INNOVADEF FOCO 2026</footer>
 </body>
 </html>`)

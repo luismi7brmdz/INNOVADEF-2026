@@ -22,15 +22,15 @@ function HudLoadingScreen() {
  *   plugin     — registry entry ({ id, component, ... })
  *   onComplete — forwarded to plugin and SDK context
  */
-export default function PluginRenderer({ plugin, onComplete }) {
+export default function PluginRenderer({ plugin, onComplete, sessionId }) {
   if (!plugin) return null
   const { component: Component } = plugin
 
   return (
-    <PluginSDKProvider onComplete={onComplete}>
+    <PluginSDKProvider onComplete={onComplete} sessionId={sessionId}>
       <PluginErrorBoundary pluginId={plugin.id} onBack={() => onComplete?.(null)}>
         <Suspense fallback={<HudLoadingScreen />}>
-          <Component onComplete={onComplete} />
+          <Component onComplete={onComplete} sessionId={sessionId} />
         </Suspense>
       </PluginErrorBoundary>
     </PluginSDKProvider>

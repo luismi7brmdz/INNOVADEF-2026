@@ -81,5 +81,20 @@ export async function runMigrations() {
     console.log('[db] Created table: report_tokens')
   })
 
+  // module_answers — intermediate answers saved by plugins during execution
+  await db.schema.hasTable('module_answers').then(async (exists) => {
+    if (exists) return
+    await db.schema.createTable('module_answers', (t) => {
+      t.increments('id')
+      t.string('session_id')             // nullable initially — filled when module starts
+      t.string('module_id').notNullable()
+      t.string('step_id')                // e.g. 'q1', 'phase-2', free-form
+      t.string('question_id')            // optional sub-identifier
+      t.text('answer')                   // JSON — any shape the plugin needs
+      t.bigInteger('created_at')
+    })
+    console.log('[db] Created table: module_answers')
+  })
+
   console.log('[db] Migrations OK')
 }
