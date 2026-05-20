@@ -57,6 +57,31 @@ function saveMeta (id, meta) {
 
 const app = express()
 
+// ─── Rate limiting (in-memory, per IP) ──────────────────────────────────────
+// No extra dependency — a simple sliding-window counter per route group.
+
+const _rl = new Map()
+function rateLimit(maxPerMinute) {
+  return (req, res, next) => {
+    const key = `${req.ip}:${req.path.split('/')[2] || ''}`
+    const now = Date.now()
+    const entry = _rl.get(key) || { count: 0, resetAt: now + 60_000 }
+    if (now > entry.resetAt) { entry.count = 0; entry.resetAt = now + 60_000 }
+    entry.count++
+    _rl.set(key, entry)
+    if (entry.count > maxPerMinute) {
+      console.warn(`[rate-limit] ${req.ip} exceeded ${maxPerMinute} req/min on ${req.path}`)
+      return res.status(429).json({ error: 'Too many requests — please wait a moment.' })
+    }
+    next()
+  }
+}
+// Clean up stale entries every 5 min
+setInterval(() => {
+  const now = Date.now()
+  for (const [k, v] of _rl) if (now > v.resetAt) _rl.delete(k)
+}, 5 * 60_000)
+
 // ─── CORS ────────────────────────────────────────────────────────────────────
 // Production: only same-origin requests (no Origin header).
 // Development: allow any private/local network origin so --host works.
@@ -169,7 +194,7 @@ app.get('/api/status', async (req, res) => {
  * Proxies requests to api.x.ai, injecting the server-side API key.
  * Plugins call /api/xai/v1/chat/completions — the key never reaches the client.
  */
-app.post('/api/xai/v1/*', async (req, res) => {
+app.post('/api/xai/v1/*', rateLimit(30), async (req, res) => {
   const key = process.env.XAI_API_KEY
   if (!key) {
     console.error('[xai] XAI_API_KEY not set in server/.env')
@@ -264,15 +289,51 @@ app.post('/api/session', async (req, res) => {
 
 /**
  * PATCH /api/session/:id/email
- * Body: { email }
- * Attaches the email to an existing session once the user submits it.
+ * Body: { email, emailToken? }
+ * Attaches the email to an existing session and queues the PDF delivery.
  */
 app.patch('/api/session/:id/email', async (req, res) => {
-  const { email } = req.body
+  const { email, emailToken } = req.body
   if (!email) return res.status(400).json({ error: 'email required' })
   try {
+    const session = await db('sessions').where({ id: req.params.id }).first()
+    if (!session) return res.status(404).json({ error: 'Session not found' })
+
     await db('sessions').where({ id: req.params.id }).update({ email })
-    res.json({ ok: true })
+
+    // Resolve the permanent token for the report link
+    const token = emailToken || (
+      await db('report_tokens')
+        .where({ session_id: req.params.id })
+        .whereNull('expires_at')
+        .orderBy('created_at', 'desc')
+        .first()
+    )?.token
+
+    // Build the public report URL
+    const host      = process.env.PUBLIC_URL || `http://${getLocalIp()}:${process.env.PORT || 3001}`
+    const reportUrl = token ? `${host}/report/${token}` : null
+
+    // Ensure PDF exists before queuing
+    const pdfPath = await ensurePdf(session).catch(err => {
+      console.error('[session/email] PDF generation failed:', err.message)
+      return null
+    })
+
+    if (pdfPath) {
+      await queueEmail({
+        to:          email,
+        reportId:    req.params.id,
+        moduleTitle: session.module_title || session.module_id,
+        pdfPath,
+        reportUrl,
+      })
+      console.log(`[session/email] Queued for ${email}, report ${req.params.id}`)
+    } else {
+      console.warn(`[session/email] PDF missing for ${req.params.id} — email NOT queued`)
+    }
+
+    res.json({ ok: true, queued: !!pdfPath })
   } catch (err) {
     console.error('[session/email] error:', err.message)
     res.status(500).json({ error: err.message })
@@ -446,6 +507,15 @@ app.get('/report/:token', async (req, res) => {
     console.error('[report page] error:', err.message)
     res.status(500).send('<h2>Error interno</h2>')
   }
+})
+
+// ─── Global error handler ─────────────────────────────────────────────────────
+// eslint-disable-next-line no-unused-vars
+app.use((err, req, res, _next) => {
+  const ts = new Date().toISOString()
+  console.error(`[error] ${ts} ${req.method} ${req.path}`)
+  console.error(err.stack || err.message)
+  res.status(err.status || 500).json({ error: err.message || 'Internal server error' })
 })
 
 // ─── Start ───────────────────────────────────────────────────────────────────

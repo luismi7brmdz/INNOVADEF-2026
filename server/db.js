@@ -96,5 +96,25 @@ export async function runMigrations() {
     console.log('[db] Created table: module_answers')
   })
 
+  // email_queue — persistent email delivery queue
+  await db.schema.hasTable('email_queue').then(async (exists) => {
+    if (exists) return
+    await db.schema.createTable('email_queue', (t) => {
+      t.increments('id')
+      t.string('to').notNullable()
+      t.string('report_id').notNullable()
+      t.string('module_title')
+      t.text('pdf_path').notNullable()
+      t.text('report_url')               // permanent link included in email body
+      t.integer('retries').defaultTo(0)
+      t.text('last_error')               // last failure message
+      t.bigInteger('last_attempt')       // Unix ms
+      t.boolean('sent').defaultTo(false)
+      t.bigInteger('sent_at')            // Unix ms — null until delivered
+      t.bigInteger('created_at').notNullable()
+    })
+    console.log('[db] Created table: email_queue')
+  })
+
   console.log('[db] Migrations OK')
 }
