@@ -526,7 +526,7 @@ function PlasmaSphere({ exploding = false, wakeProgress = 0 }) {
   }, [])
 
   return (
-    <div ref={containerRef} style={{ position: 'absolute', left: '-10%', right: '-10%', top: '5%', height: '75%', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 4, pointerEvents: 'none' }}>
+    <div ref={containerRef} style={{ flex: 1, minHeight: 0, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', zIndex: 2, pointerEvents: 'none', overflow: 'hidden' }}>
       <canvas ref={canvasRef} style={{ display: 'block', pointerEvents: 'none' }} />
     </div>
   )
@@ -534,11 +534,10 @@ function PlasmaSphere({ exploding = false, wakeProgress = 0 }) {
 
 // ─── SLEEP SCREEN ──────────────────────────────────────────────────────────────
 export default function SleepScreen({ onWake }) {
-  const [phase, setPhase] = useState('idle') // idle | waking | exploding | done
+  const [phase, setPhase]           = useState('idle')
   const [wakeProgress, setWakeProgress] = useState(0)
-  const [touchOrigin, setTouchOrigin] = useState({ x: 0, y: 0 })
-  const [ripples, setRipples] = useState([])
-  const rafRef = useRef(null)
+  const [touchOrigin, setTouchOrigin]   = useState({ x: 0, y: 0 })
+  const rafRef       = useRef(null)
   const startTimeRef = useRef(null)
 
   const wake = useCallback((e) => {
@@ -547,147 +546,132 @@ export default function SleepScreen({ onWake }) {
     const x = e?.clientX ?? e?.touches?.[0]?.clientX ?? window.innerWidth / 2
     const y = e?.clientY ?? e?.touches?.[0]?.clientY ?? window.innerHeight / 2
     setTouchOrigin({ x, y })
-
-    // Spawn ripples cascade
-    const id = Date.now()
-    setRipples([{ id, x, y }])
     sfxWakeTouch()
     sfxWakeSweep()
-
     setPhase('waking')
     startTimeRef.current = performance.now()
-
-    // Animate wakeProgress 0→1 over 1.4s
     const animWake = (now) => {
-      const elapsed = now - startTimeRef.current
-      const p = Math.min(elapsed / 1400, 1)
+      const p = Math.min((now - startTimeRef.current) / 1400, 1)
       setWakeProgress(p)
-      if (p < 1) {
-        rafRef.current = requestAnimationFrame(animWake)
-      } else {
-        setPhase('done')
-        setTimeout(() => onWake(), 180)
-      }
+      if (p < 1) { rafRef.current = requestAnimationFrame(animWake) }
+      else { setPhase('done'); setTimeout(() => onWake(), 180) }
     }
     rafRef.current = requestAnimationFrame(animWake)
   }, [phase, onWake])
 
   useEffect(() => () => rafRef.current && cancelAnimationFrame(rafRef.current), [])
 
-  const isWaking = phase === 'waking'
+  const isWaking    = phase === 'waking'
   const isExploding = false
 
   return (
     <div
       onClick={wake}
       onTouchStart={wake}
-      style={{ position: 'fixed', inset: 0, zIndex: 300, overflow: 'hidden', cursor: 'none' }}
+      style={{
+        position: 'fixed', inset: 0, zIndex: 300,
+        display: 'flex', flexDirection: 'column', alignItems: 'center',
+        overflow: 'hidden', cursor: 'none',
+      }}
     >
+      {/* ── Fondos absolutos ── */}
       <SleepBackground wakeProgress={wakeProgress} />
-
-      {/* Scanlines */}
-      <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 2,
-        background: 'repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.14) 3px, rgba(0,0,0,0.14) 6px)',
+      <div style={{ position: 'absolute', inset: 0, zIndex: 2, pointerEvents: 'none',
+        background: 'repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.14) 3px,rgba(0,0,0,0.14) 6px)',
         opacity: 1 - wakeProgress * 0.7 }} />
+      <div style={{ position: 'absolute', inset: 0, zIndex: 2, pointerEvents: 'none',
+        background: 'radial-gradient(ellipse at center,transparent 25%,rgba(0,0,0,0.85) 100%)',
+        opacity: 1 - wakeProgress * 0.8, transition: 'opacity 0.1s' }} />
 
-      {/* Vignette (fades out on wake) */}
-      <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 2,
-        background: 'radial-gradient(ellipse at center, transparent 25%, rgba(0,0,0,0.85) 100%)',
-        opacity: 1 - wakeProgress * 0.8,
-        transition: 'opacity 0.1s' }} />
+      {/* ── 1. Logo ── */}
+      <div style={{
+        position: 'relative', zIndex: 3, flexShrink: 0,
+        padding: '3vh 0 0',
+        animation: isWaking ? 'none' : 'sleepFloat 4s ease-in-out infinite',
+        opacity: isWaking ? Math.max(0, 1 - wakeProgress * 2) : 1,
+        transform: isWaking ? `scale(${1 + wakeProgress * 0.3}) translateY(${-wakeProgress * 30}px)` : undefined,
+      }}>
+        <img src="/logoinnovadef.png" alt="INNOVADEF"
+          style={{ height: '14vh', opacity: 0.85 }} />
+      </div>
 
-      {/* ── Plasma Sphere rendered inside the UI column ── */}
-      <PlasmaSphere key="plasma-sphere" exploding={isExploding} wakeProgress={wakeProgress} small />
+      {/* ── 2. Orbe — ocupa todo el espacio sobrante ── */}
+      <PlasmaSphere key="plasma-sphere" exploding={isExploding} wakeProgress={wakeProgress} />
 
-      {/* ── UI layer ── */}
-      <div style={{ position: 'absolute', inset: 0, zIndex: 3, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-between', padding: '48px 0 40px', pointerEvents: 'auto' }}>
-
-        {/* Logo — top */}
-        <div style={{
-          animation: isWaking ? 'none' : 'sleepFloat 4s ease-in-out infinite',
-          opacity: isWaking ? Math.max(0, 1 - wakeProgress * 2) : 1,
-          transform: isWaking ? `scale(${1 + wakeProgress * 0.3}) translateY(${-wakeProgress * 30}px)` : undefined,
-          transition: 'filter 0.05s',
+      {/* ── 3. Botón táctil — siempre en el layout, invisible al despertar ── */}
+      <div style={{
+          visibility: phase === 'idle' ? 'visible' : 'hidden',
+          position: 'relative', zIndex: 3, flexShrink: 0,
+          display: 'flex', flexDirection: 'column', alignItems: 'center',
+          gap: '1.5vh',
+          padding: '0 0 3vh',
         }}>
-          <img src="/logoinnovadef.png" alt="INNOVADEF"
-            style={{ height: 'clamp(80px, 12vw, 130px)',
-              opacity: 0.8 + wakeProgress * 0.2 }} />
-        </div>
-
-        {/* Spacer with orb — orbe ya renderizado en posición absoluta, este div ocupa el centro */}
-        <div style={{ flex: 1 }} />
-
-        {/* Touch button — zona inferior, hidden once wake starts */}
-        {phase === 'idle' && <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'clamp(20px, 5vw, 32px)' }}>
-          <div style={{
-            position: 'relative',
-            width: 'clamp(250px, 50vw, 414px)', height: 'clamp(250px, 50vw, 414px)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}>
-            {[0, 1, 2, 3].map(i => (
+          {/* Círculo con anillos */}
+          <div style={{ position: 'relative', width: '18vh', height: '18vh',
+            display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            {[0, 1, 2].map(i => (
               <div key={i} style={{
-                position: 'absolute',
-                left: '50%', top: '50%',
-                width: `clamp(80px, 20vw, ${165 + i * 82.5}px)`, height: `clamp(80px, 20vw, ${165 + i * 82.5}px)`,
-                border: `1.5px solid rgba(0,255,65,${0.6 - i * 0.12})`,
+                position: 'absolute', left: '50%', top: '50%',
+                width: `${100 + i * 40}%`, height: `${100 + i * 40}%`,
+                border: `1.5px solid rgba(0,255,65,${0.5 - i * 0.15})`,
                 borderRadius: '50%',
-                boxShadow: `0 0 ${8 + i * 4}px rgba(0,255,65,0.3)`,
-                animation: `sleepRing 2.6s ease-out ${i * 0.4}s infinite`,
+                transform: 'translate(-50%,-50%)',
+                animation: `sleepRing 2.6s ease-out ${i * 0.45}s infinite`,
               }} />
             ))}
             <div style={{
-              width: 'clamp(100px, 25vw, 165px)', height: 'clamp(100px, 25vw, 165px)', borderRadius: '50%',
-              border: `1.5px solid rgba(0,255,65,0.4)`,
-              background: 'radial-gradient(circle, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 70%)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 'clamp(6px, 1.5vw, 9px)',
-              boxShadow: `0 0 60px rgba(0,0,0,0.5), 0 0 135px rgba(0,0,0,0.3)`,
+              width: '100%', height: '100%', borderRadius: '50%',
+              border: '1.5px solid rgba(0,255,65,0.45)',
+              background: 'radial-gradient(circle,rgba(0,0,0,0.85) 0%,rgba(0,0,0,0.4) 100%)',
+              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+              gap: '0.5vh',
               animation: 'sleepBtnPulse 3s ease-in-out infinite',
-              position: 'relative', zIndex: 1,
             }}>
-              <div style={{ fontFamily: FONT, fontSize: 'clamp(18px, 4vw, 27px)', color: 'rgba(255,255,255,0.9)', letterSpacing: 'clamp(3px, 0.8vw, 4.5px)' }}>TOQUE</div>
-              <div style={{ fontFamily: FONT, fontSize: 'clamp(8px, 2vw, 10.5px)', color: 'rgba(255,255,255,0.7)', letterSpacing: 'clamp(2px, 0.6vw, 3px)' }}>PARA INICIAR</div>
+              <div style={{ fontFamily: FONT, fontSize: '2vh',
+                color: 'rgba(255,255,255,0.9)', letterSpacing: '0.2em' }}>TOQUE</div>
+              <div style={{ fontFamily: FONT, fontSize: '1vh',
+                color: 'rgba(255,255,255,0.6)', letterSpacing: '0.2em' }}>PARA INICIAR</div>
             </div>
           </div>
 
-          {/* Status label — footer */}
-          <div style={{ fontFamily: FONT, fontSize: 'clamp(10px, 2vw, 12px)', color: 'rgba(255,255,255,0.3)', letterSpacing: 'clamp(3px, 0.8vw, 5px)',
+          {/* Label footer */}
+          <div style={{ fontFamily: FONT, fontSize: '1.2vh',
+            color: 'rgba(255,255,255,0.25)', letterSpacing: '0.35em',
             animation: 'sleepBlink 3.5s ease-in-out infinite' }}>
             INNOVADEF FOCO 2026
           </div>
-        </div>}
-      </div>
+        </div>
 
-      {/* ── HUD scan lines sweep during wake ── */}
+      {/* ── HUD sweep durante el wake ── */}
       {isWaking && (
         <>
-          <div style={{ position: 'fixed', left: 0, right: 0, height: '2.25px', zIndex: 6, pointerEvents: 'none',
-            background: `linear-gradient(90deg, transparent 0%, ${ACCENT}cc 40%, ${ACCENT} 50%, ${ACCENT}cc 60%, transparent 100%)`,
+          <div style={{ position: 'fixed', left: 0, right: 0, height: '2px', zIndex: 6, pointerEvents: 'none',
+            background: `linear-gradient(90deg,transparent,${ACCENT}cc 40%,${ACCENT} 50%,${ACCENT}cc 60%,transparent)`,
             boxShadow: `0 0 30px ${ACCENT}88`,
             top: `${wakeProgress * 100}%`, opacity: Math.sin(wakeProgress * Math.PI) }} />
-          <div style={{ position: 'fixed', left: 0, right: 0, height: '2.25px', zIndex: 6, pointerEvents: 'none',
-            background: `linear-gradient(90deg, transparent 0%, ${ACCENT}99 40%, ${ACCENT}cc 50%, ${ACCENT}99 60%, transparent 100%)`,
+          <div style={{ position: 'fixed', left: 0, right: 0, height: '2px', zIndex: 6, pointerEvents: 'none',
+            background: `linear-gradient(90deg,transparent,${ACCENT}99 40%,${ACCENT}cc 50%,${ACCENT}99 60%,transparent)`,
             boxShadow: `0 0 18px ${ACCENT}66`,
             bottom: `${wakeProgress * 100}%`, opacity: Math.sin(wakeProgress * Math.PI) * 0.7 }} />
         </>
       )}
 
-      {/* ── Simple pointer flash on wake completion ── */}
+      {/* ── Flash al despertar ── */}
       {phase === 'done' && (
-        <div style={{ position: 'absolute', left: touchOrigin.x, top: touchOrigin.y, zIndex: 10, pointerEvents: 'none', transform: 'translate(-50%,-50%)' }}>
-          <div style={{
-            width: '60px', height: '60px', borderRadius: '50%',
-            background: `radial-gradient(circle, white 0%, ${ACCENT} 30%, transparent 70%)`,
+        <div style={{ position: 'absolute', left: touchOrigin.x, top: touchOrigin.y,
+          zIndex: 10, pointerEvents: 'none', transform: 'translate(-50%,-50%)' }}>
+          <div style={{ width: '60px', height: '60px', borderRadius: '50%',
+            background: `radial-gradient(circle,white 0%,${ACCENT} 30%,transparent 70%)`,
             animation: 'pointerFlash 0.4s ease-out forwards',
-            boxShadow: `0 0 100px ${ACCENT}, 0 0 200px ${ACCENT}88`,
-          }} />
+            boxShadow: `0 0 100px ${ACCENT},0 0 200px ${ACCENT}88` }} />
         </div>
       )}
 
       <style>{`
-        @keyframes sleepFloat    { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-18px)} }
-        @keyframes sleepRing     { 0%{transform:translate(-50%,-50%) scale(0.82);opacity:0.6} 100%{transform:translate(-50%,-50%) scale(1.35);opacity:0} }
-        @keyframes sleepBtnPulse { 0%,100%{box-shadow:0 0 40px rgba(0,255,65,0.14),0 0 90px rgba(0,255,65,0.06)} 50%{box-shadow:0 0 70px rgba(0,255,65,0.28),0 0 140px rgba(0,255,65,0.12)} }
-        @keyframes sleepBlink    { 0%,100%{opacity:0.35} 50%{opacity:0.85} }
+        @keyframes sleepFloat    { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
+        @keyframes sleepRing     { 0%{opacity:0.6;transform:translate(-50%,-50%) scale(0.85)} 100%{opacity:0;transform:translate(-50%,-50%) scale(1.3)} }
+        @keyframes sleepBtnPulse { 0%,100%{box-shadow:0 0 30px rgba(0,255,65,0.1)} 50%{box-shadow:0 0 60px rgba(0,255,65,0.25)} }
+        @keyframes sleepBlink    { 0%,100%{opacity:0.3} 50%{opacity:0.8} }
         @keyframes pointerFlash  { 0%{transform:translate(-50%,-50%) scale(0);opacity:1} 100%{transform:translate(-50%,-50%) scale(3);opacity:0} }
       `}</style>
     </div>
