@@ -877,7 +877,8 @@ export default function App() {
       clearTimeout(timeoutId)
       if (screen !== 'sleep') {
         timeoutId = setTimeout(() => {
-          navigate('/')
+          setScreen('sleep')
+          setActiveModule(null)
         }, 60000) // 60 seconds
       }
     }
