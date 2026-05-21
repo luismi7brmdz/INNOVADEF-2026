@@ -935,6 +935,10 @@ export default function App() {
   }
 
   const handleComplete = async (result) => {
+    if (!result) {
+      go(() => { setScreen('selector'); setActiveModule(null); setModuleResult(null) })
+      return
+    }
     const mod = MODULES.find(m => m.id === activeModule)
     const fullResult = { ...result, _moduleId: activeModule, _moduleTitle: mod?.label || activeModule }
     // reportId was set in commitModule when the module started

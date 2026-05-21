@@ -1,3 +1,4 @@
+import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
 import { createServer } from 'http'
@@ -105,6 +106,19 @@ app.use(express.json())
 
 // Serve generated PDFs statically
 app.use('/reports', express.static(REPORTS_DIR))
+
+// Serve the built frontend in production (dist/)
+// Must come AFTER all /api and /report routes so it doesn't shadow them.
+const DIST_DIR = join(__dirname, '..', 'dist')
+if (existsSync(DIST_DIR)) {
+  app.use(express.static(DIST_DIR))
+  // SPA fallback — any unknown route returns index.html
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api') || req.path.startsWith('/report') || req.path.startsWith('/reports')) return next()
+    res.sendFile(join(DIST_DIR, 'index.html'))
+  })
+  console.log('[static] Serving frontend from dist/')
+}
 
 /**
  * POST /api/report
@@ -547,15 +561,20 @@ httpServer.on('upgrade', (req, socket, head) => {
       headers: { Authorization: `Bearer ${key}` },
     })
 
+    const msgBuffer = []
+    client.on('message', (data, isBinary) => {
+      if (upstream.readyState === WebSocket.OPEN) upstream.send(data, { binary: isBinary })
+      else msgBuffer.push({ data, isBinary })
+    })
+    client.on('close', () => upstream.close())
+
     upstream.on('open', () => {
-      client.on('message', (data) => {
-        if (upstream.readyState === WebSocket.OPEN) upstream.send(data)
-      })
-      client.on('close', () => upstream.close())
+      msgBuffer.forEach(({ data, isBinary }) => upstream.send(data, { binary: isBinary }))
+      msgBuffer.length = 0
     })
 
-    upstream.on('message', (data) => {
-      if (client.readyState === WebSocket.OPEN) client.send(data)
+    upstream.on('message', (data, isBinary) => {
+      if (client.readyState === WebSocket.OPEN) client.send(data, { binary: isBinary })
     })
     upstream.on('close', () => client.close())
     upstream.on('error', (err) => {
