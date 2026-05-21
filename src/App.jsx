@@ -832,35 +832,37 @@ export default function App() {
   const [pendingModule, setPendingModule] = useState(null)
   const { overlay, go } = useScreenTransition(750)
 
-  // Sync URL with screen — guard /email: if no result, bounce to selector
+  // Screen → URL: empuja la URL cuando el estado cambia desde la UI.
+  // Solo navega si la URL actual no coincide, evitando entradas duplicadas en el historial.
   useEffect(() => {
+    const expected =
+      screen === 'sleep'                      ? '/' :
+      screen === 'intro'                      ? '/intro' :
+      screen === 'selector'                   ? '/selector' :
+      screen === 'module' && activeModule     ? `/module/${activeModule}` :
+      screen === 'email'                      ? '/email' :
+      null
+    if (!expected) return
+    if (screen === 'email' && !moduleResult) { setScreen('selector'); return }
+    if (location.pathname === expected) return   // ya en sync, no hacer nada
     if (screen === 'sleep') navigate('/', { replace: true })
-    else if (screen === 'intro') navigate('/intro')
-    else if (screen === 'selector') navigate('/selector')
-    else if (screen === 'module' && activeModule) navigate(`/module/${activeModule}`)
-    else if (screen === 'email') {
-      if (!moduleResult) { setScreen('selector'); return }
-      navigate('/email')
-    }
-  }, [screen, activeModule, moduleResult, navigate])
+    else navigate(expected)
+  }, [screen, activeModule, moduleResult, navigate]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Handle browser back/forward buttons
+  // URL → screen: reacciona a cambios de location (flechas del navegador).
+  // React Router actualiza location antes del re-render, así que no hay closure stale.
   useEffect(() => {
-    const handlePopState = () => {
-      const path = location.pathname
-      if (path === '/') setScreen('sleep')
-      else if (path === '/intro') setScreen('intro')
-      else if (path === '/selector') setScreen('selector')
-      else if (path === '/email') setScreen('email')
-      else if (path.startsWith('/module/')) {
-        const moduleId = path.split('/')[2]
-        setActiveModule(moduleId)
-        setScreen('module')
-      }
+    const path = location.pathname
+    if (path === '/') { setScreen('sleep') }
+    else if (path === '/intro') { setScreen('intro') }
+    else if (path === '/selector') { setScreen('selector') }
+    else if (path === '/email') { if (moduleResult) setScreen('email'); else setScreen('selector') }
+    else if (path.startsWith('/module/')) {
+      const moduleId = path.split('/')[2]
+      setActiveModule(moduleId)
+      setScreen('module')
     }
-    window.addEventListener('popstate', handlePopState)
-    return () => window.removeEventListener('popstate', handlePopState)
-  }, [location.pathname])
+  }, [location.pathname]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Ambient background sound — TEMPORARILY DISABLED
   useEffect(() => {
@@ -1056,21 +1058,12 @@ export default function App() {
         </div>
       </header>
 
-      {/* Content */}
-      <div style={{ position: 'relative', zIndex: 2, paddingTop: '117px', paddingBottom: '72px', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'clamp(140px, 18vw, 200px) clamp(24px, 4vw, 60px) clamp(52px, 7vw, 80px)' }}>
+      {/* Content — selector and email screens */}
+      <div style={{ position: 'relative', zIndex: 2, minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'clamp(140px, 18vw, 200px) clamp(24px, 4vw, 60px) clamp(52px, 7vw, 80px)' }}>
         {screen === 'selector' && (
           <div key="selector" style={{ width: '100%',
             animation: transitioning ? 'contentFadeOut 0.75s ease-in 0.67s forwards' : 'contentFadeIn 0.9s ease-out both' }}>
             <ModuleSelector onSelect={selectModule} bootStage={bootStage} />
-          </div>
-        )}
-        {screen === 'module' && (
-          <div key={`mod-${activeModule}`} style={{ width: '100%', animation: 'contentFadeIn 0.6s ease-out both' }}>
-            <PluginRenderer
-              plugin={MODULES.find(m => m.id === activeModule)}
-              onComplete={handleComplete}
-              sessionId={reportId}
-            />
           </div>
         )}
         {screen === 'email' && moduleResult && (
@@ -1079,6 +1072,21 @@ export default function App() {
           </div>
         )}
       </div>
+
+      {/* Module screen — plugin fills the space between header and status bar, sin scroll */}
+      {screen === 'module' && (
+        <div key={`mod-${activeModule}`} style={{
+          position: 'fixed', top: '90px', left: 0, right: 0, bottom: 'clamp(32px, 4vw, 48px)',
+          zIndex: 2, overflow: 'hidden',
+          animation: 'contentFadeIn 0.6s ease-out both',
+        }}>
+          <PluginRenderer
+            plugin={MODULES.find(m => m.id === activeModule)}
+            onComplete={handleComplete}
+            sessionId={reportId}
+          />
+        </div>
+      )}
 
       <StatusBar module={activeModCode} onHome={reset} bootStage={bootStage} />
 
