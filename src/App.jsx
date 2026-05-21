@@ -824,7 +824,7 @@ export default function App() {
   const [moduleResult, setModuleResult] = useState(null)
   const [sessionId] = useState(() => `FOCO-${Date.now().toString(36).toUpperCase()}`)
   const [booting, setBooting] = useState(() => getInitialScreen() === 'selector')
-  const [bootStage, setBootStage] = useState(() => getInitialScreen() === 'selector' ? 4 : 0)
+  const [bootStage, setBootStage] = useState(() => ['selector', 'module', 'email'].includes(getInitialScreen()) ? 4 : 0)
   const [qrToken, setQrToken] = useState(null)
   const [emailToken, setEmailToken] = useState(null)
   const [reportId, setReportId] = useState(null)
