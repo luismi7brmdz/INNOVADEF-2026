@@ -313,16 +313,16 @@ export default function IntroScreen({ onEnter }) {
       {/* Vignette */}
       <div style={{ position: 'absolute', inset: 0, zIndex: 2, pointerEvents: 'none', background: 'radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.9) 100%)' }} />
 
-      {/* Center content */}
-      <div style={{ position: 'relative', zIndex: 3, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0' }}>
+      {/* Center content — scrollable cuando el viewport es bajo (landscape portátil) */}
+      <div style={{ position: 'relative', zIndex: 3, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0', overflowY: 'auto', scrollbarWidth: 'none', maxHeight: '100svh', padding: 'clamp(10px, 2vh, 24px) 0', boxSizing: 'border-box' }}>
 
         {/* Logo flotante */}
-        <div style={{ animation: 'floatLogo 4.2s ease-in-out infinite', marginBottom: '30px' }}>
+        <div style={{ animation: 'floatLogo 4.2s ease-in-out infinite', marginBottom: 'clamp(10px, 2.5vh, 30px)' }}>
           <img
             src="/logoinnovadef.png"
             alt="INNOVADEF"
             style={{
-              height: 'clamp(90px, 21vw, 180px)',
+              height: 'clamp(70px, min(21vw, 20vh), 150px)',
               filter: `drop-shadow(0 0 24px ${ACCENT}) drop-shadow(0 0 60px ${ACCENT}44)`
             }}
           />
@@ -334,18 +334,18 @@ export default function IntroScreen({ onEnter }) {
         </div>
 
         {/* Nombre del sistema */}
-        <div style={{ fontFamily: FONT, fontSize: 'clamp(11px, 2.1vw, 21px)', letterSpacing: 'clamp(2px, 0.6vw, 6px)', color: TEXT2, marginBottom: '12px', animation: 'fadeInUp 0.9s ease 0.3s both' }}>
+        <div style={{ fontFamily: FONT, fontSize: 'clamp(11px, min(2.1vw, 2.5vh), 18px)', letterSpacing: 'clamp(2px, 0.6vw, 6px)', color: TEXT2, marginBottom: 'clamp(4px, 1.2vh, 12px)', animation: 'fadeInUp 0.9s ease 0.3s both' }}>
           SISTEMA DE EVALUACIÓN TÁCTICA
         </div>
-        <div style={{ fontFamily: FONT, fontSize: 'clamp(33px, 6vw, 78px)', letterSpacing: '9px', color: ACCENT, marginBottom: '6px', animation: 'fadeInUp 0.9s ease 0.6s both', textShadow: `0 0 30px ${ACCENT}66` }}>
+        <div style={{ fontFamily: FONT, fontSize: 'clamp(28px, min(6vw, 8vh), 70px)', letterSpacing: '9px', color: ACCENT, marginBottom: 'clamp(4px, 0.8vh, 6px)', animation: 'fadeInUp 0.9s ease 0.6s both', textShadow: `0 0 30px ${ACCENT}66` }}>
           FOCO 2026
         </div>
-        <div style={{ fontFamily: FONT, fontSize: 'clamp(10px, 1.5vw, 16.5px)', letterSpacing: 'clamp(2px, 0.5vw, 5px)', color: TEXT2, opacity: 0.75, marginBottom: '18px', animation: 'fadeInUp 0.9s ease 0.9s both' }}>
+        <div style={{ fontFamily: FONT, fontSize: 'clamp(10px, min(1.5vw, 1.8vh), 15px)', letterSpacing: 'clamp(2px, 0.5vw, 5px)', color: TEXT2, opacity: 0.75, marginBottom: 'clamp(8px, 1.8vh, 18px)', animation: 'fadeInUp 0.9s ease 0.9s both' }}>
           23.06.2026 · MADRID · ENS CAT-A CERTIFICADO
         </div>
 
         {/* Boot sequence */}
-        <div style={{ fontFamily: FONT, fontSize: 'clamp(11px, 1.8vw, 21px)', color: `${ACCENT}55`, letterSpacing: '1px', lineHeight: 2.5, textAlign: 'left', minHeight: 'clamp(80px, 15vw, 120px)', marginBottom: '30px', width: 'clamp(240px, 75vw, 520px)', animation: 'fadeInUp 0.75s ease 1.2s both' }}>
+        <div style={{ fontFamily: FONT, fontSize: 'clamp(11px, min(1.4vw, 1.8vh), 15px)', color: `${ACCENT}55`, letterSpacing: '1px', lineHeight: 1.7, textAlign: 'left', marginBottom: 'clamp(12px, 2.5vh, 30px)', width: 'clamp(240px, 75vw, 520px)', animation: 'fadeInUp 0.75s ease 1.2s both' }}>
           {bootLines.map((line, i) => (
             <div key={i} style={{ color: i === bootLines.length - 1 ? ACCENT : `${ACCENT}55`, animation: 'lineIn 0.3s ease' }}>
               {line}{i === bootLines.length - 1 ? <span style={{ animation: 'blink 1.2s infinite' }}>_</span> : ''}
@@ -358,8 +358,8 @@ export default function IntroScreen({ onEnter }) {
           <button
             onClick={handleEnter}
             style={{
-              fontFamily: FONT, fontSize: 'clamp(14px, 2.5vw, 27px)', letterSpacing: 'clamp(3px, 0.8vw, 9px)',
-              padding: 'clamp(12px, 2vw, 18px) clamp(24px, 5vw, 48px)',
+              fontFamily: FONT, fontSize: 'clamp(13px, min(2.5vw, 3vh), 22px)', letterSpacing: 'clamp(3px, 0.8vw, 9px)',
+              padding: 'clamp(10px, 1.8vh, 18px) clamp(20px, 4vw, 48px)',
               background: 'transparent',
               border: `1px solid #ffaa00`,
               color: '#ffaa00',
@@ -382,7 +382,7 @@ export default function IntroScreen({ onEnter }) {
         )}
 
         {/* Session ID */}
-        <div style={{ fontFamily: FONT, fontSize: 'clamp(9px, 1vw, 13.5px)', color: `${ACCENT}30`, letterSpacing: 'clamp(1px, 0.2vw, 3px)', marginTop: 'clamp(18px, 3vw, 36px)' }}>
+        <div style={{ fontFamily: FONT, fontSize: 'clamp(9px, 1vw, 13.5px)', color: `${ACCENT}30`, letterSpacing: 'clamp(1px, 0.2vw, 3px)', marginTop: 'clamp(10px, 2vh, 24px)' }}>
           ID: FOCO-{Date.now().toString(36).toUpperCase().slice(-6)} · v2.6.0
         </div>
       </div>
