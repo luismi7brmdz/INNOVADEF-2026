@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
-import * as THREE from 'three'
 import { ACCENT, FONT, TEXT2 } from './theme'
 import { sfxWakeTouch, sfxWakeSweep, markUserInteracted } from './sfx'
 
@@ -182,9 +181,9 @@ let globalMat = null
 let globalHalo1 = null
 let globalHalo2 = null
 let globalRafId = null
-let globalMouse = new THREE.Vector2(9999, 9999)
-let globalMouseVel = new THREE.Vector2(0, 0)
-let globalLastMouse = new THREE.Vector2(9999, 9999)
+let globalMouse = { x: 9999, y: 9999 }
+let globalMouseVel = { x: 0, y: 0 }
+let globalLastMouse = { x: 9999, y: 9999 }
 let globalRawStr = 0
 let globalRotX = 0, globalRotY = 0, globalRotVX = 0.0003, globalRotVY = 0.0006
 let globalSmoothStr = 0, globalSmoothVelX = 0, globalSmoothVelY = 0
@@ -218,15 +217,14 @@ function cleanupWebGL() {
   globalRafId = null
 }
 
-function initWebGL(canvas) {
-  // Reuse existing renderer if same canvas
+function initWebGL(THREE, canvas) {
   if (globalRenderer && globalRenderer.domElement === canvas) {
     return globalRenderer
   }
   cleanupWebGL()
 
-  globalRenderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true })
-  globalRenderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2))
+  globalRenderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: true })
+  globalRenderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5))
   globalRenderer.setClearColor(0x000000, 0)
 
   globalScene = new THREE.Scene()
@@ -259,42 +257,45 @@ function PlasmaSphere({ exploding = false, wakeProgress = 0 }) {
     const canvas = canvasRef.current
     if (!container || !canvas) return
 
-    initWebGL(canvas)
+    let cancelled = false
+    let ro = null
+    let onMouseMove = null
 
-    const getSide = () => {
-      const w = container.clientWidth
-      const h = container.clientHeight
-      return Math.min(w, h)
-    }
+    import('three').then(THREE => {
+      if (cancelled) return
 
-    const resize = () => {
-      const s = getSide()
-      canvas.style.width = s + 'px'
-      canvas.style.height = s + 'px'
-      globalRenderer.setSize(s, s, false)
-      globalCamera.aspect = 1
-      globalCamera.updateProjectionMatrix()
-    }
+      initWebGL(THREE, canvas)
 
-    const onMove = (cx, cy) => {
-      const r = canvas.getBoundingClientRect()
-      const nx = ((cx - r.left) / r.width) * 2 - 1
-      const ny = -((cy - r.top) / r.height) * 2 + 1
-      const dvx = nx - globalLastMouse.x
-      const dvy = ny - globalLastMouse.y
-      globalLastMouse.set(nx, ny)
-      globalMouse.set(nx, ny)
-      globalMouseVel.set(dvx, dvy)
-      globalRawStr = Math.min(1, Math.sqrt(dvx * dvx + dvy * dvy) * 22)
-    }
+      const getSide = () => Math.min(container.clientWidth, container.clientHeight)
 
-    const onMouseMove = e => onMove(e.clientX, e.clientY)
-    const onMouseLeave = () => { globalMouse.set(9999, 9999); globalRawStr = 0 }
-    window.addEventListener('mousemove', onMouseMove)
-    canvas.addEventListener('touchmove', e => {
-      e.preventDefault()
-      onMove(e.touches[0].clientX, e.touches[0].clientY)
-    }, { passive: false })
+      const resize = () => {
+        const s = getSide()
+        canvas.style.width = s + 'px'
+        canvas.style.height = s + 'px'
+        globalRenderer.setSize(s, s, false)
+        globalCamera.aspect = 1
+        globalCamera.updateProjectionMatrix()
+      }
+
+      const onMove = (cx, cy) => {
+        const r = canvas.getBoundingClientRect()
+        const nx = ((cx - r.left) / r.width) * 2 - 1
+        const ny = -((cy - r.top) / r.height) * 2 + 1
+        const dvx = nx - globalLastMouse.x
+        const dvy = ny - globalLastMouse.y
+        globalLastMouse.x = nx; globalLastMouse.y = ny
+        globalMouse.x = nx; globalMouse.y = ny
+        globalMouseVel.x = dvx; globalMouseVel.y = dvy
+        globalRawStr = Math.min(1, Math.sqrt(dvx * dvx + dvy * dvy) * 22)
+      }
+
+      onMouseMove = e => onMove(e.clientX, e.clientY)
+      const onMouseLeave = () => { globalMouse.x = 9999; globalMouse.y = 9999; globalRawStr = 0 }
+      window.addEventListener('mousemove', onMouseMove)
+      canvas.addEventListener('touchmove', e => {
+        e.preventDefault()
+        onMove(e.touches[0].clientX, e.touches[0].clientY)
+      }, { passive: false })
 
     // Vertex shader
     const vs = `
@@ -512,16 +513,18 @@ function PlasmaSphere({ exploding = false, wakeProgress = 0 }) {
       globalRenderer.render(globalScene, globalCamera)
     }
 
-    resize()
-    animate()
+      resize()
+      animate()
 
-    const ro = new ResizeObserver(resize)
-    ro.observe(container)
+      ro = new ResizeObserver(resize)
+      ro.observe(container)
+    })
 
     return () => {
+      cancelled = true
       cleanupWebGL()
-      ro.disconnect()
-      window.removeEventListener('mousemove', onMouseMove)
+      if (ro) ro.disconnect()
+      if (onMouseMove) window.removeEventListener('mousemove', onMouseMove)
     }
   }, [])
 
