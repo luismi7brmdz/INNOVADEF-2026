@@ -67,7 +67,9 @@ function MilitaryCursor() {
       ))}
 
       <style>{`
-        * { cursor: none !important; }
+        @media (hover: hover) and (pointer: fine) {
+          * { cursor: none !important; }
+        }
         @keyframes shotFade { 0%{opacity:1} 100%{opacity:0} }
         @keyframes ripple1 { 0%{r:6;opacity:1} 100%{r:27;opacity:0} }
         @keyframes ripple2 { 0%{r:12;opacity:0.8} 100%{r:42;opacity:0} }
@@ -317,7 +319,7 @@ export default function IntroScreen({ onEnter }) {
       <div style={{ position: 'relative', zIndex: 3, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0', overflowY: 'auto', scrollbarWidth: 'none', maxHeight: '100svh', padding: 'clamp(10px, 2vh, 24px) 0', boxSizing: 'border-box' }}>
 
         {/* Logo flotante */}
-        <div style={{ animation: 'floatLogo 4.2s ease-in-out infinite', marginBottom: 'clamp(10px, 2.5vh, 30px)' }}>
+        <div style={{ animation: 'floatLogo 4.2s ease-in-out infinite', marginBottom: 'clamp(10px, 2.5vh, 30px)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
           <img
             src="/logoinnovadef.png"
             alt="INNOVADEF"

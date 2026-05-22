@@ -208,9 +208,9 @@ export default function App() {
       }} />
 
       {/* Header */}
-      <header style={{
+      <header className="app-header" style={{
         position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50,
-        height: 'clamp(54px, 6.5vw, 90px)',
+        height: 'clamp(48px, 8vw, 90px)',
         background: 'rgba(5,5,5,0.96)',
         borderBottom: `1.5px solid ${BORDER}`,
         display: 'flex', alignItems: 'stretch',
@@ -220,71 +220,76 @@ export default function App() {
         overflow: 'hidden',
       }}>
         {/* Logo */}
-        <button onClick={reset} style={{
+        <button onClick={reset} className="header-logo" style={{
           background: 'none', border: 'none', borderRight: `1.5px solid ${BORDER}`,
-          padding: '0 clamp(16px, 2.5vw, 32px)', cursor: 'pointer',
-          display: 'flex', alignItems: 'center', gap: 'clamp(10px, 1.5vw, 18px)',
+          padding: '0 clamp(10px, 2vw, 32px)', cursor: 'pointer',
+          display: 'flex', alignItems: 'center', gap: 'clamp(6px, 1vw, 18px)',
         }}>
-          <img src="/logoinnovadef.png" alt="INNOVADEF" style={{ height: 'clamp(48px, 7vw, 100px)' }} />
+          <img src="/logoinnovadef.png" alt="INNOVADEF" style={{ height: 'clamp(32px, 6vw, 80px)' }} />
         </button>
 
         {/* Nav items */}
-        <div style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
+        <div className="header-nav" style={{ display: 'flex', alignItems: 'center', flex: 1, overflow: 'hidden' }}>
           {[
-            { label: 'CENTRO OPS', active: screen === 'selector', action: reset },
-            { label: activeModCode || '—', active: screen === 'module', action: null },
+            { label: 'CENTRO OPS', shortLabel: 'OPS', active: screen === 'selector', action: reset },
+            { label: activeModCode || '—', shortLabel: activeModCode || '—', active: screen === 'module', action: null },
           ].map((nav, i) => (
-            <div key={i} style={{
-              padding: '0 clamp(12px, 2vw, 24px)', height: '100%', display: 'flex', alignItems: 'center',
+            <div key={i} className="header-nav-item" style={{
+              padding: '0 clamp(8px, 1.5vw, 24px)', height: '100%', display: 'flex', alignItems: 'center',
               borderRight: `1.5px solid ${BORDER}`,
-              fontFamily: FONT, fontSize: 'clamp(14px, 2vw, 20px)', letterSpacing: 'clamp(2px, 0.4vw, 3px)',
+              fontFamily: FONT, fontSize: 'clamp(10px, 1.8vw, 18px)', letterSpacing: 'clamp(1px, 0.3vw, 3px)',
               color: nav.active ? ACCENT : TEXT2,
-              borderBottom: nav.active ? `3px solid ${ACCENT}` : '3px solid transparent',
+              borderBottom: nav.active ? `2px solid ${ACCENT}` : '2px solid transparent',
               cursor: nav.action ? 'pointer' : 'default',
               background: nav.active ? 'rgba(0,255,65,0.04)' : 'transparent',
+              whiteSpace: 'nowrap',
             }} onClick={nav.action}>
-              {nav.label}
+              <span className="nav-full">{nav.label}</span>
+              <span className="nav-short">{nav.shortLabel}</span>
             </div>
           ))}
 
           {screen === 'module' && (
             <button
               onClick={reset}
+              className="header-back-btn"
               onMouseEnter={e => { e.currentTarget.style.color = '#ffaa00'; e.currentTarget.style.borderColor = '#ffaa0066' }}
               onMouseLeave={e => { e.currentTarget.style.color = TEXT2; e.currentTarget.style.borderColor = BORDER }}
               style={{
                 marginLeft: 'auto',
-                display: 'flex', alignItems: 'center', gap: 'clamp(8px, 1.2vw, 14px)',
-                padding: '0 clamp(12px, 2vw, 20px)', height: '100%',
+                display: 'flex', alignItems: 'center', gap: 'clamp(4px, 0.8vw, 14px)',
+                padding: '0 clamp(8px, 1.5vw, 20px)', height: '100%',
                 background: 'none', border: 'none', borderLeft: `1.5px solid ${BORDER}`,
                 color: TEXT2, cursor: 'pointer',
-                fontFamily: FONT, fontSize: 'clamp(14px, 2vw, 20px)', letterSpacing: 'clamp(2px, 0.4vw, 3px)',
+                fontFamily: FONT, fontSize: 'clamp(9px, 1.5vw, 18px)', letterSpacing: 'clamp(1px, 0.3vw, 3px)',
                 transition: 'color 0.27s, border-color 0.27s',
+                whiteSpace: 'nowrap',
               }}
             >
-              ← MENÚ PRINCIPAL
+              <span className="back-full">← MENÚ PRINCIPAL</span>
+              <span className="back-short">← MENÚ</span>
             </button>
           )}
         </div>
 
         {/* Right indicators — stacked label/value */}
-        <div style={{ display: 'flex', alignItems: 'center', borderLeft: `1.5px solid ${BORDER}` }}>
+        <div className="header-indicators" style={{ display: 'flex', alignItems: 'center', borderLeft: `1.5px solid ${BORDER}` }}>
           {[
             { label: 'SYS', val: 'OK',  c: ACCENT },
             { label: 'NET', val: 'ENS', c: ACCENT },
             { label: 'SEC', val: 'A',   c: ACCENT },
           ].map((ind, i) => (
-            <div key={i} style={{
-              padding: '0 clamp(12px, 2vw, 24px)', borderRight: `1.5px solid ${BORDER}`,
+            <div key={i} className="header-indicator" style={{
+              padding: '0 clamp(6px, 1.2vw, 24px)', borderRight: `1.5px solid ${BORDER}`,
               height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center',
-              gap: 'clamp(2px, 0.4vw, 5px)',
+              gap: 'clamp(1px, 0.3vw, 5px)',
             }}>
-              <div style={{ fontFamily: FONT, fontSize: 'clamp(10px, 1.3vw, 15px)', color: TEXT2, letterSpacing: '1px' }}>{ind.label}</div>
-              <div style={{ fontFamily: FONT, fontSize: 'clamp(13px, 1.8vw, 20px)', color: ind.c, letterSpacing: '1px' }}>{ind.val}</div>
+              <div style={{ fontFamily: FONT, fontSize: 'clamp(8px, 1vw, 14px)', color: TEXT2, letterSpacing: '1px' }}>{ind.label}</div>
+              <div style={{ fontFamily: FONT, fontSize: 'clamp(10px, 1.4vw, 18px)', color: ind.c, letterSpacing: '1px' }}>{ind.val}</div>
             </div>
           ))}
-          <div style={{ padding: '0 clamp(12px, 2vw, 24px)', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 'clamp(2px, 0.4vw, 5px)' }}>
-            <div style={{ fontFamily: FONT, fontSize: 'clamp(10px, 1.3vw, 15px)', color: TEXT2, letterSpacing: '1px' }}>HORA LOCAL</div>
+          <div className="header-clock" style={{ padding: '0 clamp(8px, 1.5vw, 24px)', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 'clamp(1px, 0.3vw, 5px)' }}>
+            <div style={{ fontFamily: FONT, fontSize: 'clamp(8px, 1vw, 14px)', color: TEXT2, letterSpacing: '1px' }}>HORA</div>
             <LiveClock />
           </div>
         </div>
@@ -321,7 +326,8 @@ export default function App() {
       {screen === 'module' && (
         <div key={`mod-${activeModule}`} style={{
           position: 'fixed', top: '7vh', left: 0, right: 0, bottom: '4vw',
-          zIndex: 2, overflow: 'hidden',
+          zIndex: 2, overflowY: 'auto', overflowX: 'hidden',
+          padding: 'clamp(10px, 2vw, 30px)',
           animation: 'contentFadeIn 0.6s ease-out both',
         }}>
           <PluginRenderer
@@ -356,6 +362,29 @@ export default function App() {
         @keyframes ringExpand     { 0%{width:0;height:0;opacity:0.8} 100%{width:150vmax;height:150vmax;opacity:0} }
         @keyframes glitchFlicker  { 0%,100%{opacity:0} 10%{opacity:0.4} 20%{opacity:0} 30%{opacity:0.3} 40%{opacity:0} 50%{opacity:0.5} 60%{opacity:0} 70%{opacity:0.2} 80%{opacity:0} 90%{opacity:0.1} }
         button:focus { outline: 1.5px solid rgba(0,255,65,0.3); outline-offset: 3px; }
+        
+        /* Responsive header - default: show full labels */
+        .nav-short, .back-short { display: none; }
+        .nav-full, .back-full { display: inline; }
+        
+        /* Tablet landscape and smaller laptops (< 1024px) */
+        @media (max-width: 1024px) {
+          .header-indicator:nth-child(3) { display: none; }
+        }
+        
+        /* Tablet portrait (< 768px) */
+        @media (max-width: 768px) {
+          .nav-short, .back-short { display: inline; }
+          .nav-full, .back-full { display: none; }
+          .header-indicator:nth-child(2),
+          .header-indicator:nth-child(3) { display: none; }
+        }
+        
+        /* Mobile (< 480px) */
+        @media (max-width: 480px) {
+          .header-indicators { display: none !important; }
+          .header-clock { display: none !important; }
+        }
       `}</style>
     </div>
   )
