@@ -1,6 +1,12 @@
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteBase /
+
+  # Pass /report/* and /api/* directly to the Node server (not SPA)
+  RewriteRule ^report/ - [L]
+  RewriteRule ^api/ - [L]
+  RewriteRule ^reports/ - [L]
+
   RewriteRule ^index\.html$ - [L]
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
