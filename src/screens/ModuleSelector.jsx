@@ -102,17 +102,17 @@ export default function ModuleSelector({ onSelect, bootStage = 4 }) {
 
       {/* Title */}
       <div style={{
-        marginBottom: 'clamp(20px, 3vw, 40px)',
+        marginBottom: 'clamp(16px, 3vw, 40px)',
         borderBottom: `1.5px solid ${BORDER}`,
-        paddingBottom: 'clamp(12px, 2vw, 22px)',
+        paddingBottom: 'clamp(10px, 2vw, 22px)',
         ...vis(3, 540),
       }}>
-        <div style={{ fontFamily: FONT, fontSize: 'clamp(17px, 2.5vw, 27px)', color: TEXT2, letterSpacing: 'clamp(3px, 0.6vw, 5px)', marginBottom: 'clamp(18px, 3vw, 33px)' }}>
-          // SISTEMA DE EVALUACIÓN INTERACTIVA — SELECCIONE MÓDULO DE OPERACIÓN
+        <div className="selector-subtitle" style={{ fontFamily: FONT, fontSize: 'clamp(10px, 1.8vw, 22px)', color: TEXT2, letterSpacing: 'clamp(1px, 0.4vw, 4px)', marginBottom: 'clamp(10px, 2vw, 28px)' }}>
+          // SISTEMA DE EVALUACIÓN INTERACTIVA
         </div>
-        <div style={{ fontFamily: FONT, fontSize: 'clamp(28px, 5vw, 80px)', letterSpacing: 'clamp(3px, 0.8vw, 6px)', color: ACCENT, textShadow: `0 0 60px ${ACCENT}33`, lineHeight: 1.1 }}>
+        <div style={{ fontFamily: FONT, fontSize: 'clamp(20px, 4.5vw, 72px)', letterSpacing: 'clamp(2px, 0.6vw, 6px)', color: ACCENT, textShadow: `0 0 60px ${ACCENT}33`, lineHeight: 1.15 }}>
           CENTRO DE OPERACIONES<br />
-          <span style={{ color: TEXT2, fontSize: '65%' }}>INNOVADEF FOCO 2026 — MADRID</span>
+          <span style={{ color: TEXT2, fontSize: 'clamp(12px, 2.5vw, 48px)' }}>INNOVADEF FOCO 2026 — MADRID</span>
         </div>
       </div>
 
@@ -134,7 +134,12 @@ export default function ModuleSelector({ onSelect, bootStage = 4 }) {
           </div>
 
           {/* Cards grid */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(clamp(320px, 42vw, 560px), 1fr))', gap: 'clamp(12px, 1.5vw, 20px)', alignItems: 'stretch' }}>
+          <div className="module-cards-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, clamp(280px, 40vw, 520px)), 1fr))', gap: 'clamp(10px, 1.5vw, 20px)', alignItems: 'stretch' }}>
+            <style>{`
+              @media (max-width: 600px) {
+                .module-cards-grid { gridTemplateColumns: 1fr !important; }
+              }
+            `}</style>
             {mods.map(mod => {
               const idx = globalIdx++
               const Icon = mod.icon
@@ -158,27 +163,28 @@ export default function ModuleSelector({ onSelect, bootStage = 4 }) {
                     {/* Header bar */}
                     <div style={{
                       display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                      padding: 'clamp(12px, 2vw, 18px) clamp(16px, 3vw, 28px)',
+                      padding: 'clamp(8px, 1.5vw, 16px) clamp(10px, 2vw, 24px)',
                       borderBottom: `1.5px solid ${isH ? '#ffaa0033' : BORDER}`,
                       background: isH ? 'rgba(255,170,0,0.04)' : '#0a0a0a',
+                      flexWrap: 'wrap', gap: 'clamp(6px, 1vw, 12px)',
                     }}>
-                      <div style={{ display: 'flex', gap: 'clamp(8px, 1.2vw, 14px)', alignItems: 'center' }}>
-                        <Icon size={20} color={isH ? '#ffaa00' : TEXT2} />
-                        <span style={{ fontFamily: FONT, fontSize: 'clamp(17px, 2.5vw, 26px)', color: TEXT2, letterSpacing: 'clamp(2px, 0.6vw, 3px)' }}>
+                      <div style={{ display: 'flex', gap: 'clamp(6px, 1vw, 12px)', alignItems: 'center' }}>
+                        <Icon size={Math.min(20, window.innerWidth * 0.04)} color={isH ? '#ffaa00' : TEXT2} style={{ minWidth: 14 }} />
+                        <span style={{ fontFamily: FONT, fontSize: 'clamp(12px, 2vw, 22px)', color: TEXT2, letterSpacing: 'clamp(1px, 0.4vw, 3px)' }}>
                           {mod.code}
                         </span>
                       </div>
-                      <div style={{ display: 'flex', gap: 'clamp(8px, 1.5vw, 16px)', alignItems: 'center' }}>
+                      <div style={{ display: 'flex', gap: 'clamp(6px, 1vw, 14px)', alignItems: 'center' }}>
                         <span style={{
-                          fontFamily: FONT, fontSize: 'clamp(15px, 2vw, 22px)', letterSpacing: 'clamp(2px, 0.6vw, 3px)',
+                          fontFamily: FONT, fontSize: 'clamp(10px, 1.5vw, 18px)', letterSpacing: 'clamp(1px, 0.4vw, 3px)',
                           color: isH ? '#ffaa00' : TEXT2,
-                          padding: '2px 8px',
-                          border: `1.5px solid ${isH ? '#ffaa0044' : BORDER}`,
+                          padding: 'clamp(2px, 0.3vw, 4px) clamp(4px, 0.6vw, 8px)',
+                          border: `1px solid ${isH ? '#ffaa0044' : BORDER}`,
                         }}>
                           {mod.tag}
                         </span>
                         <span style={{
-                          width: 'clamp(6px, 0.8vw, 9px)', height: 'clamp(6px, 0.8vw, 9px)',
+                          width: 'clamp(5px, 0.7vw, 8px)', height: 'clamp(5px, 0.7vw, 8px)',
                           background: isH ? '#ffaa00' : ACCENT,
                           display: 'inline-block',
                           boxShadow: isH ? '0 0 12px #ffaa00' : `0 0 12px ${ACCENT}`,
@@ -189,28 +195,28 @@ export default function ModuleSelector({ onSelect, bootStage = 4 }) {
 
                     {/* Body */}
                     <div style={{
-                      padding: 'clamp(18px, 3.5vw, 30px) clamp(16px, 3vw, 28px)',
+                      padding: 'clamp(12px, 2.5vw, 26px) clamp(10px, 2vw, 24px)',
                       flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
                     }}>
                       <div style={{
-                        fontFamily: FONT, fontSize: 'clamp(17px, 2.5vw, 25px)', letterSpacing: 'clamp(1px, 0.3vw, 1.5px)',
+                        fontFamily: FONT, fontSize: 'clamp(13px, 2vw, 22px)', letterSpacing: 'clamp(0.5px, 0.2vw, 1.5px)',
                         color: isH ? '#ffaa00' : TEXT2,
-                        marginBottom: 'clamp(8px, 1.2vw, 14px)', lineHeight: 1.3,
+                        marginBottom: 'clamp(6px, 1vw, 12px)', lineHeight: 1.3,
                       }}>
                         {mod.label}
                       </div>
                       <div style={{
-                        fontFamily: FONT, fontSize: 'clamp(13px, 1.8vw, 22px)',
-                        color: 'rgba(0,255,65,0.3)', lineHeight: 1.7,
-                        letterSpacing: '0.75px', marginBottom: 'clamp(15px, 3vw, 27px)',
+                        fontFamily: FONT, fontSize: 'clamp(11px, 1.5vw, 18px)',
+                        color: 'rgba(0,255,65,0.3)', lineHeight: 1.6,
+                        letterSpacing: '0.5px', marginBottom: 'clamp(10px, 2vw, 22px)',
                       }}>
                         {mod.desc}
                       </div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ fontFamily: FONT, fontSize: 'clamp(16px, 2.5vw, 25px)', color: 'rgba(0,255,65,0.25)', letterSpacing: 'clamp(1px, 0.3vw, 1.5px)' }}>
-                          DURACIÓN: {mod.duration}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 'clamp(6px, 1vw, 12px)' }}>
+                        <span style={{ fontFamily: FONT, fontSize: 'clamp(10px, 1.5vw, 18px)', color: 'rgba(0,255,65,0.25)', letterSpacing: 'clamp(0.5px, 0.2vw, 1.5px)' }}>
+                          {mod.duration}
                         </span>
-                        <span style={{ fontFamily: FONT, fontSize: 'clamp(17px, 2.5vw, 27px)', color: isH ? '#ffaa00' : TEXT2, letterSpacing: 'clamp(1px, 0.3vw, 1.5px)' }}>
+                        <span style={{ fontFamily: FONT, fontSize: 'clamp(11px, 1.8vw, 20px)', color: isH ? '#ffaa00' : TEXT2, letterSpacing: 'clamp(0.5px, 0.2vw, 1.5px)' }}>
                           {isH ? '[EJECUTAR ▶]' : '[──────]'}
                         </span>
                       </div>

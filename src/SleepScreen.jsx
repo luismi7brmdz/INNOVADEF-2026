@@ -571,10 +571,11 @@ export default function SleepScreen({ onWake }) {
     <div
       onClick={wake}
       onTouchStart={wake}
+      className="sleep-screen"
       style={{
         position: 'fixed', inset: 0, zIndex: 300,
         display: 'flex', flexDirection: 'column', alignItems: 'center',
-        overflow: 'hidden', cursor: 'none',
+        overflow: 'hidden',
       }}
     >
       {/* ── Fondos absolutos ── */}
@@ -671,6 +672,9 @@ export default function SleepScreen({ onWake }) {
       )}
 
       <style>{`
+        @media (hover: hover) and (pointer: fine) {
+          .sleep-screen { cursor: none !important; }
+        }
         @keyframes sleepFloat    { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
         @keyframes sleepRing     { 0%{opacity:0.6;transform:translate(-50%,-50%) scale(0.85)} 100%{opacity:0;transform:translate(-50%,-50%) scale(1.3)} }
         @keyframes sleepBtnPulse { 0%,100%{box-shadow:0 0 30px rgba(0,255,65,0.1)} 50%{box-shadow:0 0 60px rgba(0,255,65,0.25)} }

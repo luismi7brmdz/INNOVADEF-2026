@@ -414,28 +414,31 @@ export default function EmailScreen({ sessionId, moduleResult, onReset, qrToken,
   }
 
   return (
-    <div style={{ width: '100%' }}>
-      <Panel label="// ENTREGA DE INFORME CLASIFICADO" style={{ marginBottom: '5vw' }}>
-        <div style={{
-          padding: '5vw 4vw',
-          display: 'flex', flexWrap: 'wrap', gap: '5vw', alignItems: 'flex-start',
+    <div style={{ width: '100%', maxWidth: '1400px', margin: '0 auto' }}>
+      <Panel label="// ENTREGA DE INFORME CLASIFICADO" style={{ marginBottom: 'clamp(24px, 5vw, 60px)' }}>
+        <div className="email-grid" style={{
+          padding: 'clamp(20px, 4vw, 48px) clamp(16px, 3vw, 40px)',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))',
+          gap: 'clamp(24px, 4vw, 48px)',
+          alignItems: 'start',
         }}>
 
           {/* QR Column */}
-          <div style={{ flex: '1 1 25vw' }}>
-            <div style={{ fontFamily: FONT, fontSize: '2.5vw', color: TEXT2, letterSpacing: '0.6vw', marginBottom: '4vw' }}>
+          <div>
+            <div style={{ fontFamily: FONT, fontSize: 'clamp(12px, 2vw, 18px)', color: TEXT2, letterSpacing: 'clamp(2px, 0.4vw, 4px)', marginBottom: 'clamp(16px, 3vw, 32px)' }}>
               CÓDIGO QR — ACCESO AL PORTAL
             </div>
-            <div style={{ background: '#fff', padding: '3vw', display: 'inline-block', marginBottom: '1.5vw' }}>
-              <QRCode value={qrValue} size={192} level="H" />
+            <div style={{ background: '#fff', padding: 'clamp(12px, 2vw, 24px)', display: 'inline-block', marginBottom: 'clamp(8px, 1.5vw, 16px)' }}>
+              <QRCode value={qrValue} size={Math.min(192, window.innerWidth * 0.35)} level="H" style={{ width: 'clamp(120px, 25vw, 192px)', height: 'clamp(120px, 25vw, 192px)' }} />
             </div>
-            <div style={{ fontFamily: FONT, fontSize: '1vw', color: TEXT2, marginBottom: '1.5vw' }}>
+            <div style={{ fontFamily: FONT, fontSize: 'clamp(10px, 1.2vw, 14px)', color: TEXT2, marginBottom: 'clamp(12px, 2vw, 20px)' }}>
               Escanea para acceder a tu informe en innovadef.es
             </div>
             {pdfUrl && (
               <button
                 onClick={handleDownloadPdf}
-                style={{ ...S.btnPrimary, fontSize: '1vw', padding: '1.2vw 2vw', gap: '1vw' }}
+                style={{ ...S.btnPrimary, fontSize: 'clamp(11px, 1.4vw, 16px)', padding: 'clamp(10px, 1.5vw, 18px) clamp(16px, 2.5vw, 28px)', gap: 'clamp(6px, 1vw, 12px)' }}
               >
                 <Mail size={14} /> DESCARGAR PDF
               </button>
@@ -443,8 +446,8 @@ export default function EmailScreen({ sessionId, moduleResult, onReset, qrToken,
           </div>
 
           {/* Email Column */}
-          <div style={{ flex: '1 1 25vw' }}>
-            <div style={{ fontFamily: FONT, fontSize: '2.5vw', color: TEXT2, letterSpacing: '0.6vw', marginBottom: '4vw' }}>
+          <div>
+            <div style={{ fontFamily: FONT, fontSize: 'clamp(12px, 2vw, 18px)', color: TEXT2, letterSpacing: 'clamp(2px, 0.4vw, 4px)', marginBottom: 'clamp(16px, 3vw, 32px)' }}>
               ENVÍO POR EMAIL
             </div>
             {!sent ? (
@@ -456,11 +459,11 @@ export default function EmailScreen({ sessionId, moduleResult, onReset, qrToken,
                   onKeyDown={e => e.key === 'Enter' && handleSendEmail()}
                   placeholder="USUARIO@ORGANIZACION.ES"
                   style={{
-                    width: '100%', padding: '3vw',
+                    width: '100%', padding: 'clamp(12px, 2vw, 20px)',
                     background: '#0a0a0a', border: `1.5px solid ${BORDER}`,
-                    color: ACCENT, fontFamily: FONT, fontSize: '3vw',
-                    letterSpacing: '0.3vw', outline: 'none',
-                    marginBottom: '2vw', boxSizing: 'border-box',
+                    color: ACCENT, fontFamily: FONT, fontSize: 'clamp(14px, 2vw, 20px)',
+                    letterSpacing: 'clamp(1px, 0.2vw, 2px)', outline: 'none',
+                    marginBottom: 'clamp(12px, 2vw, 20px)', boxSizing: 'border-box',
                   }}
                   onFocus={e => e.target.style.borderColor = ACCENT}
                   onBlur={e => e.target.style.borderColor = BORDER}
@@ -468,23 +471,23 @@ export default function EmailScreen({ sessionId, moduleResult, onReset, qrToken,
                 <button
                   onClick={handleSendEmail}
                   disabled={!email.includes('@')}
-                  style={{ ...S.btnPrimary, width: '100%', justifyContent: 'center', opacity: !email.includes('@') ? 0.35 : 1, gap: '1vw' }}
+                  style={{ ...S.btnPrimary, width: '100%', justifyContent: 'center', opacity: !email.includes('@') ? 0.35 : 1, gap: 'clamp(6px, 1vw, 12px)', fontSize: 'clamp(12px, 1.6vw, 18px)', padding: 'clamp(12px, 1.8vw, 20px)' }}
                 >
                   <Send size={16} /> ENVIAR INFORME
                 </button>
-                <div style={{ fontFamily: FONT, fontSize: '1vw', color: TEXT2, marginTop: '1.5vw', lineHeight: 1.8 }}>
+                <div style={{ fontFamily: FONT, fontSize: 'clamp(10px, 1.2vw, 14px)', color: TEXT2, marginTop: 'clamp(12px, 2vw, 20px)', lineHeight: 1.8 }}>
                   Se abrirá tu cliente de correo. Adjunta el PDF descargado.
                 </div>
               </>
             ) : (
-              <div style={{ border: `1.5px solid ${ACCENT}44`, padding: '4vw', background: 'rgba(0,255,65,0.04)' }}>
-                <div style={{ fontFamily: FONT, fontSize: '2.5vw', color: ACCENT, letterSpacing: '0.6vw', marginBottom: '1.5vw' }}>
+              <div style={{ border: `1.5px solid ${ACCENT}44`, padding: 'clamp(16px, 3vw, 32px)', background: 'rgba(0,255,65,0.04)' }}>
+                <div style={{ fontFamily: FONT, fontSize: 'clamp(14px, 2vw, 20px)', color: ACCENT, letterSpacing: 'clamp(2px, 0.4vw, 4px)', marginBottom: 'clamp(8px, 1.5vw, 16px)' }}>
                   CLIENTE DE CORREO ABIERTO
                 </div>
-                <div style={{ fontFamily: FONT, fontSize: '3vw', color: TEXT2, marginBottom: '1vw' }}>
+                <div style={{ fontFamily: FONT, fontSize: 'clamp(14px, 2vw, 22px)', color: TEXT2, marginBottom: 'clamp(6px, 1vw, 12px)', wordBreak: 'break-all' }}>
                   DEST: {email.toUpperCase()}
                 </div>
-                <div style={{ fontFamily: FONT, fontSize: '1.1vw', color: TEXT2 }}>
+                <div style={{ fontFamily: FONT, fontSize: 'clamp(10px, 1.2vw, 14px)', color: TEXT2 }}>
                   Adjunta el PDF descargado antes de enviar.
                 </div>
               </div>
@@ -497,8 +500,9 @@ export default function EmailScreen({ sessionId, moduleResult, onReset, qrToken,
         onClick={onReset}
         style={{
           background: 'none', border: 'none', color: TEXT2, cursor: 'pointer',
-          fontFamily: FONT, fontSize: '2.5vw', letterSpacing: '0.6vw',
+          fontFamily: FONT, fontSize: 'clamp(14px, 2vw, 22px)', letterSpacing: 'clamp(2px, 0.4vw, 4px)',
           textTransform: 'uppercase', display: 'block', margin: '0 auto',
+          padding: 'clamp(12px, 2vw, 20px)',
         }}
         onMouseEnter={e => e.currentTarget.style.color = '#ffaa00'}
         onMouseLeave={e => e.currentTarget.style.color = TEXT2}

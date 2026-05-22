@@ -553,30 +553,30 @@ export default function CyberDefense({ onComplete }) {
       {/* ══ INTRO ══ */}
       {phase === 'intro' && (
         <div>
-          <div style={{ fontSize: '19.5px', letterSpacing: '4.5px', color: TEXT2, marginBottom: '18px' }}>// MOD-06 — SIMULADOR ARCADE</div>
-          <div style={{ fontSize: 'clamp(39px, 4.5vw, 66px)', letterSpacing: '6px', color: ACCENT, marginBottom: '12px', textShadow: `0 0 45px ${ACCENT}22` }}>
+          <div style={{ fontSize: 'clamp(12px, 1.8vw, 18px)', letterSpacing: 'clamp(2px, 0.4vw, 4px)', color: TEXT2, marginBottom: 'clamp(10px, 2vw, 18px)' }}>// MOD-06 — SIMULADOR ARCADE</div>
+          <div style={{ fontSize: 'clamp(22px, 4vw, 60px)', letterSpacing: 'clamp(2px, 0.5vw, 6px)', color: ACCENT, marginBottom: 'clamp(8px, 1.5vw, 12px)', textShadow: `0 0 45px ${ACCENT}22` }}>
             OPERACIÓN ESCUDO DIGITAL
           </div>
-          <div style={{ fontSize: '21px', color: TEXT2, letterSpacing: '3px', marginBottom: '42px' }}>
+          <div style={{ fontSize: 'clamp(12px, 1.8vw, 20px)', color: TEXT2, letterSpacing: 'clamp(1px, 0.3vw, 3px)', marginBottom: 'clamp(20px, 4vw, 42px)' }}>
             8 OLEADAS · 5 TIPOS DE AMENAZA · IMPOSIBLE A PARTIR DE OLEADA 6
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '36px' }}>
+          <div className="cyber-intro-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: 'clamp(12px, 2vw, 24px)', marginBottom: 'clamp(20px, 3vw, 36px)' }}>
             {/* Threat types legend */}
-            <div style={{ ...CARD }}>
-              <div style={{ fontSize: '19.5px', color: TEXT2, letterSpacing: '4.5px', marginBottom: '21px' }}>// TIPOS DE AMENAZA</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+            <div style={{ ...CARD, padding: 'clamp(12px, 2vw, 24px)' }}>
+              <div style={{ fontSize: 'clamp(12px, 1.6vw, 18px)', color: TEXT2, letterSpacing: 'clamp(2px, 0.4vw, 4px)', marginBottom: 'clamp(12px, 2vw, 20px)' }}>// TIPOS DE AMENAZA</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'clamp(8px, 1.2vw, 14px)' }}>
                 {Object.entries(TYPES).map(([key, t]) => (
-                  <div key={key} style={{ display: 'flex', alignItems: 'center', gap: '18px' }}>
-                    <div style={{ width: 15, height: 15, borderRadius: '50%', background: t.col, opacity: t.alpha, flexShrink: 0, border: '1px solid ' + t.col + '88' }} />
-                    <div>
-                      <span style={{ fontSize: '21px', color: t.col, letterSpacing: '1.5px' }}>{t.label}</span>
-                      <span style={{ fontSize: '18px', color: TEXT2, marginLeft: '12px' }}>
+                  <div key={key} style={{ display: 'flex', alignItems: 'center', gap: 'clamp(8px, 1.2vw, 16px)' }}>
+                    <div style={{ width: 'clamp(10px, 1.2vw, 15px)', height: 'clamp(10px, 1.2vw, 15px)', borderRadius: '50%', background: t.col, opacity: t.alpha, flexShrink: 0, border: '1px solid ' + t.col + '88' }} />
+                    <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'clamp(4px, 0.6vw, 10px)' }}>
+                      <span style={{ fontSize: 'clamp(12px, 1.6vw, 18px)', color: t.col, letterSpacing: '1px' }}>{t.label}</span>
+                      <span style={{ fontSize: 'clamp(10px, 1.3vw, 16px)', color: TEXT2 }}>
                         {key === 'normal' && '1 CLICK · VELOCIDAD MEDIA'}
-                        {key === 'fast' && '1 CLICK · MUY RÁPIDO · VA DIRECTO AL SERVIDOR'}
-                        {key === 'armored' && '3 CLICKS · LENTO · MÁS PUNTOS'}
-                        {key === 'splitter' && '1 CLICK · SE DIVIDE EN 2 AL MORIR'}
-                        {key === 'phantom' && '1 CLICK · CASI INVISIBLE · CUIDADO'}
+                        {key === 'fast' && '1 CLICK · MUY RÁPIDO'}
+                        {key === 'armored' && '3 CLICKS · LENTO'}
+                        {key === 'splitter' && '1 CLICK · SE DIVIDE'}
+                        {key === 'phantom' && '1 CLICK · INVISIBLE'}
                       </span>
                     </div>
                   </div>
@@ -585,9 +585,9 @@ export default function CyberDefense({ onComplete }) {
             </div>
 
             {/* Name + leaderboard preview */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
-              <div style={{ ...CARD }}>
-                <div style={{ fontSize: '13.5px', color: TEXT2, letterSpacing: '4.5px', marginBottom: '15px' }}>// TU NOMBRE DE OPERATIVO</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'clamp(12px, 2vw, 18px)' }}>
+              <div style={{ ...CARD, padding: 'clamp(12px, 2vw, 24px)' }}>
+                <div style={{ fontSize: 'clamp(10px, 1.3vw, 14px)', color: TEXT2, letterSpacing: 'clamp(2px, 0.4vw, 4px)', marginBottom: 'clamp(10px, 1.5vw, 15px)' }}>// TU NOMBRE DE OPERATIVO</div>
                 <input
                   value={nameInput}
                   onChange={e => setNameInput(e.target.value.toUpperCase().slice(0, 18))}
@@ -595,13 +595,13 @@ export default function CyberDefense({ onComplete }) {
                   placeholder='INGRESA TU NOMBRE...'
                   autoFocus
                   style={{
-                    width: '100%', padding: '10px 12px', background: '#030303',
+                    width: '100%', padding: 'clamp(8px, 1.2vw, 12px)', background: '#030303',
                     border: `1px solid ${nameInput ? ACCENT : BORDER}`,
-                    color: ACCENT, fontFamily: FONT, fontSize: '19.5px',
+                    color: ACCENT, fontFamily: FONT, fontSize: 'clamp(14px, 1.8vw, 20px)',
                     letterSpacing: '2px', outline: 'none', boxSizing: 'border-box',
                   }}
                 />
-                <div style={{ fontSize: '13.5px', color: TEXT2, marginTop: '9px', opacity: 0.6 }}>
+                <div style={{ fontSize: 'clamp(10px, 1.2vw, 13px)', color: TEXT2, marginTop: 'clamp(6px, 1vw, 9px)', opacity: 0.6 }}>
                   OPCIONAL — SE GUARDARÁ EN EL RANKING LOCAL
                 </div>
               </div>
@@ -610,7 +610,7 @@ export default function CyberDefense({ onComplete }) {
             </div>
           </div>
 
-          <button onClick={() => setPhase('game')} style={{ ...S.btnPrimary, gap: '12px', opacity: nameInput ? 1 : 0.35, background: nameInput ? 'rgba(0,255,65,0.07)' : 'rgba(0,255,65,0.02)', border: nameInput ? '1px solid rgba(0,255,65,0.5)' : '1px solid rgba(0,255,65,0.2)', boxShadow: nameInput ? 'inset 0 0 12px rgba(0,255,65,0.04)' : 'none' }}>
+          <button onClick={() => setPhase('game')} style={{ ...S.btnPrimary, gap: 'clamp(8px, 1vw, 12px)', fontSize: 'clamp(12px, 1.5vw, 16px)', padding: 'clamp(10px, 1.5vw, 16px) clamp(20px, 3vw, 36px)', opacity: nameInput ? 1 : 0.35, background: nameInput ? 'rgba(0,255,65,0.07)' : 'rgba(0,255,65,0.02)', border: nameInput ? '1px solid rgba(0,255,65,0.5)' : '1px solid rgba(0,255,65,0.2)', boxShadow: nameInput ? 'inset 0 0 12px rgba(0,255,65,0.04)' : 'none' }}>
             <Shield size={14} /> INICIAR DEFENSA <ChevronRight size={14} />
           </button>
         </div>
@@ -620,33 +620,33 @@ export default function CyberDefense({ onComplete }) {
       {phase === 'game' && (
         <div>
           {/* HUD */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '8px', marginBottom: '10px' }}>
+          <div className="game-hud" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100px, 18vw), 1fr))', gap: 'clamp(4px, 0.8vw, 8px)', marginBottom: 'clamp(6px, 1vw, 10px)' }}>
             {[
-              { label: 'OLEADA', val: `${display.wave}`, sub: display.wave >= 6 ? '⚠ CRÍTICA' : `/${WAVE_CFG.length}`, color: display.wave >= 6 ? RD : AM },
+              { label: 'OLEADA', val: `${display.wave}`, sub: display.wave >= 6 ? '⚠' : `/${WAVE_CFG.length}`, color: display.wave >= 6 ? RD : AM },
               { label: 'PUNTOS', val: display.score.toLocaleString(), color: ACCENT },
               { label: 'ESCUDOS', val: '■'.repeat(display.lives) + '□'.repeat(Math.max(0, 3 - display.lives)), color: display.lives <= 1 ? RD : ACCENT },
-              { label: 'CORTAFUEGOS', val: '█'.repeat(display.fwUses) + '░'.repeat(Math.max(0, 6 - display.fwUses)), color: BL },
-              { label: 'EN VUELO', val: display.remaining, color: display.remaining > 8 ? RD : TEXT2 },
+              { label: 'FW', val: '█'.repeat(display.fwUses) + '░'.repeat(Math.max(0, 6 - display.fwUses)), color: BL },
+              { label: 'VUELO', val: display.remaining, color: display.remaining > 8 ? RD : TEXT2 },
             ].map(h => (
-              <div key={h.label} style={{ ...CARD, padding: '18px 21px', textAlign: 'center' }}>
-                <div style={{ fontSize: '16.5px', color: TEXT2, letterSpacing: '3px', marginBottom: '7.5px' }}>{h.label}</div>
-                <div style={{ fontSize: '27px', color: h.color, letterSpacing: '3px' }}>{h.val}</div>
-                {h.sub && <div style={{ fontSize: '16.5px', color: h.color, marginTop: '4.5px', letterSpacing: '1.5px' }}>{h.sub}</div>}
+              <div key={h.label} style={{ ...CARD, padding: 'clamp(8px, 1.2vw, 16px) clamp(6px, 1vw, 18px)', textAlign: 'center' }}>
+                <div style={{ fontSize: 'clamp(9px, 1.2vw, 14px)', color: TEXT2, letterSpacing: 'clamp(1px, 0.2vw, 3px)', marginBottom: 'clamp(3px, 0.5vw, 6px)' }}>{h.label}</div>
+                <div style={{ fontSize: 'clamp(14px, 2vw, 24px)', color: h.color, letterSpacing: 'clamp(1px, 0.2vw, 3px)' }}>{h.val}</div>
+                {h.sub && <div style={{ fontSize: 'clamp(10px, 1.2vw, 14px)', color: h.color, marginTop: 'clamp(2px, 0.3vw, 4px)', letterSpacing: '1px' }}>{h.sub}</div>}
               </div>
             ))}
           </div>
 
           {display.combo > 2 && (
-            <div style={{ textAlign: 'center', fontSize: '30px', color: AM, letterSpacing: '4.5px', marginBottom: '9px' }}>
+            <div style={{ textAlign: 'center', fontSize: 'clamp(18px, 2.5vw, 28px)', color: AM, letterSpacing: 'clamp(2px, 0.4vw, 4px)', marginBottom: 'clamp(4px, 0.8vw, 8px)' }}>
               ⚡ x{display.combo} COMBO
             </div>
           )}
 
           <canvas ref={canvasRef} width={W} height={H}
-            style={{ display: 'block', width: '100%', cursor: 'crosshair', border: `1px solid ${BORDER}`, background: '#040404' }} />
+            style={{ display: 'block', width: '100%', maxWidth: '100%', height: 'auto', aspectRatio: `${W}/${H}`, cursor: 'crosshair', border: `1px solid ${BORDER}`, background: '#040404' }} />
 
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '8px', fontSize: '13px', color: TEXT2, letterSpacing: '2px', opacity: 0.7 }}>
-            <span>CLICK EN AMENAZAS PARA NEUTRALIZAR</span>
+          <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 'clamp(4px, 0.8vw, 8px)', marginTop: 'clamp(4px, 0.8vw, 8px)', fontSize: 'clamp(9px, 1.2vw, 13px)', color: TEXT2, letterSpacing: 'clamp(1px, 0.2vw, 2px)', opacity: 0.7 }}>
+            <span>CLICK EN AMENAZAS</span>
             <span>CLICK EN NODO GW/RT PARA CORTAFUEGOS (4 SEG)</span>
           </div>
         </div>
