@@ -26,15 +26,15 @@ export default defineConfig(({ mode }) => ({
     historyApiFallback: true,
     proxy: {
       '/api': {
-        target: 'http://localhost:3001',
+        target: 'http://localhost:${process.env.PORT ?? 3001}',
         changeOrigin: true,
       },
       '/reports': {
-        target: 'http://localhost:3001',
+        target: 'http://localhost:${process.env.PORT ?? 3001}',
         changeOrigin: true,
       },
       '/report': {
-        target: 'http://localhost:3001',
+        target: 'http://localhost:${process.env.PORT ?? 3001}',
         changeOrigin: true,
       },
       // WebSocket TTS — browsers can't set Authorization on WS upgrades,
