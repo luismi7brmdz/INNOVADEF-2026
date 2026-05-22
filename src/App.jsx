@@ -320,7 +320,7 @@ export default function App() {
       {/* Module screen — fills space between header and status bar */}
       {screen === 'module' && (
         <div key={`mod-${activeModule}`} style={{
-          position: 'fixed', top: '7vh', left: 0, right: 0, bottom: '4vw',
+          position: 'fixed', top: 'clamp(54px, 6.5vw, 90px)', left: 0, right: 0, bottom: 'clamp(32px, 4vw, 48px)',
           zIndex: 2, overflow: 'hidden',
           animation: 'contentFadeIn 0.6s ease-out both',
         }}>
