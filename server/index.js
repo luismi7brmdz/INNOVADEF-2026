@@ -1,3 +1,4 @@
+import fetch from 'node-fetch'
 import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
@@ -84,14 +85,18 @@ setInterval(() => {
 }, 5 * 60_000)
 
 // ─── CORS ────────────────────────────────────────────────────────────────────
-// Production: only same-origin requests (no Origin header).
+// Production: allow same-origin requests (no Origin header) + explicit allowed origins.
 // Development: allow any private/local network origin so --host works.
 const IS_DEV = process.env.NODE_ENV !== 'production'
+const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS ?? '')
+  .split(',').map(s => s.trim()).filter(Boolean)
 
 app.use(cors({
   origin: (origin, cb) => {
     // No Origin header = same-origin (production kiosk or server-to-server) → allow
     if (!origin) return cb(null, true)
+    // Explicit whitelist from env (e.g. ALLOWED_ORIGINS=https://demos.innovadef.es)
+    if (ALLOWED_ORIGINS.includes(origin)) return cb(null, true)
     // In dev, allow any localhost or LAN origin (192.168.x, 10.x, 172.16-31.x)
     if (IS_DEV) {
       const isLocal = /^https?:\/\/(localhost|127\.0\.0\.1|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[01])\.\d+\.\d+)(:\d+)?$/.test(origin)
