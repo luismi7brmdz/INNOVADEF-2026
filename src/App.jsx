@@ -170,7 +170,7 @@ export default function App() {
   // ── Render ───────────────────────────────────────────────────────────────────
 
   return (
-    <div style={{ fontFamily: FONT, background: '#070707', minHeight: '100vh', color: ACCENT, overflowX: 'hidden', fontSize: FS.sm }}>
+    <div style={{ fontFamily: FONT, background: '#070707', minHeight: '100vh', color: ACCENT, fontSize: FS.sm }}>
       <MilitaryCursor />
 
       {screen === 'sleep' && <SleepScreen onWake={() => go(() => navigate('/intro'))} />}
@@ -278,7 +278,7 @@ export default function App() {
       {/* Selector & Email content */}
       <div style={{
         position: 'relative', zIndex: 2, minHeight: '100vh',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        display: 'flex', alignItems: 'flex-start', justifyContent: 'center',
         padding: 'clamp(100px, 12vw, 160px) clamp(24px, 4vw, 60px) clamp(52px, 7vw, 80px)',
       }}>
         <Suspense fallback={null}>
@@ -309,6 +309,7 @@ export default function App() {
         <div key={`mod-${activeModule}`} style={{
           position: 'fixed', top: 'clamp(54px, 6.5vw, 90px)', left: 0, right: 0, bottom: 'clamp(32px, 4vw, 48px)',
           zIndex: 2, overflowY: 'auto', overflowX: 'hidden',
+          scrollbarWidth: 'thin', scrollbarColor: 'rgba(0,255,65,0.3) transparent',
           padding: 'clamp(10px, 2vw, 30px)',
           animation: 'contentFadeIn 0.6s ease-out both',
         }}>
@@ -332,6 +333,7 @@ export default function App() {
         ::selection { background: rgba(0,255,65,0.2); color: #00FF41; }
         ::-webkit-scrollbar { width: 4px; background: #070707; }
         ::-webkit-scrollbar-thumb { background: rgba(0,255,65,0.2); }
+        html { scrollbar-width: thin; scrollbar-color: rgba(0,255,65,0.2) #070707; }
         @keyframes blink          { 0%,100%{opacity:1} 50%{opacity:0.2} }
         @keyframes fadeIn         { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
         @keyframes contentFadeIn  { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
