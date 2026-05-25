@@ -65,29 +65,29 @@ export default function ThreatClassifier({ onComplete }) {
 
       {phase === 'classify' && (
         <div>
-          <div style={{ fontFamily: FONT, fontSize: '19.5px', color: RED, letterSpacing: '4.5px', marginBottom: '18px' }}>// AMENAZAS ACTIVAS DETECTADAS — CLASIFICACIÓN REQUERIDA</div>
-          <div style={{ fontFamily: FONT, fontSize: '42px', letterSpacing: '4.5px', color: ACCENT, marginBottom: '27px', textTransform: 'uppercase' }}>CENTRO DE OPERACIONES DE SEGURIDAD</div>
-          <div style={{ fontFamily: FONT, fontSize: '22.5px', color: TEXT2, marginBottom: '54px', lineHeight: 1.7, letterSpacing: '0.75px' }}>
+          <div style={{ fontFamily: FONT, fontSize: 'clamp(12px, 1.81vmin, 9999px)', color: RED, letterSpacing: '0.42vmin', marginBottom: '1.67vmin' }}>// AMENAZAS ACTIVAS DETECTADAS — CLASIFICACIÓN REQUERIDA</div>
+          <div style={{ fontFamily: FONT, fontSize: 'clamp(25px, 3.89vmin, 9999px)', letterSpacing: '0.42vmin', color: ACCENT, marginBottom: '2.5vmin', textTransform: 'uppercase' }}>CENTRO DE OPERACIONES DE SEGURIDAD</div>
+          <div style={{ fontFamily: FONT, fontSize: 'clamp(14px, 2.08vmin, 9999px)', color: TEXT2, marginBottom: '5vmin', lineHeight: 1.7, letterSpacing: '0.07vmin' }}>
             SE HAN DETECTADO 6 AMENAZAS ACTIVAS EN EL ECOSISTEMA DIGITAL DE DEFENSA.<br/>SELECCIONE LAS 3 QUE REQUIEREN RESPUESTA PRIORITARIA SEGÚN SU CRITERIO ESTRATÉGICO.
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '24px', marginBottom: '30px', fontFamily: FONT }}>
-            <div style={{ padding: '9px 21px', fontSize: '22.5px', letterSpacing: '3px', background: priority.length >= 3 ? 'rgba(0,255,65,0.08)' : 'rgba(0,255,65,0.03)', border: `1.5px solid ${priority.length >= 3 ? `${ACCENT}55` : BORDER}`, color: ACCENT, transition: 'all 0.3s' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '2.22vmin', marginBottom: '2.78vmin', fontFamily: FONT }}>
+            <div style={{ padding: '0.83vmin 1.94vmin', fontSize: 'clamp(14px, 2.08vmin, 9999px)', letterSpacing: '0.28vmin', background: priority.length >= 3 ? 'rgba(0,255,65,0.08)' : 'rgba(0,255,65,0.03)', border: `1.5px solid ${priority.length >= 3 ? `${ACCENT}55` : BORDER}`, color: ACCENT, transition: 'all 0.3s' }}>
               {priority.length}/3 SELECCIONADAS
             </div>
             {priority.length >= 3 && (
-              <span style={{ fontSize: '13.5px', color: TEXT2, letterSpacing: '3px' }}>▶ ORDEN DE PRIORIDAD DEFINIDO</span>
+              <span style={{ fontSize: 'clamp(10px, 1.25vmin, 9999px)', color: TEXT2, letterSpacing: '0.28vmin' }}>▶ ORDEN DE PRIORIDAD DEFINIDO</span>
             )}
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', marginBottom: '28px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1.11vmin', marginBottom: '2.59vmin' }}>
             {threats.map(threat => {
               const sel = isSelected(threat.id)
               const r = rank(threat.id)
               return (
                 <button key={threat.id} onClick={() => toggleThreat(threat.id)}
                   style={{
-                    display: 'flex', alignItems: 'flex-start', gap: '21px', padding: '36px',
+                    display: 'flex', alignItems: 'flex-start', gap: '1.94vmin', padding: '3.33vmin',
                     textAlign: 'left', width: '100%',
                     background: sel ? 'rgba(0,255,65,0.05)' : '#070707',
                     border: `2.25px solid ${sel ? `${ACCENT}55` : BORDER}`,
@@ -97,15 +97,15 @@ export default function ThreatClassifier({ onComplete }) {
                     boxShadow: sel ? `inset 0 0 30px rgba(0,255,65,0.03)` : 'none'
                   }}
                 >
-                  <div style={{ width: '48px', height: '48px', flexShrink: 0, border: `1.5px solid ${sel ? ACCENT : BORDER}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: sel ? '18px' : '24px', color: sel ? ACCENT : TEXT2 }}>
+                  <div style={{ width: '4.44vmin', height: '4.44vmin', flexShrink: 0, border: `1.5px solid ${sel ? ACCENT : BORDER}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: sel ? 'clamp(11px, 1.67vmin, 9999px)' : 'clamp(14px, 2.22vmin, 9999px)', color: sel ? ACCENT : TEXT2 }}>
                     {sel ? `#${r}` : threat.icon}
                   </div>
                   <div style={{ flex: 1 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '6px', flexWrap: 'wrap' }}>
-                      <span style={{ fontSize: '24px', letterSpacing: '1.5px', color: sel ? ACCENT : TEXT2 }}>{threat.label.toUpperCase()}</span>
-                      <span style={{ fontSize: '18px', padding: '3px 12px', letterSpacing: '1.5px', color: threat.severity === 'CRÍTICA' ? RED : AMBER, border: `1.5px solid ${threat.severity === 'CRÍTICA' ? RED : AMBER}44` }}>{threat.severity}</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1.11vmin', marginBottom: '6px', flexWrap: 'wrap' }}>
+                      <span style={{ fontSize: 'clamp(14px, 2.22vmin, 9999px)', letterSpacing: '0.14vmin', color: sel ? ACCENT : TEXT2 }}>{threat.label.toUpperCase()}</span>
+                      <span style={{ fontSize: 'clamp(11px, 1.67vmin, 9999px)', padding: '3px 1.11vmin', letterSpacing: '0.14vmin', color: threat.severity === 'CRÍTICA' ? RED : AMBER, border: `1.5px solid ${threat.severity === 'CRÍTICA' ? RED : AMBER}44` }}>{threat.severity}</span>
                     </div>
-                    <p style={{ fontSize: '21px', color: 'rgba(0,255,65,0.28)', lineHeight: 1.6, margin: 0, letterSpacing: '0.45px' }}>{threat.desc}</p>
+                    <p style={{ fontSize: 'clamp(13px, 1.94vmin, 9999px)', color: 'rgba(0,255,65,0.28)', lineHeight: 1.6, margin: 0, letterSpacing: '0.04vmin' }}>{threat.desc}</p>
                   </div>
                 </button>
               )
@@ -121,25 +121,25 @@ export default function ThreatClassifier({ onComplete }) {
 
       {phase === 'allocate' && (
         <div>
-          <div style={{ fontFamily: FONT, fontSize: '19.5px', color: TEXT2, letterSpacing: '4.5px', marginBottom: '18px' }}>// ASIGNACIÓN DE RECURSOS</div>
-          <div style={{ fontFamily: FONT, fontSize: '42px', letterSpacing: '4.5px', color: ACCENT, marginBottom: '45px', textTransform: 'uppercase' }}>DESPLIEGUE DE CAPACIDADES</div>
+          <div style={{ fontFamily: FONT, fontSize: 'clamp(12px, 1.81vmin, 9999px)', color: TEXT2, letterSpacing: '0.42vmin', marginBottom: '1.67vmin' }}>// ASIGNACIÓN DE RECURSOS</div>
+          <div style={{ fontFamily: FONT, fontSize: 'clamp(25px, 3.89vmin, 9999px)', letterSpacing: '0.42vmin', color: ACCENT, marginBottom: '4.17vmin', textTransform: 'uppercase' }}>DESPLIEGUE DE CAPACIDADES</div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '28px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.11vmin', marginBottom: '2.59vmin' }}>
             {priority.map((id, rankIdx) => {
               const threat = threats.find(t => t.id === id)
               const alloc = allocation[id] || []
               return (
                 <div key={id} style={{ ...CARD, borderLeft: `2px solid ${ACCENT}44` }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '18px', marginBottom: '18px', fontFamily: FONT }}>
-                    <span style={{ fontSize: '19.5px', color: ACCENT, letterSpacing: '3px' }}>PRIORIDAD #{rankIdx + 1}</span>
-                    <span style={{ fontSize: '24px', color: TEXT2, letterSpacing: '1.5px' }}>{threat.label.toUpperCase()}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '1.67vmin', marginBottom: '1.67vmin', fontFamily: FONT }}>
+                    <span style={{ fontSize: 'clamp(12px, 1.81vmin, 9999px)', color: ACCENT, letterSpacing: '0.28vmin' }}>PRIORIDAD #{rankIdx + 1}</span>
+                    <span style={{ fontSize: 'clamp(14px, 2.22vmin, 9999px)', color: TEXT2, letterSpacing: '0.14vmin' }}>{threat.label.toUpperCase()}</span>
                   </div>
-                  <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                  <div style={{ display: 'flex', gap: '1.11vmin', flexWrap: 'wrap' }}>
                     {resources.map(res => {
                       const sel = alloc.includes(res.id)
                       return (
                         <button key={res.id} onClick={() => toggleAlloc(id, res.id)}
-                          style={{ padding: '18px 24px', fontSize: '24px', letterSpacing: '1.5px', background: sel ? 'rgba(0,255,65,0.08)' : '#070707', border: `1.5px solid ${sel ? `${ACCENT}55` : BORDER}`, color: sel ? ACCENT : TEXT2, cursor: 'pointer', transition: 'all 0.12s', fontFamily: FONT }}
+                          style={{ padding: '1.67vmin 2.22vmin', fontSize: 'clamp(14px, 2.22vmin, 9999px)', letterSpacing: '0.14vmin', background: sel ? 'rgba(0,255,65,0.08)' : '#070707', border: `1.5px solid ${sel ? `${ACCENT}55` : BORDER}`, color: sel ? ACCENT : TEXT2, cursor: 'pointer', transition: 'all 0.12s', fontFamily: FONT }}
                         >
                           {res.label.toUpperCase()}
                         </button>
@@ -159,11 +159,11 @@ export default function ThreatClassifier({ onComplete }) {
 
       {phase === 'result' && (
         <div>
-          <div style={{ fontFamily: FONT, fontSize: '9px', color: TEXT2, letterSpacing: '3px', marginBottom: '12px' }}>// VISIÓN ESTRATÉGICA DE RIESGOS</div>
-          <div style={{ fontFamily: FONT, fontSize: '18px', letterSpacing: '3px', color: ACCENT, marginBottom: '12px', textTransform: 'uppercase' }}>ANÁLISIS DE AMENAZAS</div>
-          <div style={{ fontFamily: FONT, fontSize: '15px', color: TEXT2, marginBottom: '36px', letterSpacing: '1px' }}>BASADO EN CRITERIO DE PRIORIZACIÓN Y ASIGNACIÓN DE RECURSOS</div>
+          <div style={{ fontFamily: FONT, fontSize: 'clamp(10px, 0.83vmin, 9999px)', color: TEXT2, letterSpacing: '0.28vmin', marginBottom: '1.11vmin' }}>// VISIÓN ESTRATÉGICA DE RIESGOS</div>
+          <div style={{ fontFamily: FONT, fontSize: 'clamp(11px, 1.67vmin, 9999px)', letterSpacing: '0.28vmin', color: ACCENT, marginBottom: '1.11vmin', textTransform: 'uppercase' }}>ANÁLISIS DE AMENAZAS</div>
+          <div style={{ fontFamily: FONT, fontSize: 'clamp(10px, 1.39vmin, 9999px)', color: TEXT2, marginBottom: '3.33vmin', letterSpacing: '0.09vmin' }}>BASADO EN CRITERIO DE PRIORIZACIÓN Y ASIGNACIÓN DE RECURSOS</div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '28px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.11vmin', marginBottom: '2.59vmin' }}>
             {priority.map((id, rankIdx) => {
               const threat = threats.find(t => t.id === id)
               const alloc = allocation[id] || []
@@ -171,18 +171,18 @@ export default function ThreatClassifier({ onComplete }) {
               const isOptimal = id === 'apt' && rankIdx === 0
               return (
                 <div key={id} style={{ ...CARD, borderLeft: `2px solid ${rankIdx === 0 ? RED : rankIdx === 1 ? AMBER : ACCENT}55`, fontFamily: FONT }}>
-                  <div style={{ display: 'flex', gap: '6px', alignItems: 'flex-start' }}>
-                    <div style={{ fontSize: '30px', color: rankIdx === 0 ? RED : rankIdx === 1 ? AMBER : ACCENT, lineHeight: 1, minWidth: '32px' }}>#{rankIdx + 1}</div>
+                  <div style={{ display: 'flex', gap: '0.56vmin', alignItems: 'flex-start' }}>
+                    <div style={{ fontSize: 'clamp(18px, 2.78vmin, 9999px)', color: rankIdx === 0 ? RED : rankIdx === 1 ? AMBER : ACCENT, lineHeight: 1, minWidth: '2.96vmin' }}>#{rankIdx + 1}</div>
                     <div style={{ flex: 1 }}>
-                      <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginBottom: '6px', flexWrap: 'wrap' }}>
-                        <span style={{ fontSize: '11px', letterSpacing: '1px', color: TEXT2 }}>{threat.label.toUpperCase()}</span>
-                        {isOptimal && <span style={{ fontSize: '8px', padding: '2px 6px', border: `1px solid ${ACCENT}44`, color: ACCENT, letterSpacing: '1px' }}>PRIORIZACIÓN ÓPTIMA</span>}
+                      <div style={{ display: 'flex', gap: '1.11vmin', alignItems: 'center', marginBottom: '6px', flexWrap: 'wrap' }}>
+                        <span style={{ fontSize: 'clamp(10px, 1.02vmin, 9999px)', letterSpacing: '0.09vmin', color: TEXT2 }}>{threat.label.toUpperCase()}</span>
+                        {isOptimal && <span style={{ fontSize: 'clamp(10px, 0.74vmin, 9999px)', padding: '2px 6px', border: `1px solid ${ACCENT}44`, color: ACCENT, letterSpacing: '0.09vmin' }}>PRIORIZACIÓN ÓPTIMA</span>}
                       </div>
-                      <p style={{ fontSize: '11px', color: 'rgba(0,255,65,0.3)', lineHeight: 1.6, margin: '0 0 8px', letterSpacing: '0.3px' }}>{threat.desc}</p>
+                      <p style={{ fontSize: 'clamp(10px, 1.02vmin, 9999px)', color: 'rgba(0,255,65,0.3)', lineHeight: 1.6, margin: '0 0 8px', letterSpacing: '0.03vmin' }}>{threat.desc}</p>
                       {allocResources.length > 0 && (
-                        <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                        <div style={{ display: 'flex', gap: '0.56vmin', flexWrap: 'wrap' }}>
                           {allocResources.map(r => (
-                            <span key={r.id} style={{ fontSize: '9px', padding: '2px 8px', border: `1px solid ${ACCENT}33`, color: TEXT2, letterSpacing: '1px' }}>{r.label.toUpperCase()}</span>
+                            <span key={r.id} style={{ fontSize: 'clamp(10px, 0.83vmin, 9999px)', padding: '2px 8px', border: `1px solid ${ACCENT}33`, color: TEXT2, letterSpacing: '0.09vmin' }}>{r.label.toUpperCase()}</span>
                           ))}
                         </div>
                       )}

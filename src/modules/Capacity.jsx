@@ -25,14 +25,14 @@ function Panel({ label, children, style = {} }) {
       {label && (
         <div style={{
           position: 'absolute', top: -1.5, left: 0,
-          padding: '6px 18px', background: '#070707',
+          padding: '6px 1.67vmin', background: '#070707',
           borderBottom: `1.5px solid ${BORDER}`, borderRight: `1.5px solid ${BORDER}`,
-          fontSize: '20.25px', letterSpacing: '3px', color: TEXT2, fontFamily: FONT, textTransform: 'uppercase'
+          fontSize: 'clamp(12px, 1.88vmin, 9999px)', letterSpacing: '3px', color: TEXT2, fontFamily: FONT, textTransform: 'uppercase'
         }}>
           {label}
         </div>
       )}
-      <div style={{ paddingTop: label ? '42px' : '0' }}>{children}</div>
+      <div style={{ paddingTop: label ? '3.89vmin' : '0' }}>{children}</div>
     </div>
   )
 }
@@ -91,21 +91,21 @@ export default function CapacityTest({ onComplete }) {
   if (phase === 'thinking') return (
     <div style={{ maxWidth: '1050px', width: '100%', margin: '0 auto' }}>
       <Panel label="// ANÁLISIS EN CURSO — CLASIFICADO">
-        <div style={{ padding: '54px', fontFamily: FONT, fontSize: '18px' }}>
-          <div style={{ display: 'flex', gap: '18px', marginBottom: '45px', alignItems: 'center' }}>
-            <div style={{ width: '12px', height: '12px', background: '#FF5F57' }} />
-            <div style={{ width: '12px', height: '12px', background: '#FFBD2E' }} />
-            <div style={{ width: '12px', height: '12px', background: '#28C840' }} />
-            <span style={{ color: TEXT2, marginLeft: '12px', letterSpacing: '3px', fontSize: '15.75px' }}>TERMINAL — AES-256 — ENS-CAT-A</span>
+        <div style={{ padding: '5vmin', fontFamily: FONT, fontSize: 'clamp(11px, 1.67vmin, 9999px)' }}>
+          <div style={{ display: 'flex', gap: '1.67vmin', marginBottom: '4.17vmin', alignItems: 'center' }}>
+            <div style={{ width: '1.11vmin', height: '1.11vmin', background: '#FF5F57' }} />
+            <div style={{ width: '1.11vmin', height: '1.11vmin', background: '#FFBD2E' }} />
+            <div style={{ width: '1.11vmin', height: '1.11vmin', background: '#28C840' }} />
+            <span style={{ color: TEXT2, marginLeft: '1.11vmin', letterSpacing: '3px', fontSize: 'clamp(10px, 1.46vmin, 9999px)' }}>TERMINAL — AES-256 — ENS-CAT-A</span>
           </div>
           {thinkingLines.map((l, i) => (
-            <div key={i} style={{ display: 'flex', gap: '15px', marginBottom: '12px', color: i === thinkingLines.length - 1 ? ACCENT : TEXT2, animation: 'fadeIn 0.45s ease' }}>
+            <div key={i} style={{ display: 'flex', gap: '1.39vmin', marginBottom: '1.11vmin', color: i === thinkingLines.length - 1 ? ACCENT : TEXT2, animation: 'fadeIn 0.45s ease' }}>
               <span style={{ color: ACCENT, opacity: 0.5 }}>{'>'}</span>
               <span>{l}</span>
               {i === thinkingLines.length - 1 && <span style={{ color: '#28C840' }}> [OK]</span>}
             </div>
           ))}
-          <div style={{ display: 'flex', gap: '15px', color: ACCENT }}>
+          <div style={{ display: 'flex', gap: '1.39vmin', color: ACCENT }}>
             <span style={{ opacity: 0.5 }}>{'>'}</span>
             <span style={{ animation: 'blink 1.5s infinite' }}>█</span>
           </div>
@@ -116,21 +116,21 @@ export default function CapacityTest({ onComplete }) {
 
   if (phase === 'report') return (
     <div style={{ maxWidth: '1350px', width: '100%', margin: '0 auto' }}>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '36px', marginBottom: '24px', alignItems: 'start' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '3.33vmin', marginBottom: '2.22vmin', alignItems: 'start' }}>
         <Panel label="// INFORME DE CAPACIDAD DIGITAL — CLASIFICADO">
-          <div style={{ padding: '45px 36px', display: 'flex', alignItems: 'center', gap: '48px' }}>
-            <div style={{ textAlign: 'center', minWidth: '150px' }}>
-              <div style={{ fontFamily: FONT, fontSize: '96px', fontWeight: 400, color: ACCENT, lineHeight: 1, textShadow: `0 0 45px ${ACCENT}44` }}>
+          <div style={{ padding: '4.17vmin 3.33vmin', display: 'flex', alignItems: 'center', gap: '4.44vmin' }}>
+            <div style={{ textAlign: 'center', minWidth: '13.89vmin' }}>
+              <div style={{ fontFamily: FONT, fontSize: 'clamp(58px, 8.89vmin, 9999px)', fontWeight: 400, color: ACCENT, lineHeight: 1, textShadow: `0 0 4.17vmin ${ACCENT}44` }}>
                 {report.overall}
               </div>
-              <div style={{ fontFamily: FONT, fontSize: '20.25px', color: TEXT2, letterSpacing: '3px', marginTop: '27px' }}>ÍNDICE GLOBAL</div>
+              <div style={{ fontFamily: FONT, fontSize: 'clamp(12px, 1.88vmin, 9999px)', color: TEXT2, letterSpacing: '3px', marginTop: '2.5vmin' }}>ÍNDICE GLOBAL</div>
             </div>
-            <div style={{ borderLeft: `1.5px solid ${BORDER}`, paddingLeft: '48px', flex: 1 }}>
-              <div style={{ fontFamily: FONT, fontSize: '20.25px', color: TEXT2, letterSpacing: '3px', marginBottom: '12px' }}>CLASIFICACIÓN OPERATIVA</div>
-              <div style={{ fontFamily: FONT, fontSize: '63px', letterSpacing: '3px', color: ACCENT, marginBottom: '12px' }}>
+            <div style={{ borderLeft: `1.5px solid ${BORDER}`, paddingLeft: '4.44vmin', flex: 1 }}>
+              <div style={{ fontFamily: FONT, fontSize: 'clamp(12px, 1.88vmin, 9999px)', color: TEXT2, letterSpacing: '3px', marginBottom: '1.11vmin' }}>CLASIFICACIÓN OPERATIVA</div>
+              <div style={{ fontFamily: FONT, fontSize: 'clamp(38px, 5.83vmin, 9999px)', letterSpacing: '3px', color: ACCENT, marginBottom: '1.11vmin' }}>
                 {report.overall >= 80 ? 'MADUREZ AVANZADA' : report.overall >= 60 ? 'MADUREZ INTERMEDIA' : report.overall >= 40 ? 'EN DESARROLLO' : 'FASE INICIAL'}
               </div>
-              <div style={{ fontFamily: FONT, fontSize: '24.75px', color: TEXT2, lineHeight: 1.7 }}>
+              <div style={{ fontFamily: FONT, fontSize: 'clamp(15px, 2.29vmin, 9999px)', color: TEXT2, lineHeight: 1.7 }}>
                 {report.overall >= 80
                   ? 'SU ORGANIZACIÓN LIDERA LA TRANSFORMACIÓN DIGITAL EN EL ÁMBITO DE LA DEFENSA NACIONAL.'
                   : report.overall >= 60
@@ -141,7 +141,7 @@ export default function CapacityTest({ onComplete }) {
           </div>
         </Panel>
         <Panel label="// FOCO 2026">
-          <div style={{ padding: '45px 36px', fontFamily: FONT, fontSize: '15.75px', color: TEXT2, letterSpacing: '1.5px', lineHeight: 3.2, minWidth: '240px' }}>
+          <div style={{ padding: '4.17vmin 3.33vmin', fontFamily: FONT, fontSize: 'clamp(10px, 1.46vmin, 9999px)', color: TEXT2, letterSpacing: '1.5px', lineHeight: 3.2, minWidth: '22.22vmin' }}>
             <div>DATE: 23JUN2026</div>
             <div>LOC: EOI MADRID</div>
             <div>ORG: INNOVADEF</div>
@@ -150,32 +150,32 @@ export default function CapacityTest({ onComplete }) {
         </Panel>
       </div>
 
-      <Panel label="// VECTORES DE CAPACIDAD" style={{ marginBottom: '24px' }}>
-        <div style={{ padding: '45px 36px' }}>
+      <Panel label="// VECTORES DE CAPACIDAD" style={{ marginBottom: '2.22vmin' }}>
+        <div style={{ padding: '4.17vmin 3.33vmin' }}>
           {questions.map(q => (
-            <div key={q.category} style={{ display: 'grid', gridTemplateColumns: '270px 1fr 72px', gap: '36px', alignItems: 'center', marginBottom: '27px' }}>
-              <div style={{ fontFamily: FONT, fontSize: '15.75px', color: TEXT2, letterSpacing: '1.5px' }}>{categoryLabels[q.category]}</div>
+            <div key={q.category} style={{ display: 'grid', gridTemplateColumns: '25vmin 1fr 6.67vmin', gap: '3.33vmin', alignItems: 'center', marginBottom: '2.5vmin' }}>
+              <div style={{ fontFamily: FONT, fontSize: 'clamp(10px, 1.46vmin, 9999px)', color: TEXT2, letterSpacing: '1.5px' }}>{categoryLabels[q.category]}</div>
               <div style={{ height: '2.25px', background: 'rgba(0,255,65,0.06)', border: `1.5px solid ${BORDER}` }}>
                 <div style={{
                   height: '100%',
                   width: `${barWidths[q.category] || 0}%`,
                   background: `${ACCENT}`,
-                  boxShadow: `0 0 9px ${ACCENT}55`,
+                  boxShadow: `0 0 0.83vmin ${ACCENT}55`,
                   transition: 'width 1.8s cubic-bezier(0.4,0,0.2,1)'
                 }} />
               </div>
-              <div style={{ fontFamily: FONT, fontSize: '19.5px', color: ACCENT, textAlign: 'right', letterSpacing: '1.5px' }}>{report.scores[q.category]}</div>
+              <div style={{ fontFamily: FONT, fontSize: 'clamp(12px, 1.81vmin, 9999px)', color: ACCENT, textAlign: 'right', letterSpacing: '1.5px' }}>{report.scores[q.category]}</div>
             </div>
           ))}
         </div>
       </Panel>
 
-      <Panel label="// DIRECTIVAS ESTRATÉGICAS" style={{ marginBottom: '45px' }}>
-        <div style={{ padding: '45px 36px' }}>
+      <Panel label="// DIRECTIVAS ESTRATÉGICAS" style={{ marginBottom: '4.17vmin' }}>
+        <div style={{ padding: '4.17vmin 3.33vmin' }}>
           {report.recs.map((rec, i) => (
-            <div key={i} style={{ display: 'flex', gap: '21px', marginBottom: '15px', alignItems: 'flex-start' }}>
-              <div style={{ fontFamily: FONT, fontSize: '15.75px', color: ACCENT, minWidth: '42px', paddingTop: '3px' }}>[{String(i+1).padStart(2,'0')}]</div>
-              <div style={{ fontFamily: FONT, fontSize: '24.75px', color: TEXT2, lineHeight: 1.7, letterSpacing: '0.75px' }}>{rec}</div>
+            <div key={i} style={{ display: 'flex', gap: '1.94vmin', marginBottom: '1.39vmin', alignItems: 'flex-start' }}>
+              <div style={{ fontFamily: FONT, fontSize: 'clamp(10px, 1.46vmin, 9999px)', color: ACCENT, minWidth: '3.89vmin', paddingTop: '3px' }}>[{String(i+1).padStart(2,'0')}]</div>
+              <div style={{ fontFamily: FONT, fontSize: 'clamp(15px, 2.29vmin, 9999px)', color: TEXT2, lineHeight: 1.7, letterSpacing: '0.75px' }}>{rec}</div>
             </div>
           ))}
         </div>
@@ -191,7 +191,7 @@ export default function CapacityTest({ onComplete }) {
   // Questions phase
   return (
     <div style={{ maxWidth: '1260px', width: '100%', margin: '0 auto' }}>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '9px', marginBottom: '63px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '0.83vmin', marginBottom: '5.83vmin' }}>
         {questions.map((q, i) => (
           <div key={i} style={{
             height: '6px',
@@ -201,32 +201,32 @@ export default function CapacityTest({ onComplete }) {
           }} />
         ))}
       </div>
-      <Panel label={`// VECTOR ${step + 1}/${questions.length} — EVALUACIÓN EN CURSO`} style={{ marginBottom: '45px' }}>
-        <div style={{ padding: '42px 36px 36px' }}>
-          <div style={{ fontFamily: FONT, fontSize: '20.25px', color: TEXT2, letterSpacing: '3px', marginBottom: '24px' }}>
+      <Panel label={`// VECTOR ${step + 1}/${questions.length} — EVALUACIÓN EN CURSO`} style={{ marginBottom: '4.17vmin' }}>
+        <div style={{ padding: '3.89vmin 3.33vmin 3.33vmin' }}>
+          <div style={{ fontFamily: FONT, fontSize: 'clamp(12px, 1.88vmin, 9999px)', color: TEXT2, letterSpacing: '3px', marginBottom: '2.22vmin' }}>
             CATEGORÍA: {categoryLabels[questions[step].category]}
           </div>
-          <div style={{ fontFamily: FONT, fontSize: '45px', color: ACCENT, lineHeight: 1.6, letterSpacing: '0.75px', textShadow: `0 0 30px ${ACCENT}22` }}>
+          <div style={{ fontFamily: FONT, fontSize: 'clamp(27px, 4.17vmin, 9999px)', color: ACCENT, lineHeight: 1.6, letterSpacing: '0.75px', textShadow: `0 0 2.78vmin ${ACCENT}22` }}>
             {questions[step].text}
           </div>
         </div>
       </Panel>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '13.5px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25vmin' }}>
         {questions[step].options.map((opt, i) => (
           <button key={`${step}-${i}`}
             onClick={() => handleAnswer(questions[step].id, opt)}
             style={{
-              display: 'flex', alignItems: 'center', gap: '36px',
-              padding: '24px 30px', textAlign: 'left', width: '100%',
+              display: 'flex', alignItems: 'center', gap: '3.33vmin',
+              padding: '2.22vmin 2.78vmin', textAlign: 'left', width: '100%',
               background: '#070707', border: `1.5px solid ${BORDER}`,
               color: TEXT2, cursor: 'pointer', transition: 'all 0.18s',
-              fontFamily: FONT, fontSize: '24.75px', letterSpacing: '1.5px'
+              fontFamily: FONT, fontSize: 'clamp(15px, 2.29vmin, 9999px)', letterSpacing: '1.5px'
             }}
             onMouseEnter={e => {
               e.currentTarget.style.background = 'rgba(255,170,0,0.05)'
               e.currentTarget.style.borderColor = '#ffaa0066'
               e.currentTarget.style.color = '#ffaa00'
-              e.currentTarget.style.boxShadow = `inset 0 0 30px rgba(0,255,65,0.04)`
+              e.currentTarget.style.boxShadow = `inset 0 0 2.78vmin rgba(0,255,65,0.04)`
             }}
             onMouseLeave={e => {
               e.currentTarget.style.background = '#070707'
@@ -235,7 +235,7 @@ export default function CapacityTest({ onComplete }) {
               e.currentTarget.style.boxShadow = 'none'
             }}
           >
-            <span style={{ color: ACCENT, minWidth: '42px', fontSize: '22.5px' }}>[{String.fromCharCode(65+i)}]</span>
+            <span style={{ color: ACCENT, minWidth: '3.89vmin', fontSize: 'clamp(14px, 2.08vmin, 9999px)' }}>[{String.fromCharCode(65+i)}]</span>
             {opt}
           </button>
         ))}

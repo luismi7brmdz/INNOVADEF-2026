@@ -30,23 +30,23 @@ function StepBar({ stepIdx, decodeIdx }) {
         const col    = done||active ? ACCENT : 'rgba(0,255,65,0.25)'
         return (
           <div key={i} style={{ display:'flex', alignItems:'center', flex: i<steps.length-1 ? '1' : 'none' }}>
-            <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:'6px' }}>
+            <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:'0.56vmin' }}>
               <div style={{
-                width:'44px', height:'44px',
+                width:'4.07vmin', height:'4.07vmin',
                 border:`2px solid ${col}`,
                 background: active ? `${ACCENT}11` : done ? `${ACCENT}18` : 'transparent',
                 display:'flex', alignItems:'center', justifyContent:'center',
-                fontSize:'20px', color:col,
+                fontSize:'clamp(12px, 1.85vmin, 9999px)', color:col,
               }}>
                 {done ? '✓' : icons[i]}
               </div>
-              <div style={{ fontSize:'13px', color:col, letterSpacing:'2px', textAlign:'center', whiteSpace:'nowrap' }}>
+              <div style={{ fontSize:'clamp(10px, 1.2vmin, 9999px)', color:col, letterSpacing:'0.19vmin', textAlign:'center', whiteSpace:'nowrap' }}>
                 {label}
-                {i===2 && active && <div style={{ fontSize:'11px', color:TEXT2, letterSpacing:'1px' }}>({decodeIdx+1}/3)</div>}
+                {i===2 && active && <div style={{ fontSize:'clamp(10px, 1.02vmin, 9999px)', color:TEXT2, letterSpacing:'0.09vmin' }}>({decodeIdx+1}/3)</div>}
               </div>
             </div>
             {i < steps.length-1 && (
-              <div style={{ flex:1, height:'1px', background: i<stepIdx ? `${ACCENT}55` : BORDER, margin:'0 8px', marginBottom:'28px' }} />
+              <div style={{ flex:1, height:'1px', background: i<stepIdx ? `${ACCENT}55` : BORDER, margin:'0 0.74vmin', marginBottom:'2.59vmin' }} />
             )}
           </div>
         )
@@ -91,41 +91,41 @@ function Decoder({ intercept, onSolved }) {
   return (
     <div>
       {/* Header */}
-      <div style={{ fontFamily:FONT, marginBottom:'20px' }}>
-        <div style={{ fontSize:'13px', color:TEXT2, letterSpacing:'4px', marginBottom:'6px' }}>{intercept.label}</div>
-        <div style={{ fontSize:'22px', color:AMBER, letterSpacing:'2px' }}>OBJETIVO: {intercept.objective}</div>
+      <div style={{ fontFamily:FONT, marginBottom:'1.85vmin' }}>
+        <div style={{ fontSize:'clamp(10px, 1.2vmin, 9999px)', color:TEXT2, letterSpacing:'0.37vmin', marginBottom:'6px' }}>{intercept.label}</div>
+        <div style={{ fontSize:'clamp(13px, 2.04vmin, 9999px)', color:AMBER, letterSpacing:'0.19vmin' }}>OBJETIVO: {intercept.objective}</div>
       </div>
 
       {/* Encoded message with keyword highlighted */}
-      <div style={{ background:'#030303', border:`1px solid ${BORDER}`, padding:'20px', marginBottom:'14px' }}>
-        <div style={{ fontSize:'12px', color:TEXT2, letterSpacing:'3px', marginBottom:'12px' }}>MENSAJE CIFRADO INTERCEPTADO:</div>
-        <div style={{ display:'flex', flexWrap:'wrap', gap:'6px', alignItems:'flex-end' }}>
-          {before && <span style={{ fontSize:'20px', color:'rgba(0,255,65,0.3)', letterSpacing:'4px', alignSelf:'center', fontFamily:FONT }}>{before}</span>}
+      <div style={{ background:'#030303', border:`1px solid ${BORDER}`, padding:'1.85vmin', marginBottom:'1.3vmin' }}>
+        <div style={{ fontSize:'clamp(10px, 1.11vmin, 9999px)', color:TEXT2, letterSpacing:'0.28vmin', marginBottom:'1.11vmin' }}>MENSAJE CIFRADO INTERCEPTADO:</div>
+        <div style={{ display:'flex', flexWrap:'wrap', gap:'0.56vmin', alignItems:'flex-end' }}>
+          {before && <span style={{ fontSize:'clamp(12px, 1.85vmin, 9999px)', color:'rgba(0,255,65,0.3)', letterSpacing:'0.37vmin', alignSelf:'center', fontFamily:FONT }}>{before}</span>}
           <div style={{ display:'flex', gap:'3px' }}>
             {kw.split('').map((ch,i)=>(
               <div key={i} style={{
                 display:'flex', flexDirection:'column', alignItems:'center',
                 border:`1.5px solid ${success ? ACCENT : AMBER}77`,
                 background: success ? 'rgba(0,255,65,0.08)' : 'rgba(255,170,0,0.06)',
-                padding:'8px 10px', minWidth:'32px',
+                padding:'0.74vmin 0.93vmin', minWidth:'2.96vmin',
               }}>
-                <div style={{ fontSize:'24px', color:success ? ACCENT : AMBER, fontFamily:FONT }}>
+                <div style={{ fontSize:'clamp(14px, 2.22vmin, 9999px)', color:success ? ACCENT : AMBER, fontFamily:FONT }}>
                   {success ? intercept.keyword[i] : ch}
                 </div>
-                <div style={{ fontSize:'9px', color:'rgba(0,255,65,0.3)', marginTop:'3px' }}>{success?'✓':'?'}</div>
+                <div style={{ fontSize:'clamp(10px, 0.83vmin, 9999px)', color:'rgba(0,255,65,0.3)', marginTop:'3px' }}>{success?'✓':'?'}</div>
               </div>
             ))}
           </div>
-          {after && <span style={{ fontSize:'20px', color:'rgba(0,255,65,0.3)', letterSpacing:'4px', alignSelf:'center', fontFamily:FONT }}>{after}</span>}
+          {after && <span style={{ fontSize:'clamp(12px, 1.85vmin, 9999px)', color:'rgba(0,255,65,0.3)', letterSpacing:'0.37vmin', alignSelf:'center', fontFamily:FONT }}>{after}</span>}
         </div>
-        <div style={{ fontSize:'11px', color:'rgba(255,170,0,0.5)', letterSpacing:'2px', marginTop:'10px' }}>
+        <div style={{ fontSize:'clamp(10px, 1.02vmin, 9999px)', color:'rgba(255,170,0,0.5)', letterSpacing:'0.19vmin', marginTop:'0.93vmin' }}>
           ↑ DESCIFRE LOS {kw.length} CARACTERES RESALTADOS EN NARANJA
         </div>
       </div>
 
       {/* Full cipher table — highlight chars that appear in keyword */}
-      <div style={{ background:'#030303', border:`1px solid ${BORDER}`, padding:'16px', marginBottom:'14px' }}>
-        <div style={{ fontSize:'12px', color:TEXT2, letterSpacing:'3px', marginBottom:'10px' }}>
+      <div style={{ background:'#030303', border:`1px solid ${BORDER}`, padding:'1.48vmin', marginBottom:'1.3vmin' }}>
+        <div style={{ fontSize:'clamp(10px, 1.11vmin, 9999px)', color:TEXT2, letterSpacing:'0.28vmin', marginBottom:'0.93vmin' }}>
           TABLA DE DESCIFRADO — CÓDIGO CIFRADO <span style={{ color:AMBER }}>▶</span> TEXTO REAL:
         </div>
         <div style={{ display:'grid', gridTemplateColumns:'repeat(13,1fr)', gap:'5px' }}>
@@ -137,22 +137,22 @@ function Decoder({ intercept, onSolved }) {
                 border:`1px solid ${relevant ? `${AMBER}55` : 'transparent'}`,
                 background: relevant ? 'rgba(255,170,0,0.05)' : 'transparent',
               }}>
-                <span style={{ fontSize:'17px', color:relevant ? AMBER : 'rgba(255,170,0,0.4)' }}>{enc}</span>
-                <span style={{ fontSize:'11px', color:'rgba(0,255,65,0.3)' }}>›</span>
-                <span style={{ fontSize:'17px', color:relevant ? ACCENT : 'rgba(0,255,65,0.35)' }}>{dec}</span>
+                <span style={{ fontSize:'clamp(10px, 1.57vmin, 9999px)', color:relevant ? AMBER : 'rgba(255,170,0,0.4)' }}>{enc}</span>
+                <span style={{ fontSize:'clamp(10px, 1.02vmin, 9999px)', color:'rgba(0,255,65,0.3)' }}>›</span>
+                <span style={{ fontSize:'clamp(10px, 1.57vmin, 9999px)', color:relevant ? ACCENT : 'rgba(0,255,65,0.35)' }}>{dec}</span>
               </div>
             )
           })}
         </div>
-        <div style={{ fontSize:'10px', color:'rgba(255,170,0,0.4)', letterSpacing:'2px', marginTop:'8px' }}>
+        <div style={{ fontSize:'clamp(10px, 0.93vmin, 9999px)', color:'rgba(255,170,0,0.4)', letterSpacing:'0.19vmin', marginTop:'8px' }}>
           ★ LAS ENTRADAS CON BORDE CORRESPONDEN A LOS CARACTERES DEL MENSAJE CIFRADO
         </div>
       </div>
 
       {/* Hint */}
       {hintsUsed > 0 && !success && (
-        <div style={{ ...CARD, borderColor:`${AMBER}44`, marginBottom:'12px', padding:'12px 18px' }}>
-          <span style={{ fontSize:'17px', color:AMBER, letterSpacing:'3px', fontFamily:FONT }}>
+        <div style={{ ...CARD, borderColor:`${AMBER}44`, marginBottom:'1.11vmin', padding:'1.11vmin 1.67vmin' }}>
+          <span style={{ fontSize:'clamp(10px, 1.57vmin, 9999px)', color:AMBER, letterSpacing:'0.28vmin', fontFamily:FONT }}>
             PISTA: <span style={{ color:ACCENT }}>{intercept.keyword.slice(0,hintsUsed)}</span>
             <span style={{ opacity:0.35 }}>{'_'.repeat(intercept.keyword.length-hintsUsed)}</span>
           </span>
@@ -162,8 +162,8 @@ function Decoder({ intercept, onSolved }) {
       {/* Input / success */}
       {!success ? (
         <div>
-          <div style={{ display:'flex', gap:'10px', alignItems:'center', flexWrap:'wrap' }}>
-            <span style={{ color:ACCENT, fontSize:'20px', fontFamily:FONT }}>{'>'}</span>
+          <div style={{ display:'flex', gap:'0.93vmin', alignItems:'center', flexWrap:'wrap' }}>
+            <span style={{ color:ACCENT, fontSize:'clamp(12px, 1.85vmin, 9999px)', fontFamily:FONT }}>{'>'}</span>
             <input
               ref={inputRef}
               value={input}
@@ -172,29 +172,29 @@ function Decoder({ intercept, onSolved }) {
               placeholder={`ESCRIBA LA PALABRA CLAVE (${intercept.keyword.length} LETRAS)`}
               maxLength={intercept.keyword.length}
               style={{
-                flex:1, padding:'14px 16px', background:'#030303',
+                flex:1, padding:'1.3vmin 1.48vmin', background:'#030303',
                 border:`1.5px solid ${error?RED:BORDER}`,
-                color:ACCENT, fontFamily:FONT, fontSize:'24px', letterSpacing:'6px', outline:'none', minWidth:'180px',
+                color:ACCENT, fontFamily:FONT, fontSize:'clamp(14px, 2.22vmin, 9999px)', letterSpacing:'0.56vmin', outline:'none', minWidth:'16.67vmin',
               }}
             />
             <button onClick={verify} disabled={!input}
-              style={{ ...S.btnPrimary, opacity:input?1:0.4, padding:'14px 24px', fontSize:'18px' }}>
+              style={{ ...S.btnPrimary, opacity:input?1:0.4, padding:'1.3vmin 2.22vmin', fontSize:'clamp(11px, 1.67vmin, 9999px)' }}>
               VERIFICAR <ChevronRight size={18}/>
             </button>
           </div>
-          <div style={{ display:'flex', gap:'12px', marginTop:'10px', alignItems:'center', flexWrap:'wrap' }}>
+          <div style={{ display:'flex', gap:'1.11vmin', marginTop:'0.93vmin', alignItems:'center', flexWrap:'wrap' }}>
             {attempts >= 1 && hintsUsed < intercept.keyword.length-1 && (
-              <button onClick={useHint} style={{ padding:'10px 20px', background:'none', border:`1px solid ${AMBER}44`, color:AMBER, fontFamily:FONT, fontSize:'15px', letterSpacing:'2px', cursor:'pointer' }}>
+              <button onClick={useHint} style={{ padding:'0.93vmin 1.85vmin', background:'none', border:`1px solid ${AMBER}44`, color:AMBER, fontFamily:FONT, fontSize:'clamp(10px, 1.39vmin, 9999px)', letterSpacing:'0.19vmin', cursor:'pointer' }}>
                 💡 PISTA (+2 LETRAS)
               </button>
             )}
-            {error && <div style={{ fontSize:'15px', color:RED, letterSpacing:'2px', fontFamily:FONT }}>{error}</div>}
+            {error && <div style={{ fontSize:'clamp(10px, 1.39vmin, 9999px)', color:RED, letterSpacing:'0.19vmin', fontFamily:FONT }}>{error}</div>}
           </div>
         </div>
       ) : (
-        <div style={{ padding:'20px', background:'rgba(0,255,65,0.06)', border:`1px solid ${ACCENT}44`, textAlign:'center', fontFamily:FONT }}>
-          <div style={{ fontSize:'22px', color:ACCENT, letterSpacing:'4px' }}>
-            ✓ DECODIFICADO — PALABRA CLAVE: <span style={{ fontSize:'30px', textShadow:`0 0 20px ${ACCENT}66` }}>{intercept.keyword}</span>
+        <div style={{ padding:'1.85vmin', background:'rgba(0,255,65,0.06)', border:`1px solid ${ACCENT}44`, textAlign:'center', fontFamily:FONT }}>
+          <div style={{ fontSize:'clamp(13px, 2.04vmin, 9999px)', color:ACCENT, letterSpacing:'0.37vmin' }}>
+            ✓ DECODIFICADO — PALABRA CLAVE: <span style={{ fontSize:'clamp(18px, 2.78vmin, 9999px)', textShadow:`0 0 20px ${ACCENT}66` }}>{intercept.keyword}</span>
           </div>
         </div>
       )}
@@ -273,14 +273,14 @@ export default function CovertMission({ onComplete }) {
   /* ═══════════════════════════════ INTRO ═══════════════════════════════════ */
   if (phase==='intro') return (
     <div style={{ maxWidth:'1920px', width:'100%', margin:'0 auto', fontFamily:FONT }}>
-      <div style={{ fontSize:'15px', color:TEXT2, letterSpacing:'4px', marginBottom:'14px' }}>// MOD-08 — OPERACIÓN ENCUBIERTA</div>
-      <div style={{ fontSize:'clamp(30px,4vw,58px)', letterSpacing:'5px', color:ACCENT, marginBottom:'36px' }}>MISIÓN SOMBRA</div>
+      <div style={{ fontSize:'clamp(10px, 1.39vmin, 9999px)', color:TEXT2, letterSpacing:'0.37vmin', marginBottom:'1.3vmin' }}>// MOD-08 — OPERACIÓN ENCUBIERTA</div>
+      <div style={{ fontSize:'clamp(30px,4vw,58px)', letterSpacing:'0.46vmin', color:ACCENT, marginBottom:'3.33vmin' }}>MISIÓN SOMBRA</div>
 
-      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'16px', marginBottom:'28px' }}>
+      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'1.48vmin', marginBottom:'2.59vmin' }}>
         {/* Mission brief */}
         <div style={{ ...CARD, borderLeft:`2px solid ${ACCENT}44` }}>
-          <div style={{ fontSize:'12px', color:TEXT2, letterSpacing:'4px', marginBottom:'12px' }}>// SITUACIÓN</div>
-          <p style={{ fontSize:'19px', color:TEXT2, lineHeight:1.9, margin:0 }}>
+          <div style={{ fontSize:'clamp(10px, 1.11vmin, 9999px)', color:TEXT2, letterSpacing:'0.37vmin', marginBottom:'1.11vmin' }}>// SITUACIÓN</div>
+          <p style={{ fontSize:'clamp(11px, 1.76vmin, 9999px)', color:TEXT2, lineHeight:1.9, margin:0 }}>
             Se ha detectado una exfiltración de inteligencia desde la red INTRADEF.
             Usted debe infiltrarse en el sistema, interceptar transmisiones cifradas del enemigo
             y decodificarlas para identificar al agente infiltrado y su plan.
@@ -289,18 +289,18 @@ export default function CovertMission({ onComplete }) {
 
         {/* 4 steps */}
         <div style={{ ...CARD, borderLeft:`2px solid ${AMBER}44` }}>
-          <div style={{ fontSize:'12px', color:TEXT2, letterSpacing:'4px', marginBottom:'14px' }}>// CÓMO JUGAR — 4 PASOS</div>
+          <div style={{ fontSize:'clamp(10px, 1.11vmin, 9999px)', color:TEXT2, letterSpacing:'0.37vmin', marginBottom:'1.3vmin' }}>// CÓMO JUGAR — 4 PASOS</div>
           {[
             ['1','⬡','CONECTAR','Acceda a la red INTRADEF con sus credenciales'],
             ['2','⊛','ESCANEAR','Localice el nodo con actividad sospechosa'],
             ['3','◈','DESCIFRAR','Decodifique 3 transmisiones cifradas usando la tabla'],
             ['4','↑','EXFILTRAR','Extraiga las evidencias y complete la misión'],
           ].map(([n,icon,label,desc])=>(
-            <div key={n} style={{ display:'flex', gap:'14px', alignItems:'flex-start', marginBottom:'13px' }}>
-              <div style={{ width:'32px', height:'32px', border:`1px solid ${ACCENT}55`, display:'flex', alignItems:'center', justifyContent:'center', fontSize:'18px', color:ACCENT, flexShrink:0 }}>{icon}</div>
+            <div key={n} style={{ display:'flex', gap:'1.3vmin', alignItems:'flex-start', marginBottom:'1.2vmin' }}>
+              <div style={{ width:'2.96vmin', height:'2.96vmin', border:`1px solid ${ACCENT}55`, display:'flex', alignItems:'center', justifyContent:'center', fontSize:'clamp(11px, 1.67vmin, 9999px)', color:ACCENT, flexShrink:0 }}>{icon}</div>
               <div>
-                <div style={{ fontSize:'17px', color:ACCENT, letterSpacing:'2px' }}>{label}</div>
-                <div style={{ fontSize:'14px', color:TEXT2, marginTop:'2px' }}>{desc}</div>
+                <div style={{ fontSize:'clamp(10px, 1.57vmin, 9999px)', color:ACCENT, letterSpacing:'0.19vmin' }}>{label}</div>
+                <div style={{ fontSize:'clamp(10px, 1.3vmin, 9999px)', color:TEXT2, marginTop:'2px' }}>{desc}</div>
               </div>
             </div>
           ))}
@@ -308,41 +308,41 @@ export default function CovertMission({ onComplete }) {
       </div>
 
       {/* Cipher example */}
-      <div style={{ ...CARD, borderLeft:`2px solid ${AMBER}44`, marginBottom:'32px' }}>
-        <div style={{ fontSize:'12px', color:TEXT2, letterSpacing:'4px', marginBottom:'14px' }}>// CÓMO FUNCIONA EL DESCIFRADO</div>
-        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'24px', alignItems:'center' }}>
+      <div style={{ ...CARD, borderLeft:`2px solid ${AMBER}44`, marginBottom:'2.96vmin' }}>
+        <div style={{ fontSize:'clamp(10px, 1.11vmin, 9999px)', color:TEXT2, letterSpacing:'0.37vmin', marginBottom:'1.3vmin' }}>// CÓMO FUNCIONA EL DESCIFRADO</div>
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'2.22vmin', alignItems:'center' }}>
           <div>
-            <p style={{ fontSize:'18px', color:TEXT2, lineHeight:1.9, margin:'0 0 12px' }}>
+            <p style={{ fontSize:'clamp(11px, 1.67vmin, 9999px)', color:TEXT2, lineHeight:1.9, margin:'0 0 1.11vmin' }}>
               Las transmisiones están cifradas con un <span style={{ color:ACCENT }}>código de sustitución</span>:
               cada letra ha sido reemplazada por otra diferente.
             </p>
-            <p style={{ fontSize:'18px', color:TEXT2, lineHeight:1.9, margin:0 }}>
+            <p style={{ fontSize:'clamp(11px, 1.67vmin, 9999px)', color:TEXT2, lineHeight:1.9, margin:0 }}>
               Use la <span style={{ color:AMBER }}>tabla de descifrado</span> para convertir
               cada letra cifrada (naranja) a su letra real (verde). Luego escriba la palabra que forman.
             </p>
           </div>
-          <div style={{ background:'#030303', border:`1px solid ${BORDER}`, padding:'18px' }}>
-            <div style={{ fontSize:'12px', color:TEXT2, letterSpacing:'3px', marginBottom:'12px' }}>EJEMPLO — descifrar "MBCLCM":</div>
-            <div style={{ display:'flex', gap:'6px', alignItems:'center', flexWrap:'wrap', marginBottom:'12px' }}>
+          <div style={{ background:'#030303', border:`1px solid ${BORDER}`, padding:'1.67vmin' }}>
+            <div style={{ fontSize:'clamp(10px, 1.11vmin, 9999px)', color:TEXT2, letterSpacing:'0.28vmin', marginBottom:'1.11vmin' }}>EJEMPLO — descifrar "MBCLCM":</div>
+            <div style={{ display:'flex', gap:'0.56vmin', alignItems:'center', flexWrap:'wrap', marginBottom:'1.11vmin' }}>
               {['M','B','C','L','C','M'].map((ch,i)=>(
-                <div key={i} style={{ border:`1px solid ${AMBER}66`, padding:'8px 10px', textAlign:'center', minWidth:'36px' }}>
-                  <div style={{ fontSize:'20px', color:AMBER, fontFamily:FONT }}>{ch}</div>
-                  <div style={{ fontSize:'10px', color:'rgba(0,255,65,0.3)' }}>↓</div>
-                  <div style={{ fontSize:'20px', color:ACCENT, fontFamily:FONT }}>{DECIPHER[ch]}</div>
+                <div key={i} style={{ border:`1px solid ${AMBER}66`, padding:'0.74vmin 0.93vmin', textAlign:'center', minWidth:'3.33vmin' }}>
+                  <div style={{ fontSize:'clamp(12px, 1.85vmin, 9999px)', color:AMBER, fontFamily:FONT }}>{ch}</div>
+                  <div style={{ fontSize:'clamp(10px, 0.93vmin, 9999px)', color:'rgba(0,255,65,0.3)' }}>↓</div>
+                  <div style={{ fontSize:'clamp(12px, 1.85vmin, 9999px)', color:ACCENT, fontFamily:FONT }}>{DECIPHER[ch]}</div>
                 </div>
               ))}
-              <div style={{ fontSize:'18px', color:TEXT2, marginLeft:'6px' }}>
-                = <span style={{ color:ACCENT, letterSpacing:'3px', fontSize:'22px' }}>AURORA</span>
+              <div style={{ fontSize:'clamp(11px, 1.67vmin, 9999px)', color:TEXT2, marginLeft:'6px' }}>
+                = <span style={{ color:ACCENT, letterSpacing:'0.28vmin', fontSize:'clamp(13px, 2.04vmin, 9999px)' }}>AURORA</span>
               </div>
             </div>
-            <div style={{ fontSize:'11px', color:'rgba(0,255,65,0.35)', letterSpacing:'2px' }}>
+            <div style={{ fontSize:'clamp(10px, 1.02vmin, 9999px)', color:'rgba(0,255,65,0.35)', letterSpacing:'0.19vmin' }}>
               M→A, B→U, C→R, L→O, C→R, M→A = AURORA
             </div>
           </div>
         </div>
       </div>
 
-      <button onClick={()=>setPhase('game')} style={{ ...S.btnPrimary, fontSize:'20px', padding:'18px 40px', gap:'12px' }}>
+      <button onClick={()=>setPhase('game')} style={{ ...S.btnPrimary, fontSize:'clamp(12px, 1.85vmin, 9999px)', padding:'1.67vmin 3.7vmin', gap:'1.11vmin' }}>
         <Terminal size={20}/> INICIAR MISIÓN <ChevronRight size={20}/>
       </button>
     </div>
@@ -351,29 +351,29 @@ export default function CovertMission({ onComplete }) {
   /* ═══════════════════════════════ RESULT ══════════════════════════════════ */
   if (phase==='result') return (
     <div style={{ maxWidth:'1920px', width:'100%', margin:'0 auto', fontFamily:FONT }}>
-      <div style={{ fontSize:'15px', color:TEXT2, letterSpacing:'4px', marginBottom:'20px' }}>// MISIÓN COMPLETADA — INFORME OPERATIVO</div>
-      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'16px', marginBottom:'24px' }}>
-        <div style={{ ...CARD, borderLeft:`2px solid ${ACCENT}66`, padding:'28px', display:'flex', flexDirection:'column', gap:'12px' }}>
-          <div style={{ fontSize:'13px', color:TEXT2, letterSpacing:'4px' }}>PUNTUACIÓN OPERATIVA</div>
-          <div style={{ fontSize:'86px', color:ACCENT, lineHeight:1, textShadow:`0 0 40px ${ACCENT}44` }}>{score}</div>
-          <div style={{ fontSize:'13px', color:TEXT2, letterSpacing:'3px' }}>CLASIFICACIÓN</div>
-          <div style={{ fontSize:'28px', letterSpacing:'4px', color:ACCENT }}>{rank}</div>
+      <div style={{ fontSize:'clamp(10px, 1.39vmin, 9999px)', color:TEXT2, letterSpacing:'0.37vmin', marginBottom:'1.85vmin' }}>// MISIÓN COMPLETADA — INFORME OPERATIVO</div>
+      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'1.48vmin', marginBottom:'2.22vmin' }}>
+        <div style={{ ...CARD, borderLeft:`2px solid ${ACCENT}66`, padding:'2.59vmin', display:'flex', flexDirection:'column', gap:'1.11vmin' }}>
+          <div style={{ fontSize:'clamp(10px, 1.2vmin, 9999px)', color:TEXT2, letterSpacing:'0.37vmin' }}>PUNTUACIÓN OPERATIVA</div>
+          <div style={{ fontSize:'clamp(52px, 7.96vmin, 9999px)', color:ACCENT, lineHeight:1, textShadow:`0 0 40px ${ACCENT}44` }}>{score}</div>
+          <div style={{ fontSize:'clamp(10px, 1.2vmin, 9999px)', color:TEXT2, letterSpacing:'0.28vmin' }}>CLASIFICACIÓN</div>
+          <div style={{ fontSize:'clamp(17px, 2.59vmin, 9999px)', letterSpacing:'0.37vmin', color:ACCENT }}>{rank}</div>
         </div>
-        <div style={{ display:'flex', flexDirection:'column', gap:'10px' }}>
+        <div style={{ display:'flex', flexDirection:'column', gap:'0.93vmin' }}>
           {[
             { label:'OPERACIÓN ENEMIGA IDENTIFICADA', val:decoded[0]||'NO IDENTIFICADA', ok:!!decoded[0] },
             { label:'AGENTE INFILTRADO NEUTRALIZADO',  val:decoded[1]||'EN FUGA',          ok:!!decoded[1] },
             { label:'FECHA DE EXFILTRACIÓN CONOCIDA',  val:decoded[2]||'DESCONOCIDA',       ok:!!decoded[2] },
             { label:'TRANSMISIONES DECODIFICADAS',     val:`${decoded.length}/3`,           ok:decoded.length===3 },
           ].map(r=>(
-            <div key={r.label} style={{ ...CARD, padding:'18px 20px', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-              <span style={{ fontSize:'15px', color:TEXT2, letterSpacing:'1px' }}>{r.label}</span>
-              <span style={{ fontSize:'18px', color:r.ok?ACCENT:RED, letterSpacing:'2px' }}>{r.val}</span>
+            <div key={r.label} style={{ ...CARD, padding:'1.67vmin 1.85vmin', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+              <span style={{ fontSize:'clamp(10px, 1.39vmin, 9999px)', color:TEXT2, letterSpacing:'0.09vmin' }}>{r.label}</span>
+              <span style={{ fontSize:'clamp(11px, 1.67vmin, 9999px)', color:r.ok?ACCENT:RED, letterSpacing:'0.19vmin' }}>{r.val}</span>
             </div>
           ))}
         </div>
       </div>
-      <button onClick={()=>onComplete({type:'covert-mission',score,rank,decoded})} style={{ ...S.btnPrimary, fontSize:'20px', padding:'18px 40px', gap:'12px' }}>
+      <button onClick={()=>onComplete({type:'covert-mission',score,rank,decoded})} style={{ ...S.btnPrimary, fontSize:'clamp(12px, 1.85vmin, 9999px)', padding:'1.67vmin 3.7vmin', gap:'1.11vmin' }}>
         CONTINUAR AL INFORME <ChevronRight size={20}/>
       </button>
     </div>
@@ -383,24 +383,24 @@ export default function CovertMission({ onComplete }) {
   return (
     <div style={{ maxWidth:'1920px', width:'100%', margin:'0 auto', fontFamily:FONT }}>
       {/* Step bar */}
-      <div style={{ ...CARD, padding:'20px 32px', marginBottom:'16px' }}>
+      <div style={{ ...CARD, padding:'1.85vmin 2.96vmin', marginBottom:'1.48vmin' }}>
         <StepBar stepIdx={stepIdx} decodeIdx={decodeIdx}/>
       </div>
 
-      <div style={{ display:'grid', gridTemplateColumns:'1fr 290px', gap:'16px' }}>
+      <div style={{ display:'grid', gridTemplateColumns:'1fr 26.85vmin', gap:'1.48vmin' }}>
         {/* Main panel */}
-        <div style={{ ...CARD, padding:'28px' }}>
+        <div style={{ ...CARD, padding:'2.59vmin' }}>
 
           {/* ── CONNECT ── */}
           {step==='connect' && (
             <div>
-              <div style={{ fontSize:'13px', color:TEXT2, letterSpacing:'4px', marginBottom:'10px' }}>// PASO 1 DE 4</div>
-              <div style={{ fontSize:'34px', color:ACCENT, letterSpacing:'4px', marginBottom:'18px' }}>CONECTAR A LA RED</div>
-              <p style={{ fontSize:'19px', color:TEXT2, lineHeight:1.9, marginBottom:'28px' }}>
+              <div style={{ fontSize:'clamp(10px, 1.2vmin, 9999px)', color:TEXT2, letterSpacing:'0.37vmin', marginBottom:'0.93vmin' }}>// PASO 1 DE 4</div>
+              <div style={{ fontSize:'clamp(20px, 3.15vmin, 9999px)', color:ACCENT, letterSpacing:'0.37vmin', marginBottom:'1.67vmin' }}>CONECTAR A LA RED</div>
+              <p style={{ fontSize:'clamp(11px, 1.76vmin, 9999px)', color:TEXT2, lineHeight:1.9, marginBottom:'2.59vmin' }}>
                 Establezca una conexión segura con la red INTRADEF usando sus credenciales de operativo clasificado ENS-CAT-A.
               </p>
               <button onClick={doConnect} disabled={busy}
-                style={{ ...S.btnPrimary, fontSize:'22px', padding:'18px 40px', opacity:busy?0.6:1, gap:'12px' }}>
+                style={{ ...S.btnPrimary, fontSize:'clamp(13px, 2.04vmin, 9999px)', padding:'1.67vmin 3.7vmin', opacity:busy?0.6:1, gap:'1.11vmin' }}>
                 {busy ? '● AUTENTICANDO...' : '⬡ CONECTAR A LA RED'}
                 {!busy && <ChevronRight size={20}/>}
               </button>
@@ -410,27 +410,27 @@ export default function CovertMission({ onComplete }) {
           {/* ── SCAN ── */}
           {step==='scan' && (
             <div>
-              <div style={{ fontSize:'13px', color:TEXT2, letterSpacing:'4px', marginBottom:'10px' }}>// PASO 2 DE 4</div>
-              <div style={{ fontSize:'34px', color:ACCENT, letterSpacing:'4px', marginBottom:'18px' }}>ESCANEAR LA RED</div>
-              <p style={{ fontSize:'19px', color:TEXT2, lineHeight:1.9, marginBottom:'22px' }}>
+              <div style={{ fontSize:'clamp(10px, 1.2vmin, 9999px)', color:TEXT2, letterSpacing:'0.37vmin', marginBottom:'0.93vmin' }}>// PASO 2 DE 4</div>
+              <div style={{ fontSize:'clamp(20px, 3.15vmin, 9999px)', color:ACCENT, letterSpacing:'0.37vmin', marginBottom:'1.67vmin' }}>ESCANEAR LA RED</div>
+              <p style={{ fontSize:'clamp(11px, 1.76vmin, 9999px)', color:TEXT2, lineHeight:1.9, marginBottom:'2.04vmin' }}>
                 Escanee los nodos de la red para localizar la estación con actividad sospechosa. El nodo comprometido contiene las transmisiones cifradas.
               </p>
               {/* Network nodes */}
-              <div style={{ display:'flex', gap:'10px', marginBottom:'28px', flexWrap:'wrap' }}>
+              <div style={{ display:'flex', gap:'0.93vmin', marginBottom:'2.59vmin', flexWrap:'wrap' }}>
                 {[
                   { ip:'192.168.1.10', name:'SERVIDOR-FORMACION', status:'ACTIVO', susp:false },
                   { ip:'192.168.1.44', name:'ESTACION-ALFA',       status:'⚠ SOSPECHOSO', susp:true },
                   { ip:'192.168.1.77', name:'ARCHIVO-CENTRAL',     status:'ACTIVO', susp:false },
                 ].map(n=>(
-                  <div key={n.ip} style={{ ...CARD, flex:1, minWidth:'150px', padding:'16px', borderColor:n.susp?`${AMBER}66`:BORDER, background:n.susp?'rgba(255,170,0,0.04)':'#0a0a0a' }}>
-                    <div style={{ fontSize:'11px', color:n.susp?AMBER:TEXT2, letterSpacing:'2px', marginBottom:'5px' }}>{n.ip}</div>
-                    <div style={{ fontSize:'15px', color:n.susp?AMBER:TEXT2, letterSpacing:'1px', marginBottom:'4px' }}>{n.name}</div>
-                    <div style={{ fontSize:'13px', color:n.susp?AMBER:`${ACCENT}55` }}>{n.status}</div>
+                  <div key={n.ip} style={{ ...CARD, flex:1, minWidth:'13.89vmin', padding:'1.48vmin', borderColor:n.susp?`${AMBER}66`:BORDER, background:n.susp?'rgba(255,170,0,0.04)':'#0a0a0a' }}>
+                    <div style={{ fontSize:'clamp(10px, 1.02vmin, 9999px)', color:n.susp?AMBER:TEXT2, letterSpacing:'0.19vmin', marginBottom:'5px' }}>{n.ip}</div>
+                    <div style={{ fontSize:'clamp(10px, 1.39vmin, 9999px)', color:n.susp?AMBER:TEXT2, letterSpacing:'0.09vmin', marginBottom:'4px' }}>{n.name}</div>
+                    <div style={{ fontSize:'clamp(10px, 1.2vmin, 9999px)', color:n.susp?AMBER:`${ACCENT}55` }}>{n.status}</div>
                   </div>
                 ))}
               </div>
               <button onClick={doScan} disabled={busy}
-                style={{ ...S.btnPrimary, fontSize:'22px', padding:'18px 40px', opacity:busy?0.6:1, gap:'12px' }}>
+                style={{ ...S.btnPrimary, fontSize:'clamp(13px, 2.04vmin, 9999px)', padding:'1.67vmin 3.7vmin', opacity:busy?0.6:1, gap:'1.11vmin' }}>
                 {busy ? '⊛ ESCANEANDO...' : '⊛ INICIAR ESCANEO'}
                 {!busy && <ChevronRight size={20}/>}
               </button>
@@ -440,15 +440,15 @@ export default function CovertMission({ onComplete }) {
           {/* ── DECODE ── */}
           {step==='decode' && (
             <div>
-              <div style={{ fontSize:'13px', color:TEXT2, letterSpacing:'4px', marginBottom:'10px' }}>// PASO 3 DE 4 — DESCIFRAR TRANSMISIONES</div>
+              <div style={{ fontSize:'clamp(10px, 1.2vmin, 9999px)', color:TEXT2, letterSpacing:'0.37vmin', marginBottom:'0.93vmin' }}>// PASO 3 DE 4 — DESCIFRAR TRANSMISIONES</div>
               {/* Pills */}
-              <div style={{ display:'flex', gap:'8px', marginBottom:'20px' }}>
+              <div style={{ display:'flex', gap:'8px', marginBottom:'1.85vmin' }}>
                 {INTERCEPTS.map((ic,i)=>{
                   const done   = i < decodeIdx || decoded.length > i
                   const active = i === decodeIdx && decoded.length <= i
                   return (
                     <div key={i} style={{
-                      padding:'7px 14px', fontSize:'13px', letterSpacing:'2px', fontFamily:FONT,
+                      padding:'0.65vmin 1.3vmin', fontSize:'clamp(10px, 1.2vmin, 9999px)', letterSpacing:'0.19vmin', fontFamily:FONT,
                       border:`1px solid ${done?ACCENT:active?`${ACCENT}66`:BORDER}`,
                       color:done?ACCENT:active?ACCENT:'rgba(0,255,65,0.3)',
                       background:done?'rgba(0,255,65,0.06)':'transparent',
@@ -465,30 +465,30 @@ export default function CovertMission({ onComplete }) {
           {/* ── EXFIL ── */}
           {step==='exfil' && (
             <div>
-              <div style={{ fontSize:'13px', color:TEXT2, letterSpacing:'4px', marginBottom:'10px' }}>// PASO 4 DE 4</div>
-              <div style={{ fontSize:'34px', color:ACCENT, letterSpacing:'4px', marginBottom:'18px' }}>EXFILTRAR EVIDENCIAS</div>
-              <div style={{ display:'flex', gap:'12px', marginBottom:'28px', flexWrap:'wrap' }}>
+              <div style={{ fontSize:'clamp(10px, 1.2vmin, 9999px)', color:TEXT2, letterSpacing:'0.37vmin', marginBottom:'0.93vmin' }}>// PASO 4 DE 4</div>
+              <div style={{ fontSize:'clamp(20px, 3.15vmin, 9999px)', color:ACCENT, letterSpacing:'0.37vmin', marginBottom:'1.67vmin' }}>EXFILTRAR EVIDENCIAS</div>
+              <div style={{ display:'flex', gap:'1.11vmin', marginBottom:'2.59vmin', flexWrap:'wrap' }}>
                 {[
                   { label:'OPERACIÓN ENEMIGA', val:decoded[0]||'?' },
                   { label:'AGENTE INFILTRADO', val:decoded[1]||'?' },
                   { label:'FECHA EXFILTRACIÓN', val:decoded[2]||'?' },
                 ].map(r=>(
-                  <div key={r.label} style={{ ...CARD, flex:1, minWidth:'140px', padding:'16px', borderLeft:`2px solid ${ACCENT}44` }}>
-                    <div style={{ fontSize:'12px', color:TEXT2, letterSpacing:'3px', marginBottom:'8px' }}>{r.label}</div>
-                    <div style={{ fontSize:'24px', color:ACCENT, letterSpacing:'4px' }}>{r.val}</div>
+                  <div key={r.label} style={{ ...CARD, flex:1, minWidth:'12.96vmin', padding:'1.48vmin', borderLeft:`2px solid ${ACCENT}44` }}>
+                    <div style={{ fontSize:'clamp(10px, 1.11vmin, 9999px)', color:TEXT2, letterSpacing:'0.28vmin', marginBottom:'8px' }}>{r.label}</div>
+                    <div style={{ fontSize:'clamp(14px, 2.22vmin, 9999px)', color:ACCENT, letterSpacing:'0.37vmin' }}>{r.val}</div>
                   </div>
                 ))}
               </div>
               {exfilPct===0 ? (
-                <button onClick={doExfil} style={{ ...S.btnPrimary, fontSize:'22px', padding:'18px 40px', gap:'12px' }}>
+                <button onClick={doExfil} style={{ ...S.btnPrimary, fontSize:'clamp(13px, 2.04vmin, 9999px)', padding:'1.67vmin 3.7vmin', gap:'1.11vmin' }}>
                   ↑ EXFILTRAR EVIDENCIAS <ChevronRight size={20}/>
                 </button>
               ) : (
                 <div>
-                  <div style={{ marginBottom:'8px', fontSize:'16px', color:ACCENT, letterSpacing:'3px', fontFamily:FONT }}>
+                  <div style={{ marginBottom:'8px', fontSize:'clamp(10px, 1.48vmin, 9999px)', color:ACCENT, letterSpacing:'0.28vmin', fontFamily:FONT }}>
                     EXFILTRANDO... {Math.round(exfilPct)}%
                   </div>
-                  <div style={{ height:'10px', background:'#1a1a1a', border:`1px solid ${BORDER}` }}>
+                  <div style={{ height:'0.93vmin', background:'#1a1a1a', border:`1px solid ${BORDER}` }}>
                     <div style={{ height:'100%', width:`${exfilPct}%`, background:ACCENT, transition:'width 0.2s', boxShadow:`0 0 10px ${ACCENT}66` }}/>
                   </div>
                 </div>
@@ -499,15 +499,15 @@ export default function CovertMission({ onComplete }) {
 
         {/* Terminal log */}
         <div style={{ ...CARD, padding:0, display:'flex', flexDirection:'column', overflow:'hidden' }}>
-          <div style={{ padding:'12px 16px', borderBottom:`1px solid ${BORDER}`, fontSize:'12px', color:TEXT2, letterSpacing:'3px', flexShrink:0 }}>
+          <div style={{ padding:'1.11vmin 1.48vmin', borderBottom:`1px solid ${BORDER}`, fontSize:'clamp(10px, 1.11vmin, 9999px)', color:TEXT2, letterSpacing:'0.28vmin', flexShrink:0 }}>
             ▸ REGISTRO OPERATIVO
           </div>
-          <div ref={logRef} style={{ flex:1, overflowY:'auto', padding:'14px', display:'flex', flexDirection:'column', gap:'5px', minHeight:'350px' }}>
+          <div ref={logRef} style={{ flex:1, overflowY:'auto', padding:'1.3vmin', display:'flex', flexDirection:'column', gap:'5px', minHeight:'32.41vmin' }}>
             {log.length===0 && (
-              <div style={{ fontSize:'13px', color:'rgba(0,255,65,0.2)', fontFamily:FONT }}>Esperando operación...</div>
+              <div style={{ fontSize:'clamp(10px, 1.2vmin, 9999px)', color:'rgba(0,255,65,0.2)', fontFamily:FONT }}>Esperando operación...</div>
             )}
             {log.map((entry,i)=>(
-              <div key={i} style={{ fontSize:'13px', fontFamily:FONT, lineHeight:1.6, color:entry.type==='success'?ACCENT:entry.type==='warn'?AMBER:TEXT2 }}>
+              <div key={i} style={{ fontSize:'clamp(10px, 1.2vmin, 9999px)', fontFamily:FONT, lineHeight:1.6, color:entry.type==='success'?ACCENT:entry.type==='warn'?AMBER:TEXT2 }}>
                 <span style={{ opacity:0.35 }}>[{entry.t}]</span> {entry.text}
               </div>
             ))}

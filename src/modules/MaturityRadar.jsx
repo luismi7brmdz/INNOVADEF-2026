@@ -128,19 +128,19 @@ export default function MaturityRadar({ onComplete }) {
           transform: transitioning ? 'translateX(-20px)' : 'translateX(0)',
           transition: 'opacity 0.3s ease, transform 0.3s ease'
         }}>
-          <div style={{ marginBottom: '36px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '18px', fontFamily: FONT }}>
-              <span style={{ fontSize: '19.5px', color: TEXT2, letterSpacing: '4.5px' }}>EJE {step + 1}/{questions.length} — {axes.find(a => a.key === q.axis)?.label.toUpperCase()}</span>
-              <span style={{ fontSize: '19.5px', color: ACCENT, letterSpacing: '3px' }}>{Math.round((step / questions.length) * 100)}%</span>
+          <div style={{ marginBottom: '3.33vmin' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.67vmin', fontFamily: FONT }}>
+              <span style={{ fontSize: 'clamp(12px, 1.81vmin, 9999px)', color: TEXT2, letterSpacing: '0.42vmin' }}>EJE {step + 1}/{questions.length} — {axes.find(a => a.key === q.axis)?.label.toUpperCase()}</span>
+              <span style={{ fontSize: 'clamp(12px, 1.81vmin, 9999px)', color: ACCENT, letterSpacing: '0.28vmin' }}>{Math.round((step / questions.length) * 100)}%</span>
             </div>
-            <div style={{ display: 'flex', gap: '3px' }}>
+            <div style={{ display: 'flex', gap: '0.28vmin' }}>
               {questions.map((_, i) => (
                 <div key={i} style={{ flex: 1, height: '3px', background: i < step ? ACCENT : i === step ? `${ACCENT}88` : `${ACCENT}12`, boxShadow: i === step ? `0 0 4px ${ACCENT}` : 'none' }} />
               ))}
             </div>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '54px', alignItems: 'center' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '5vmin', alignItems: 'center' }}>
             {/* Radar live */}
             <div style={{ display: 'flex', justifyContent: 'center' }}>
               <RadarChart values={values} size={570} />
@@ -148,24 +148,24 @@ export default function MaturityRadar({ onComplete }) {
 
             {/* Question */}
             <div style={{ width: '100%' }}>
-              <div style={{ fontFamily: FONT, fontSize: '19.5px', color: TEXT2, letterSpacing: '4.5px', marginBottom: '15px' }}>// {axes.find(a => a.key === q.axis)?.label.toUpperCase()}</div>
-              <p style={{ fontFamily: FONT, fontSize: '30px', lineHeight: 1.6, color: ACCENT, marginBottom: '36px', letterSpacing: '0.45px' }}>{q.text.toUpperCase()}</p>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '27px' }}>
+              <div style={{ fontFamily: FONT, fontSize: 'clamp(12px, 1.81vmin, 9999px)', color: TEXT2, letterSpacing: '0.42vmin', marginBottom: '1.39vmin' }}>// {axes.find(a => a.key === q.axis)?.label.toUpperCase()}</div>
+              <p style={{ fontFamily: FONT, fontSize: 'clamp(18px, 2.78vmin, 9999px)', lineHeight: 1.6, color: ACCENT, marginBottom: '3.33vmin', letterSpacing: '0.04vmin' }}>{q.text.toUpperCase()}</p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5vmin' }}>
                 {q.labels.map((label, i) => (
                   <button
                     key={i}
                     onClick={() => handleSelect(i)}
                     style={{
-                      display: 'flex', alignItems: 'center', gap: '24px',
-                      padding: '24px 27px', textAlign: 'left', width: '100%',
+                      display: 'flex', alignItems: 'center', gap: '2.22vmin',
+                      padding: '2.22vmin 2.5vmin', textAlign: 'left', width: '100%',
                       background: '#070707', border: `1.5px solid ${BORDER}`,
                       color: TEXT2, cursor: 'pointer', transition: 'all 0.18s',
-                      fontFamily: FONT, fontSize: '21px', letterSpacing: '0.75px'
+                      fontFamily: FONT, fontSize: 'clamp(13px, 1.94vmin, 9999px)', letterSpacing: '0.07vmin'
                     }}
                     onMouseEnter={e => { e.currentTarget.style.borderColor = '#ffaa0055'; e.currentTarget.style.background = 'rgba(255,170,0,0.04)'; e.currentTarget.style.color = '#ffaa00' }}
                     onMouseLeave={e => { e.currentTarget.style.borderColor = BORDER; e.currentTarget.style.background = '#070707'; e.currentTarget.style.color = TEXT2 }}
                   >
-                    <span style={{ color: ACCENT, minWidth: '36px', fontSize: '24px' }}>[{i}]</span>
+                    <span style={{ color: ACCENT, minWidth: '3.33vmin', fontSize: 'clamp(14px, 2.22vmin, 9999px)' }}>[{i}]</span>
                     {label.toUpperCase()}
                   </button>
                 ))}
@@ -177,25 +177,25 @@ export default function MaturityRadar({ onComplete }) {
 
       {phase === 'result' && (
         <div>
-          <div style={{ fontFamily: FONT, fontSize: '19.5px', color: TEXT2, letterSpacing: '4.5px', marginBottom: '27px' }}>// RADAR DE MADUREZ — RESULTADO</div>
-          <div style={{ fontFamily: FONT, fontSize: 'clamp(18px, 3.75vw, 26px)', letterSpacing: '4.5px', color: ACCENT, marginBottom: '27px', textTransform: 'uppercase' }}>MAPA DE CAPACIDAD DIGITAL</div>
-          <div style={{ fontFamily: FONT, fontSize: '22.5px', color: TEXT2, marginBottom: '108px', letterSpacing: '1.5px' }}>ÍNDICE GLOBAL DE MADUREZ: <span style={{ color: ACCENT }}>{overallScore}%</span></div>
+          <div style={{ fontFamily: FONT, fontSize: 'clamp(12px, 1.81vmin, 9999px)', color: TEXT2, letterSpacing: '0.42vmin', marginBottom: '2.5vmin' }}>// RADAR DE MADUREZ — RESULTADO</div>
+          <div style={{ fontFamily: FONT, fontSize: 'clamp(18px, 3.75vw, 26px)', letterSpacing: '0.42vmin', color: ACCENT, marginBottom: '2.5vmin', textTransform: 'uppercase' }}>MAPA DE CAPACIDAD DIGITAL</div>
+          <div style={{ fontFamily: FONT, fontSize: 'clamp(14px, 2.08vmin, 9999px)', color: TEXT2, marginBottom: '10vmin', letterSpacing: '0.14vmin' }}>ÍNDICE GLOBAL DE MADUREZ: <span style={{ color: ACCENT }}>{overallScore}%</span></div>
 
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '60px' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '5.56vmin' }}>
             <RadarChart values={values} size={855} />
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '27px', marginBottom: '54px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '2.5vmin', marginBottom: '5vmin' }}>
             {axes.map(a => {
               const val = values[a.key] ?? 0
               const pct = Math.round((val / 4) * 100)
               return (
-                <div key={a.key} style={{ ...CARD, padding: '18px 27px', fontFamily: FONT }}>
-                  <div style={{ fontSize: '19.5px', color: TEXT2, letterSpacing: '3px', marginBottom: '18px' }}>{a.label.toUpperCase()}</div>
-                  <div style={{ height: '3px', background: `${ACCENT}0d`, border: `1px solid ${ACCENT}18`, marginBottom: '6px' }}>
+                <div key={a.key} style={{ ...CARD, padding: '1.67vmin 2.5vmin', fontFamily: FONT }}>
+                  <div style={{ fontSize: 'clamp(12px, 1.81vmin, 9999px)', color: TEXT2, letterSpacing: '0.28vmin', marginBottom: '1.67vmin' }}>{a.label.toUpperCase()}</div>
+                  <div style={{ height: '3px', background: `${ACCENT}0d`, border: `1px solid ${ACCENT}18`, marginBottom: '0.56vmin' }}>
                     <div style={{ height: '100%', background: ACCENT, width: `${pct}%`, transition: 'width 1.5s ease', boxShadow: `0 0 4px ${ACCENT}44` }} />
                   </div>
-                  <div style={{ fontSize: '40.5px', color: ACCENT }}>{pct}%</div>
+                  <div style={{ fontSize: 'clamp(24px, 3.75vmin, 9999px)', color: ACCENT }}>{pct}%</div>
                 </div>
               )
             })}

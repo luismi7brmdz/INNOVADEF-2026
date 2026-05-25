@@ -155,32 +155,32 @@ export default function TacticalSimulator({ onComplete }) {
 
       {phase === 'briefing' && (
         <div>
-          <div style={{ display: 'flex', gap: '18px', marginBottom: '30px', alignItems: 'center' }}>
-            <div style={{ padding: '7.5px 21px', fontSize: '27px', letterSpacing: '3px', background: scenario.urgency === 'CRÍTICA' ? 'rgba(255,43,43,0.08)' : 'rgba(255,170,0,0.08)', border: `1.5px solid ${scenario.urgency === 'CRÍTICA' ? 'rgba(255,43,43,0.4)' : 'rgba(255,170,0,0.4)'}`, color: scenario.urgency === 'CRÍTICA' ? '#FF2B2B' : '#FFAA00' }}>
+          <div style={{ display: 'flex', gap: '1.67vmin', marginBottom: '2.78vmin', alignItems: 'center' }}>
+            <div style={{ padding: '0.69vmin 1.94vmin', fontSize: 'clamp(16px, 2.5vmin, 9999px)', letterSpacing: '0.28vmin', background: scenario.urgency === 'CRÍTICA' ? 'rgba(255,43,43,0.08)' : 'rgba(255,170,0,0.08)', border: `1.5px solid ${scenario.urgency === 'CRÍTICA' ? 'rgba(255,43,43,0.4)' : 'rgba(255,170,0,0.4)'}`, color: scenario.urgency === 'CRÍTICA' ? '#FF2B2B' : '#FFAA00' }}>
               URGENCIA: {scenario.urgency}
             </div>
-            <span style={{ fontSize: '27px', color: TEXT2, letterSpacing: '3px' }}>{scenario.code}</span>
+            <span style={{ fontSize: 'clamp(16px, 2.5vmin, 9999px)', color: TEXT2, letterSpacing: '0.28vmin' }}>{scenario.code}</span>
           </div>
 
-          <div style={{ fontSize: '19.5px', letterSpacing: '3px', color: TEXT2, marginBottom: '18px' }}>// ESCENARIO ACTIVO</div>
-          <div style={{ fontSize: 'clamp(39px, 5.625vw, 60px)', letterSpacing: '3px', color: ACCENT, marginBottom: '54px', textShadow: `0 0 20px ${ACCENT}33`, textTransform: 'uppercase' }}>
+          <div style={{ fontSize: 'clamp(12px, 1.81vmin, 9999px)', letterSpacing: '0.28vmin', color: TEXT2, marginBottom: '1.67vmin' }}>// ESCENARIO ACTIVO</div>
+          <div style={{ fontSize: 'clamp(39px, 5.625vw, 60px)', letterSpacing: '0.28vmin', color: ACCENT, marginBottom: '5vmin', textShadow: `0 0 20px ${ACCENT}33`, textTransform: 'uppercase' }}>
             {scenario.title}
           </div>
 
-          <div style={{ ...CARD, marginBottom: '36px', borderLeft: `2px solid ${ACCENT}44` }}>
-            <div style={{ fontSize: '19.5px', letterSpacing: '3px', color: TEXT2, marginBottom: '15px' }}>// BRIEFING OPERACIONAL</div>
-            <p style={{ fontSize: '24px', lineHeight: 1.8, color: TEXT2, margin: 0, letterSpacing: '0.75px' }}>{scenario.briefing}</p>
+          <div style={{ ...CARD, marginBottom: '3.33vmin', borderLeft: `2px solid ${ACCENT}44` }}>
+            <div style={{ fontSize: 'clamp(12px, 1.81vmin, 9999px)', letterSpacing: '0.28vmin', color: TEXT2, marginBottom: '1.39vmin' }}>// BRIEFING OPERACIONAL</div>
+            <p style={{ fontSize: 'clamp(14px, 2.22vmin, 9999px)', lineHeight: 1.8, color: TEXT2, margin: 0, letterSpacing: '0.07vmin' }}>{scenario.briefing}</p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '28px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.11vmin', marginBottom: '2.59vmin' }}>
             {[
               { label: 'DECISIONES', value: `${scenario.decisions.length} PUNTOS CRÍTICOS` },
               { label: 'T/DECISIÓN', value: '45 SEGUNDOS' },
               { label: 'EVALUACIÓN', value: 'PERFIL LIDERAZGO' }
             ].map(item => (
-              <div key={item.label} style={{ ...CARD, padding: '21px 24px' }}>
-                <div style={{ fontSize: '19.5px', color: TEXT2, letterSpacing: '3px', marginBottom: '9px' }}>{item.label}</div>
-                <div style={{ fontSize: '22.5px', color: ACCENT, letterSpacing: '1.5px' }}>{item.value}</div>
+              <div key={item.label} style={{ ...CARD, padding: '1.94vmin 2.22vmin' }}>
+                <div style={{ fontSize: 'clamp(12px, 1.81vmin, 9999px)', color: TEXT2, letterSpacing: '0.28vmin', marginBottom: '0.83vmin' }}>{item.label}</div>
+                <div style={{ fontSize: 'clamp(14px, 2.08vmin, 9999px)', color: ACCENT, letterSpacing: '0.14vmin' }}>{item.value}</div>
               </div>
             ))}
           </div>
@@ -195,28 +195,28 @@ export default function TacticalSimulator({ onComplete }) {
           transform: transitioning ? 'translateX(-20px)' : 'translateX(0)',
           transition: 'opacity 0.3s ease, transform 0.3s ease'
         }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
-            <div style={{ display: 'flex', gap: '6px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.78vmin' }}>
+            <div style={{ display: 'flex', gap: '0.56vmin' }}>
               {scenario.decisions.map((_, i) => (
-                <div key={i} style={{ width: '40px', height: '3px', background: i <= step ? ACCENT : `${ACCENT}18`, boxShadow: i === step ? `0 0 6px ${ACCENT}` : 'none' }} />
+                <div key={i} style={{ width: '3.7vmin', height: '3px', background: i <= step ? ACCENT : `${ACCENT}18`, boxShadow: i === step ? `0 0 6px ${ACCENT}` : 'none' }} />
               ))}
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: timeLeft <= 10 ? '#FF2B2B' : TEXT2, fontSize: '11px', letterSpacing: '2px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.93vmin', color: timeLeft <= 10 ? '#FF2B2B' : TEXT2, fontSize: 'clamp(10px, 1.02vmin, 9999px)', letterSpacing: '0.19vmin' }}>
               <Clock size={18} />
               T-{String(timeLeft).padStart(2, '0')}S
-              <div style={{ width: '80px', height: '3px', background: `${ACCENT}12`, border: `1px solid ${ACCENT}22` }}>
+              <div style={{ width: '7.41vmin', height: '3px', background: `${ACCENT}12`, border: `1px solid ${ACCENT}22` }}>
                 <div style={{ height: '100%', background: timeLeft <= 10 ? '#FF2B2B' : ACCENT, width: `${(timeLeft / 45) * 100}%`, transition: 'width 1s linear', boxShadow: `0 0 4px ${ACCENT}` }} />
               </div>
             </div>
           </div>
 
-          <div style={{ fontSize: '9px', letterSpacing: '2px', color: TEXT2, marginBottom: '10px' }}>// DECISIÓN {step + 1}/{scenario.decisions.length} — {scenario.code}</div>
+          <div style={{ fontSize: 'clamp(10px, 0.83vmin, 9999px)', letterSpacing: '0.19vmin', color: TEXT2, marginBottom: '0.93vmin' }}>// DECISIÓN {step + 1}/{scenario.decisions.length} — {scenario.code}</div>
 
-          <div style={{ ...CARD, marginBottom: '30px', borderLeft: `2px solid ${ACCENT}44` }}>
-            <p style={{ fontSize: '21px', lineHeight: 1.7, color: ACCENT, margin: 0, letterSpacing: '0.5px' }}>{currentDecision.situation}</p>
+          <div style={{ ...CARD, marginBottom: '2.78vmin', borderLeft: `2px solid ${ACCENT}44` }}>
+            <p style={{ fontSize: 'clamp(13px, 1.94vmin, 9999px)', lineHeight: 1.7, color: ACCENT, margin: 0, letterSpacing: '0.05vmin' }}>{currentDecision.situation}</p>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '30px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.56vmin', marginBottom: '2.78vmin' }}>
             {currentDecision.options.map((option, i) => {
               const isSelected = selected?.text === option.text
               const isWrong = showImpact && isSelected && option.score < 70
@@ -224,7 +224,7 @@ export default function TacticalSimulator({ onComplete }) {
               return (
                 <button key={i} onClick={() => !selected && handleSelect(option)}
                   style={{
-                    display: 'flex', alignItems: 'flex-start', gap: '36px', padding: '14px 16px', textAlign: 'left', width: '100%',
+                    display: 'flex', alignItems: 'flex-start', gap: '3.33vmin', padding: '1.3vmin 1.48vmin', textAlign: 'left', width: '100%',
                     background: isBest && showImpact ? 'rgba(0,255,65,0.06)' : isWrong ? 'rgba(255,43,43,0.06)' : '#070707',
                     border: `1px solid ${isBest && showImpact ? `${ACCENT}55` : isWrong ? 'rgba(255,43,43,0.4)' : BORDER}`,
                     color: TEXT2, cursor: selected ? 'default' : 'pointer', transition: 'all 0.12s', fontFamily: F,
@@ -233,11 +233,11 @@ export default function TacticalSimulator({ onComplete }) {
                   onMouseEnter={e => { if (!selected) { e.currentTarget.style.borderColor = '#ffaa0055'; e.currentTarget.style.background = 'rgba(255,170,0,0.04)'; e.currentTarget.style.color = '#ffaa00' } }}
                   onMouseLeave={e => { if (!selected) { e.currentTarget.style.borderColor = BORDER; e.currentTarget.style.background = '#070707'; e.currentTarget.style.color = TEXT2 } }}
                 >
-                  <span style={{ color: ACCENT, fontSize: '24px', minWidth: '24px', marginTop: '1px' }}>[{String.fromCharCode(65+i)}]</span>
+                  <span style={{ color: ACCENT, fontSize: 'clamp(14px, 2.22vmin, 9999px)', minWidth: '2.22vmin', marginTop: '1px' }}>[{String.fromCharCode(65+i)}]</span>
                   <div style={{ flex: 1 }}>
-                    <span style={{ fontSize: '24px', letterSpacing: '0.5px', lineHeight: 1.6 }}>{option.text}</span>
+                    <span style={{ fontSize: 'clamp(14px, 2.22vmin, 9999px)', letterSpacing: '0.05vmin', lineHeight: 1.6 }}>{option.text}</span>
                     {showImpact && (isSelected || isBest) && (
-                      <div style={{ marginTop: '6px', fontSize: '11px', color: isBest ? ACCENT : '#FF2B2B', letterSpacing: '0.5px' }}>
+                      <div style={{ marginTop: '0.56vmin', fontSize: 'clamp(10px, 1.02vmin, 9999px)', color: isBest ? ACCENT : '#FF2B2B', letterSpacing: '0.05vmin' }}>
                         {'>'} {option.impact}
                       </div>
                     )}
@@ -258,26 +258,26 @@ export default function TacticalSimulator({ onComplete }) {
 
       {phase === 'result' && (
         <div>
-          <div style={{ fontSize: '9px', letterSpacing: '2px', color: TEXT2, marginBottom: '18px' }}>// EVALUACIÓN COMPLETADA — {scenario.code}</div>
-          <div style={{ fontSize: '9px', letterSpacing: '2px', color: TEXT2, marginBottom: '36px' }}>// PERFIL DE LIDERAZGO DIGITAL</div>
+          <div style={{ fontSize: 'clamp(10px, 0.83vmin, 9999px)', letterSpacing: '0.19vmin', color: TEXT2, marginBottom: '1.67vmin' }}>// EVALUACIÓN COMPLETADA — {scenario.code}</div>
+          <div style={{ fontSize: 'clamp(10px, 0.83vmin, 9999px)', letterSpacing: '0.19vmin', color: TEXT2, marginBottom: '3.33vmin' }}>// PERFIL DE LIDERAZGO DIGITAL</div>
 
-          <div style={{ ...CARD, borderColor: `${ACCENT}33`, marginBottom: '24px', display: 'grid', gridTemplateColumns: '120px 1fr', gap: '28px', alignItems: 'center' }}>
+          <div style={{ ...CARD, borderColor: `${ACCENT}33`, marginBottom: '2.22vmin', display: 'grid', gridTemplateColumns: '11.11vmin 1fr', gap: '2.59vmin', alignItems: 'center' }}>
             <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '48px', color: ACCENT, lineHeight: 1, textShadow: `0 0 30px ${ACCENT}44` }}>{avgScore}</div>
-              <div style={{ fontSize: '9px', color: TEXT2, letterSpacing: '2px' }}>PUNTUACIÓN</div>
+              <div style={{ fontSize: 'clamp(29px, 4.44vmin, 9999px)', color: ACCENT, lineHeight: 1, textShadow: `0 0 30px ${ACCENT}44` }}>{avgScore}</div>
+              <div style={{ fontSize: 'clamp(10px, 0.83vmin, 9999px)', color: TEXT2, letterSpacing: '0.19vmin' }}>PUNTUACIÓN</div>
             </div>
-            <div style={{ borderLeft: `1px solid ${BORDER}`, paddingLeft: '28px' }}>
-              <div style={{ fontSize: '9px', color: TEXT2, letterSpacing: '2px', marginBottom: '12px' }}>PERFIL ASIGNADO</div>
-              <div style={{ fontSize: '27px', letterSpacing: '2px', color: ACCENT, marginBottom: '12px', textTransform: 'uppercase' }}>{profileMap[profile].label}</div>
-              <p style={{ fontSize: '24px', color: TEXT2, lineHeight: 1.7, margin: 0, letterSpacing: '0.5px' }}>{profileMap[profile].desc}</p>
+            <div style={{ borderLeft: `1px solid ${BORDER}`, paddingLeft: '2.59vmin' }}>
+              <div style={{ fontSize: 'clamp(10px, 0.83vmin, 9999px)', color: TEXT2, letterSpacing: '0.19vmin', marginBottom: '1.11vmin' }}>PERFIL ASIGNADO</div>
+              <div style={{ fontSize: 'clamp(16px, 2.5vmin, 9999px)', letterSpacing: '0.19vmin', color: ACCENT, marginBottom: '1.11vmin', textTransform: 'uppercase' }}>{profileMap[profile].label}</div>
+              <p style={{ fontSize: 'clamp(14px, 2.22vmin, 9999px)', color: TEXT2, lineHeight: 1.7, margin: 0, letterSpacing: '0.05vmin' }}>{profileMap[profile].desc}</p>
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: `repeat(${scores.length}, 1fr)`, gap: '12px', marginBottom: '36px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: `repeat(${scores.length}, 1fr)`, gap: '1.11vmin', marginBottom: '3.33vmin' }}>
             {scores.map((s, i) => (
-              <div key={i} style={{ ...CARD, textAlign: 'center', padding: '6px' }}>
-                <div style={{ fontSize: '9px', color: TEXT2, letterSpacing: '2px', marginBottom: '6px' }}>DEC.{String(i+1).padStart(2,'0')}</div>
-                <div style={{ fontSize: '28px', color: s >= 80 ? ACCENT : s >= 50 ? AMBER : RED }}>{s}</div>
+              <div key={i} style={{ ...CARD, textAlign: 'center', padding: '0.56vmin' }}>
+                <div style={{ fontSize: 'clamp(10px, 0.83vmin, 9999px)', color: TEXT2, letterSpacing: '0.19vmin', marginBottom: '0.56vmin' }}>DEC.{String(i+1).padStart(2,'0')}</div>
+                <div style={{ fontSize: 'clamp(17px, 2.59vmin, 9999px)', color: s >= 80 ? ACCENT : s >= 50 ? AMBER : RED }}>{s}</div>
               </div>
             ))}
           </div>

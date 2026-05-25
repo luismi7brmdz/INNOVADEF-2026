@@ -283,12 +283,12 @@ function draw(st, canvas) {
 function Leaderboard({ entries, highlightName, highlightScore }) {
   return (
     <div style={{ ...CARD, padding: 0, overflow: 'hidden' }}>
-      <div style={{ padding: '10px 16px', borderBottom: `1px solid ${BORDER}`, display: 'flex', alignItems: 'center', gap: '10px' }}>
+      <div style={{ padding: '0.93vmin 1.48vmin', borderBottom: `1px solid ${BORDER}`, display: 'flex', alignItems: 'center', gap: '0.93vmin' }}>
         <Trophy size={13} color={AM} />
-        <span style={{ fontSize: '9px', color: AM, letterSpacing: '3px', fontFamily: FONT }}>RANKING GLOBAL — TOP 10</span>
+        <span style={{ fontSize: 'clamp(10px, 0.83vmin, 9999px)', color: AM, letterSpacing: '0.28vmin', fontFamily: FONT }}>RANKING GLOBAL — TOP 10</span>
       </div>
       {entries.length === 0 && (
-        <div style={{ padding: '20px', textAlign: 'center', fontSize: '10px', color: TEXT2, fontFamily: FONT, letterSpacing: '2px' }}>
+        <div style={{ padding: '1.85vmin', textAlign: 'center', fontSize: 'clamp(10px, 0.93vmin, 9999px)', color: TEXT2, fontFamily: FONT, letterSpacing: '0.19vmin' }}>
           SIN REGISTROS — SÉ EL PRIMERO
         </div>
       )}
@@ -296,26 +296,26 @@ function Leaderboard({ entries, highlightName, highlightScore }) {
         const isMe = e.name === (highlightName || '').toUpperCase().trim().slice(0, 18) && e.score === highlightScore
         return (
           <div key={e.ts || i} style={{
-            display: 'grid', gridTemplateColumns: '28px 1fr 70px 55px 50px',
-            alignItems: 'center', gap: '8px',
-            padding: '9px 16px',
+            display: 'grid', gridTemplateColumns: '2.59vmin 1fr 6.48vmin 5.09vmin 4.63vmin',
+            alignItems: 'center', gap: '0.74vmin',
+            padding: '0.83vmin 1.48vmin',
             borderBottom: i < entries.length - 1 ? `1px solid ${BORDER}` : 'none',
             background: isMe ? 'rgba(0,255,65,0.07)' : 'transparent',
             borderLeft: isMe ? `2px solid ${ACCENT}` : '2px solid transparent',
           }}>
-            <span style={{ fontFamily: FONT, fontSize: '11px', color: i < 3 ? [AM, 'rgba(180,180,180,0.7)', '#CD7F32'][i] : TEXT2, textAlign: 'center' }}>
+            <span style={{ fontFamily: FONT, fontSize: 'clamp(10px, 1.02vmin, 9999px)', color: i < 3 ? [AM, 'rgba(180,180,180,0.7)', '#CD7F32'][i] : TEXT2, textAlign: 'center' }}>
               {i < 3 ? ['🥇','🥈','🥉'][i] : `#${i+1}`}
             </span>
-            <span style={{ fontFamily: FONT, fontSize: '11px', color: isMe ? ACCENT : TEXT2, letterSpacing: '1px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <span style={{ fontFamily: FONT, fontSize: 'clamp(10px, 1.02vmin, 9999px)', color: isMe ? ACCENT : TEXT2, letterSpacing: '0.09vmin', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {e.name}{isMe ? ' ◄' : ''}
             </span>
-            <span style={{ fontFamily: FONT, fontSize: '13px', color: isMe ? ACCENT : 'rgba(0,255,65,0.55)', textAlign: 'right', fontWeight: 'bold' }}>
+            <span style={{ fontFamily: FONT, fontSize: 'clamp(10px, 1.2vmin, 9999px)', color: isMe ? ACCENT : 'rgba(0,255,65,0.55)', textAlign: 'right', fontWeight: 'bold' }}>
               {e.score.toLocaleString()}
             </span>
-            <span style={{ fontFamily: FONT, fontSize: '9px', color: TEXT2, textAlign: 'center', letterSpacing: '1px' }}>
+            <span style={{ fontFamily: FONT, fontSize: 'clamp(10px, 0.83vmin, 9999px)', color: TEXT2, textAlign: 'center', letterSpacing: '0.09vmin' }}>
               OL.{e.wave}
             </span>
-            <span style={{ fontFamily: FONT, fontSize: '9px', color: TEXT2, textAlign: 'right', opacity: 0.5 }}>
+            <span style={{ fontFamily: FONT, fontSize: 'clamp(10px, 0.83vmin, 9999px)', color: TEXT2, textAlign: 'right', opacity: 0.5 }}>
               {e.date}
             </span>
           </div>
@@ -654,25 +654,25 @@ export default function CyberDefense({ onComplete }) {
 
       {/* ══ NAME ENTRY (post-game) ══ */}
       {phase === 'nameentry' && (
-        <div style={{ maxWidth: '520px', margin: '0 auto' }}>
-          <div style={{ fontSize: '9px', letterSpacing: '3px', color: RED, marginBottom: '16px' }}>// SERVIDOR COMPROMETIDO — REGISTRA TU PUNTUACIÓN</div>
+        <div style={{ maxWidth: '48.15vmin', margin: '0 auto' }}>
+          <div style={{ fontSize: 'clamp(10px, 0.83vmin, 9999px)', letterSpacing: '0.28vmin', color: RED, marginBottom: '1.48vmin' }}>// SERVIDOR COMPROMETIDO — REGISTRA TU PUNTUACIÓN</div>
 
-          <div style={{ ...CARD, borderLeft: `2px solid ${RED}55`, marginBottom: '24px', display: 'grid', gridTemplateColumns: '100px 1fr', gap: '24px', alignItems: 'center' }}>
+          <div style={{ ...CARD, borderLeft: `2px solid ${RED}55`, marginBottom: '2.22vmin', display: 'grid', gridTemplateColumns: '9.26vmin 1fr', gap: '2.22vmin', alignItems: 'center' }}>
             <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '48px', color: ACCENT, lineHeight: 1, textShadow: `0 0 30px ${ACCENT}44` }}>{finalScore.toLocaleString()}</div>
-              <div style={{ fontSize: '8px', color: TEXT2, letterSpacing: '2px', marginTop: '4px' }}>PUNTOS</div>
+              <div style={{ fontSize: 'clamp(29px, 4.44vmin, 9999px)', color: ACCENT, lineHeight: 1, textShadow: `0 0 30px ${ACCENT}44` }}>{finalScore.toLocaleString()}</div>
+              <div style={{ fontSize: 'clamp(10px, 0.74vmin, 9999px)', color: TEXT2, letterSpacing: '0.19vmin', marginTop: '0.37vmin' }}>PUNTOS</div>
             </div>
-            <div style={{ borderLeft: `1px solid ${BORDER}`, paddingLeft: '20px' }}>
-              <div style={{ fontSize: '9px', color: TEXT2, letterSpacing: '2px', marginBottom: '6px' }}>OLEADA ALCANZADA</div>
-              <div style={{ fontSize: '22px', color: AM, letterSpacing: '2px', marginBottom: '12px' }}>{finalWave}</div>
-              <div style={{ fontSize: '9px', color: TEXT2, letterSpacing: '2px', marginBottom: '6px' }}>RANGO</div>
-              <div style={{ fontSize: '16px', letterSpacing: '2px', color: rankColor }}>{rank}</div>
+            <div style={{ borderLeft: `1px solid ${BORDER}`, paddingLeft: '1.85vmin' }}>
+              <div style={{ fontSize: 'clamp(10px, 0.83vmin, 9999px)', color: TEXT2, letterSpacing: '0.19vmin', marginBottom: '0.56vmin' }}>OLEADA ALCANZADA</div>
+              <div style={{ fontSize: 'clamp(13px, 2.04vmin, 9999px)', color: AM, letterSpacing: '0.19vmin', marginBottom: '1.11vmin' }}>{finalWave}</div>
+              <div style={{ fontSize: 'clamp(10px, 0.83vmin, 9999px)', color: TEXT2, letterSpacing: '0.19vmin', marginBottom: '0.56vmin' }}>RANGO</div>
+              <div style={{ fontSize: 'clamp(10px, 1.48vmin, 9999px)', letterSpacing: '0.19vmin', color: rankColor }}>{rank}</div>
             </div>
           </div>
 
-          <div style={{ ...CARD, marginBottom: '16px' }}>
-            <div style={{ fontSize: '9px', color: TEXT2, letterSpacing: '3px', marginBottom: '10px' }}>// NOMBRE DE OPERATIVO PARA EL RANKING</div>
-            <div style={{ display: 'flex', gap: '10px' }}>
+          <div style={{ ...CARD, marginBottom: '1.48vmin' }}>
+            <div style={{ fontSize: 'clamp(10px, 0.83vmin, 9999px)', color: TEXT2, letterSpacing: '0.28vmin', marginBottom: '0.93vmin' }}>// NOMBRE DE OPERATIVO PARA EL RANKING</div>
+            <div style={{ display: 'flex', gap: '0.93vmin' }}>
               <input
                 value={nameInput}
                 onChange={e => setNameInput(e.target.value.toUpperCase().slice(0, 18))}
@@ -680,19 +680,19 @@ export default function CyberDefense({ onComplete }) {
                 placeholder={nameInput || 'OPERATIVO'}
                 autoFocus
                 style={{
-                  flex: 1, padding: '12px', background: '#030303',
+                  flex: 1, padding: '1.11vmin', background: '#030303',
                   border: `1px solid ${ACCENT}`,
-                  color: ACCENT, fontFamily: FONT, fontSize: '14px',
-                  letterSpacing: '2px', outline: 'none',
+                  color: ACCENT, fontFamily: FONT, fontSize: 'clamp(10px, 1.3vmin, 9999px)',
+                  letterSpacing: '0.19vmin', outline: 'none',
                 }}
               />
-              <button onClick={submitScore} style={{ ...S.btnPrimary, padding: '12px 20px', gap: '8px' }}>
+              <button onClick={submitScore} style={{ ...S.btnPrimary, padding: '1.11vmin 1.85vmin', gap: '0.74vmin' }}>
                 <Trophy size={13} /> GUARDAR
               </button>
             </div>
           </div>
 
-          <button onClick={submitScore} style={{ ...S.btnPrimary, width: '100%', justifyContent: 'center', opacity: 0.7, fontSize: '10px' }}>
+          <button onClick={submitScore} style={{ ...S.btnPrimary, width: '100%', justifyContent: 'center', opacity: 0.7, fontSize: 'clamp(10px, 0.93vmin, 9999px)' }}>
             SALTAR — VER RANKING SIN GUARDAR NOMBRE
           </button>
         </div>
@@ -701,35 +701,35 @@ export default function CyberDefense({ onComplete }) {
       {/* ══ RESULT + LEADERBOARD ══ */}
       {phase === 'result' && (
         <div>
-          <div style={{ fontSize: '9px', letterSpacing: '3px', color: TEXT2, marginBottom: '16px' }}>// OPERACIÓN COMPLETADA — CLASIFICACIÓN GLOBAL</div>
+          <div style={{ fontSize: 'clamp(10px, 0.83vmin, 9999px)', letterSpacing: '0.28vmin', color: TEXT2, marginBottom: '1.48vmin' }}>// OPERACIÓN COMPLETADA — CLASIFICACIÓN GLOBAL</div>
 
           {/* Score card */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '20px' }}>
-            <div style={{ ...CARD, borderLeft: `2px solid ${rankColor}66`, padding: '20px 24px' }}>
-              <div style={{ fontSize: '9px', color: TEXT2, letterSpacing: '3px', marginBottom: '8px' }}>TU PUNTUACIÓN</div>
-              <div style={{ fontSize: '52px', color: rankColor, lineHeight: 1, textShadow: `0 0 30px ${rankColor}44`, marginBottom: '8px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.11vmin', marginBottom: '1.85vmin' }}>
+            <div style={{ ...CARD, borderLeft: `2px solid ${rankColor}66`, padding: '1.85vmin 2.22vmin' }}>
+              <div style={{ fontSize: 'clamp(10px, 0.83vmin, 9999px)', color: TEXT2, letterSpacing: '0.28vmin', marginBottom: '0.74vmin' }}>TU PUNTUACIÓN</div>
+              <div style={{ fontSize: 'clamp(31px, 4.81vmin, 9999px)', color: rankColor, lineHeight: 1, textShadow: `0 0 30px ${rankColor}44`, marginBottom: '0.74vmin' }}>
                 {finalScore.toLocaleString()}
               </div>
-              <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
+              <div style={{ display: 'flex', gap: '1.85vmin', alignItems: 'center' }}>
                 <div>
-                  <div style={{ fontSize: '8px', color: TEXT2, letterSpacing: '2px' }}>RANGO</div>
-                  <div style={{ fontSize: '16px', color: rankColor, letterSpacing: '2px' }}>{rank}</div>
+                  <div style={{ fontSize: 'clamp(10px, 0.74vmin, 9999px)', color: TEXT2, letterSpacing: '0.19vmin' }}>RANGO</div>
+                  <div style={{ fontSize: 'clamp(10px, 1.48vmin, 9999px)', color: rankColor, letterSpacing: '0.19vmin' }}>{rank}</div>
                 </div>
                 <div>
-                  <div style={{ fontSize: '8px', color: TEXT2, letterSpacing: '2px' }}>OLEADA</div>
-                  <div style={{ fontSize: '16px', color: AM, letterSpacing: '2px' }}>{finalWave}</div>
+                  <div style={{ fontSize: 'clamp(10px, 0.74vmin, 9999px)', color: TEXT2, letterSpacing: '0.19vmin' }}>OLEADA</div>
+                  <div style={{ fontSize: 'clamp(10px, 1.48vmin, 9999px)', color: AM, letterSpacing: '0.19vmin' }}>{finalWave}</div>
                 </div>
                 {myRankPos >= 0 && (
                   <div>
-                    <div style={{ fontSize: '8px', color: TEXT2, letterSpacing: '2px' }}>POSICIÓN</div>
-                    <div style={{ fontSize: '16px', color: ACCENT, letterSpacing: '2px' }}>#{myRankPos + 1}</div>
+                    <div style={{ fontSize: 'clamp(10px, 0.74vmin, 9999px)', color: TEXT2, letterSpacing: '0.19vmin' }}>POSICIÓN</div>
+                    <div style={{ fontSize: 'clamp(10px, 1.48vmin, 9999px)', color: ACCENT, letterSpacing: '0.19vmin' }}>#{myRankPos + 1}</div>
                   </div>
                 )}
               </div>
             </div>
 
-            <div style={{ ...CARD, padding: '20px 24px' }}>
-              <div style={{ fontSize: '9px', color: TEXT2, letterSpacing: '3px', marginBottom: '12px' }}>GUÍA DE RANGOS</div>
+            <div style={{ ...CARD, padding: '1.85vmin 2.22vmin' }}>
+              <div style={{ fontSize: 'clamp(10px, 0.83vmin, 9999px)', color: TEXT2, letterSpacing: '0.28vmin', marginBottom: '1.11vmin' }}>GUÍA DE RANGOS</div>
               {[
                 { r: 'LEYENDA', pts: '2000+', col: AM },
                 { r: 'ÉLITE', pts: '1200+', col: GRN },
@@ -737,31 +737,31 @@ export default function CyberDefense({ onComplete }) {
                 { r: 'OPERATIVO', pts: '200+', col: ACCENT },
                 { r: 'RECLUTA', pts: '<200', col: RED },
               ].map(g => (
-                <div key={g.r} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                  <span style={{ fontSize: '10px', color: g.r === rank ? g.col : TEXT2, letterSpacing: '1px', fontWeight: g.r === rank ? 'bold' : 'normal' }}>
+                <div key={g.r} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.37vmin' }}>
+                  <span style={{ fontSize: 'clamp(10px, 0.93vmin, 9999px)', color: g.r === rank ? g.col : TEXT2, letterSpacing: '0.09vmin', fontWeight: g.r === rank ? 'bold' : 'normal' }}>
                     {g.r === rank ? '▶ ' : '  '}{g.r}
                   </span>
-                  <span style={{ fontSize: '9px', color: TEXT2 }}>{g.pts} PTS</span>
+                  <span style={{ fontSize: 'clamp(10px, 0.83vmin, 9999px)', color: TEXT2 }}>{g.pts} PTS</span>
                 </div>
               ))}
             </div>
           </div>
 
           {/* Full leaderboard */}
-          <div style={{ marginBottom: '20px' }}>
+          <div style={{ marginBottom: '1.85vmin' }}>
             <Leaderboard entries={leaderboard} highlightName={playerName} highlightScore={finalScore} />
           </div>
 
           {/* Actions */}
-          <div style={{ display: 'flex', gap: '12px' }}>
+          <div style={{ display: 'flex', gap: '1.11vmin' }}>
             <button onClick={() => {
               setNameInput(playerName)
               setPhase('intro')
-            }} style={{ ...S.btnPrimary, gap: '10px' }}>
+            }} style={{ ...S.btnPrimary, gap: '0.93vmin' }}>
               <Zap size={13} /> JUGAR DE NUEVO
             </button>
             <button onClick={() => onComplete({ type: 'cyberdefense', score: finalScore, rank, wave: finalWave })}
-              style={{ ...S.btnPrimary, gap: '10px', opacity: 0.7 }}>
+              style={{ ...S.btnPrimary, gap: '0.93vmin', opacity: 0.7 }}>
               CONTINUAR AL INFORME <ChevronRight size={13} />
             </button>
           </div>

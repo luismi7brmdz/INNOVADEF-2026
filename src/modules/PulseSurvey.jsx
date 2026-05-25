@@ -64,10 +64,10 @@ function ResultBar({ label, count, total, isUser }) {
   const [width, setWidth] = useState(0)
   useEffect(() => { const t = setTimeout(() => setWidth(pct), 100); return () => clearTimeout(t) }, [pct])
   return (
-    <div style={{ marginBottom: '12px', fontFamily: FONT }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '3px' }}>
-        <span style={{ fontSize: '15px', color: isUser ? ACCENT : TEXT2, letterSpacing: '0.5px' }}>{isUser ? '[YOU] ' : '[     ] '}{label.toUpperCase()}</span>
-        <span style={{ fontSize: '15px', color: isUser ? ACCENT : TEXT2 }}>{pct}%</span>
+    <div style={{ marginBottom: '1.11vmin', fontFamily: FONT }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.28vmin' }}>
+        <span style={{ fontSize: 'clamp(10px, 1.39vmin, 9999px)', color: isUser ? ACCENT : TEXT2, letterSpacing: '0.5px' }}>{isUser ? '[YOU] ' : '[     ] '}{label.toUpperCase()}</span>
+        <span style={{ fontSize: 'clamp(10px, 1.39vmin, 9999px)', color: isUser ? ACCENT : TEXT2 }}>{pct}%</span>
       </div>
       <div style={{ height: '3px', background: 'rgba(0,255,65,0.06)', border: `1px solid rgba(0,255,65,0.08)` }}>
         <div style={{ height: '100%', background: isUser ? ACCENT : 'rgba(0,255,65,0.25)', width: `${width}%`, transition: 'width 0.8s ease', boxShadow: isUser ? `0 0 4px ${ACCENT}66` : 'none' }} />
@@ -128,10 +128,10 @@ export default function PulseSurvey({ onComplete }) {
           transform: transitioning ? 'translateX(-20px)' : 'translateX(0)',
           transition: 'opacity 0.3s ease, transform 0.3s ease'
         }}>
-          <div style={{ marginBottom: '28px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', fontFamily: FONT }}>
-              <span style={{ fontSize: '19.5px', color: TEXT2, letterSpacing: '4.5px' }}>PULSO FOCO 2026 — PREGUNTA {step + 1}/{pulseQuestions.length}</span>
-              <span style={{ fontSize: '19.5px', color: ACCENT, letterSpacing: '3px' }}>{Math.round((step / pulseQuestions.length) * 100)}%</span>
+          <div style={{ marginBottom: '2.59vmin' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.11vmin', fontFamily: FONT }}>
+              <span style={{ fontSize: 'clamp(12px, 1.81vmin, 9999px)', color: TEXT2, letterSpacing: '4.5px' }}>PULSO FOCO 2026 — PREGUNTA {step + 1}/{pulseQuestions.length}</span>
+              <span style={{ fontSize: 'clamp(12px, 1.81vmin, 9999px)', color: ACCENT, letterSpacing: '3px' }}>{Math.round((step / pulseQuestions.length) * 100)}%</span>
             </div>
             <div style={{ display: 'flex', gap: '3px' }}>
               {pulseQuestions.map((_, i) => (
@@ -140,19 +140,19 @@ export default function PulseSurvey({ onComplete }) {
             </div>
           </div>
 
-          <div style={{ ...CARD, marginBottom: '30px', borderLeft: `2px solid ${ACCENT}44` }}>
-            <div style={{ fontFamily: FONT, fontSize: '19.5px', color: TEXT2, letterSpacing: '4.5px', marginBottom: '15px' }}>// CONSULTA</div>
-            <p style={{ fontFamily: FONT, fontSize: '33px', lineHeight: 1.7, color: ACCENT, margin: 0, letterSpacing: '0.45px' }}>{q.text.toUpperCase()}</p>
+          <div style={{ ...CARD, marginBottom: '2.78vmin', borderLeft: `2px solid ${ACCENT}44` }}>
+            <div style={{ fontFamily: FONT, fontSize: 'clamp(12px, 1.81vmin, 9999px)', color: TEXT2, letterSpacing: '4.5px', marginBottom: '1.39vmin' }}>// CONSULTA</div>
+            <p style={{ fontFamily: FONT, fontSize: 'clamp(20px, 3.06vmin, 9999px)', lineHeight: 1.7, color: ACCENT, margin: 0, letterSpacing: '0.45px' }}>{q.text.toUpperCase()}</p>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
             {q.options.map((option, i) => (
               <button key={i} onClick={() => handleAnswer(i)}
-                style={{ display: 'flex', alignItems: 'center', gap: '21px', padding: '24px 27px', textAlign: 'left', width: '100%', background: '#070707', border: `1.5px solid ${BORDER}`, color: TEXT2, cursor: 'pointer', transition: 'all 0.12s', fontFamily: FONT, fontSize: '22.5px', letterSpacing: '0.75px' }}
+                style={{ display: 'flex', alignItems: 'center', gap: '1.94vmin', padding: '2.22vmin 2.5vmin', textAlign: 'left', width: '100%', background: '#070707', border: `1.5px solid ${BORDER}`, color: TEXT2, cursor: 'pointer', transition: 'all 0.12s', fontFamily: FONT, fontSize: 'clamp(14px, 2.08vmin, 9999px)', letterSpacing: '0.75px' }}
                 onMouseEnter={e => { e.currentTarget.style.borderColor = '#ffaa0055'; e.currentTarget.style.background = 'rgba(255,170,0,0.04)'; e.currentTarget.style.color = '#ffaa00' }}
                 onMouseLeave={e => { e.currentTarget.style.borderColor = BORDER; e.currentTarget.style.background = '#070707'; e.currentTarget.style.color = TEXT2 }}
               >
-                <span style={{ color: ACCENT, minWidth: '39px', fontSize: '27px' }}>[{String.fromCharCode(65+i)}]</span>
+                <span style={{ color: ACCENT, minWidth: '3.61vmin', fontSize: 'clamp(16px, 2.5vmin, 9999px)' }}>[{String.fromCharCode(65+i)}]</span>
                 {option.toUpperCase()}
               </button>
             ))}
@@ -162,19 +162,19 @@ export default function PulseSurvey({ onComplete }) {
 
       {phase === 'results' && (
         <div>
-          <div style={{ fontFamily: FONT, fontSize: '19.5px', color: TEXT2, letterSpacing: '4.5px', marginBottom: '18px' }}>// RESULTADOS EN TIEMPO REAL — {totalRespondents + 1} RESPUESTAS REGISTRADAS</div>
-          <div style={{ fontFamily: FONT, fontSize: 'clamp(27px, 5.625vw, 39px)', letterSpacing: '4.5px', color: ACCENT, marginBottom: '18px', textTransform: 'uppercase' }}>PULSO DEL EVENTO</div>
-          <div style={{ fontFamily: FONT, fontSize: '22.5px', color: TEXT2, marginBottom: '42px', letterSpacing: '1.5px', lineHeight: 1.7 }}>
+          <div style={{ fontFamily: FONT, fontSize: 'clamp(12px, 1.81vmin, 9999px)', color: TEXT2, letterSpacing: '4.5px', marginBottom: '1.67vmin' }}>// RESULTADOS EN TIEMPO REAL — {totalRespondents + 1} RESPUESTAS REGISTRADAS</div>
+          <div style={{ fontFamily: FONT, fontSize: 'clamp(27px, 5.625vw, 39px)', letterSpacing: '4.5px', color: ACCENT, marginBottom: '1.67vmin', textTransform: 'uppercase' }}>PULSO DEL EVENTO</div>
+          <div style={{ fontFamily: FONT, fontSize: 'clamp(14px, 2.08vmin, 9999px)', color: TEXT2, marginBottom: '3.89vmin', letterSpacing: '1.5px', lineHeight: 1.7 }}>
             SUS RESPUESTAS HAN SIDO INCORPORADAS AL AGREGADO DE {totalRespondents} ASISTENTES.<br/>
             SU POSICIÓN APARECE MARCADA CON [YOU].
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '18px', marginBottom: '28px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.67vmin', marginBottom: '2.59vmin' }}>
             {pulseQuestions.slice(0, 6).map(q => {
               const total = getTotal(q.id)
               return (
                 <div key={q.id} style={{ ...CARD }}>
-                  <div style={{ fontFamily: FONT, fontSize: '24px', color: TEXT2, marginBottom: '27px', lineHeight: 1.6, letterSpacing: '0.75px' }}>{q.text.toUpperCase()}</div>
+                  <div style={{ fontFamily: FONT, fontSize: 'clamp(14px, 2.22vmin, 9999px)', color: TEXT2, marginBottom: '2.5vmin', lineHeight: 1.6, letterSpacing: '0.75px' }}>{q.text.toUpperCase()}</div>
                   {q.options.map((opt, i) => (
                     <ResultBar key={i} label={opt} count={getAggregate(q.id, i)} total={total} isUser={answers[q.id] === i} />
                   ))}

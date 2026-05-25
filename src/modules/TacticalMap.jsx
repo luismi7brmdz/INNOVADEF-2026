@@ -285,8 +285,8 @@ function OptionCard({ opt, onSelect, disabled, selectedId, correct, showResult }
       onClick={onSelect}
       disabled={disabled}
       style={{
-        display: 'flex', gap: '18px', alignItems: 'flex-start',
-        padding: '22px 24px', textAlign: 'left', width: '100%',
+        display: 'flex', gap: '1.67vmin', alignItems: 'flex-start',
+        padding: '2.04vmin 2.22vmin', textAlign: 'left', width: '100%',
         background: bgCol,
         border: `2px solid ${borderCol}`,
         cursor: disabled ? 'default' : 'pointer',
@@ -296,19 +296,19 @@ function OptionCard({ opt, onSelect, disabled, selectedId, correct, showResult }
     >
       {/* Letter badge */}
       <div style={{
-        width: '36px', height: '36px', flexShrink: 0,
+        width: '3.33vmin', height: '3.33vmin', flexShrink: 0,
         border: `1.5px solid ${showResult && isCorrect ? ACCENT : BORDER}`,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontSize: '18px', color: showResult && isCorrect ? ACCENT : TEXT2,
+        fontSize: 'clamp(11px, 1.67vmin, 9999px)', color: showResult && isCorrect ? ACCENT : TEXT2,
         fontFamily: FONT,
       }}>
         {showResult && isCorrect ? '✓' : letter}
       </div>
       <div style={{ flex: 1 }}>
-        <div style={{ fontSize: '20px', color: textCol, letterSpacing: '2px', marginBottom: '6px' }}>
+        <div style={{ fontSize: 'clamp(12px, 1.85vmin, 9999px)', color: textCol, letterSpacing: '0.19vmin', marginBottom: '0.56vmin' }}>
           {opt.label}
         </div>
-        <div style={{ fontSize: '15px', color: 'rgba(0,255,65,0.38)', lineHeight: 1.6 }}>
+        <div style={{ fontSize: 'clamp(10px, 1.39vmin, 9999px)', color: 'rgba(0,255,65,0.38)', lineHeight: 1.6 }}>
           {opt.desc}
         </div>
       </div>
@@ -325,17 +325,17 @@ function FeedbackBar({ phase, selectedId }) {
 
   return (
     <div style={{
-      padding: '18px 22px', marginBottom: '14px',
+      padding: '1.67vmin 2.04vmin', marginBottom: '1.3vmin',
       border: `1.5px solid ${col}55`,
       background: `${col}07`,
-      display: 'flex', gap: '18px', alignItems: 'flex-start', fontFamily: FONT,
+      display: 'flex', gap: '1.67vmin', alignItems: 'flex-start', fontFamily: FONT,
     }}>
-      <div style={{ fontSize: '28px', color: col, lineHeight: 1, flexShrink: 0 }}>
+      <div style={{ fontSize: 'clamp(17px, 2.59vmin, 9999px)', color: col, lineHeight: 1, flexShrink: 0 }}>
         {isOptimal ? '◉' : opt.level === 'wrong' ? '✗' : '◎'}
       </div>
       <div>
-        <div style={{ fontSize: '14px', color: col, letterSpacing: '3px', marginBottom: '6px' }}>{badge}</div>
-        <div style={{ fontSize: '17px', color: TEXT2, lineHeight: 1.7 }}>{phase.fb[selectedId]}</div>
+        <div style={{ fontSize: 'clamp(10px, 1.3vmin, 9999px)', color: col, letterSpacing: '0.28vmin', marginBottom: '0.56vmin' }}>{badge}</div>
+        <div style={{ fontSize: 'clamp(10px, 1.57vmin, 9999px)', color: TEXT2, lineHeight: 1.7 }}>{phase.fb[selectedId]}</div>
       </div>
     </div>
   )
@@ -352,25 +352,25 @@ function PhaseBar({ phaseIdx, answers }) {
         const ans    = answers[i]
         return (
           <div key={i} style={{ display: 'flex', alignItems: 'center', flex: i < PHASES.length - 1 ? '1' : 'none' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.56vmin' }}>
               <div style={{
-                width: '44px', height: '44px',
+                width: '4.07vmin', height: '4.07vmin',
                 border: `2px solid ${col}`,
                 background: active ? `${ACCENT}11` : done ? `${ACCENT}1a` : 'transparent',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: '16px', color: col,
+                fontSize: 'clamp(10px, 1.48vmin, 9999px)', color: col,
               }}>
                 {done
                   ? <span style={{ color: LEVEL_COLOR[answers[i]?.level] || ACCENT }}>✓</span>
                   : `${i + 1}`
                 }
               </div>
-              <div style={{ fontSize: '11px', color: col, letterSpacing: '1px', textAlign: 'center', maxWidth: '90px', lineHeight: 1.3 }}>
+              <div style={{ fontSize: 'clamp(10px, 1.02vmin, 9999px)', color: col, letterSpacing: '0.09vmin', textAlign: 'center', maxWidth: '90px', lineHeight: 1.3 }}>
                 {p.code}
               </div>
             </div>
             {i < PHASES.length - 1 && (
-              <div style={{ flex: 1, height: '1px', background: i < phaseIdx ? `${ACCENT}44` : BORDER, margin: '0 8px', marginBottom: '22px' }} />
+              <div style={{ flex: 1, height: '1px', background: i < phaseIdx ? `${ACCENT}44` : BORDER, margin: '0 0.74vmin', marginBottom: '2.04vmin' }} />
             )}
           </div>
         )
@@ -441,57 +441,57 @@ export default function TacticalMap({ onComplete }) {
   /* ══════════════════════════════ INTRO ══════════════════════════════════════ */
   if (screen === 'intro') return (
     <div style={{ maxWidth: '1920px', width: '100%', margin: '0 auto', fontFamily: FONT }}>
-      <div style={{ fontSize: '15px', color: TEXT2, letterSpacing: '4px', marginBottom: '14px' }}>// MOD-07 — EJERCICIO DE MANDO TÁCTICO</div>
-      <div style={{ fontSize: 'clamp(28px, 3.5vw, 54px)', letterSpacing: '5px', color: ACCENT, marginBottom: '8px' }}>SALA DE CRISIS</div>
-      <div style={{ fontSize: 'clamp(14px, 1.8vw, 22px)', color: TEXT2, letterSpacing: '3px', marginBottom: '36px' }}>EJERCICIO SIERRA-26 — SIMULACRO DE DECISIÓN DE MANDO</div>
+      <div style={{ fontSize: 'clamp(10px, 1.39vmin, 9999px)', color: TEXT2, letterSpacing: '0.37vmin', marginBottom: '1.3vmin' }}>// MOD-07 — EJERCICIO DE MANDO TÁCTICO</div>
+      <div style={{ fontSize: 'clamp(28px, 3.5vw, 54px)', letterSpacing: '0.46vmin', color: ACCENT, marginBottom: '0.74vmin' }}>SALA DE CRISIS</div>
+      <div style={{ fontSize: 'clamp(14px, 1.8vw, 22px)', color: TEXT2, letterSpacing: '0.28vmin', marginBottom: '3.33vmin' }}>EJERCICIO SIERRA-26 — SIMULACRO DE DECISIÓN DE MANDO</div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '28px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.48vmin', marginBottom: '2.59vmin' }}>
         {/* Situation */}
         <div style={{ ...CARD, borderLeft: `2px solid ${ACCENT}44` }}>
-          <div style={{ fontSize: '12px', color: TEXT2, letterSpacing: '4px', marginBottom: '14px' }}>// ESCENARIO</div>
-          <p style={{ fontSize: '18px', color: TEXT2, lineHeight: 1.9, margin: '0 0 14px' }}>
+          <div style={{ fontSize: 'clamp(10px, 1.11vmin, 9999px)', color: TEXT2, letterSpacing: '0.37vmin', marginBottom: '1.3vmin' }}>// ESCENARIO</div>
+          <p style={{ fontSize: 'clamp(11px, 1.67vmin, 9999px)', color: TEXT2, lineHeight: 1.9, margin: '0 0 1.3vmin' }}>
             Durante el Ejercicio SIERRA-26, una serie de incidentes de diversa naturaleza se desarrollan de forma progresiva en el teatro de operaciones.
           </p>
-          <p style={{ fontSize: '18px', color: TEXT2, lineHeight: 1.9, margin: 0 }}>
+          <p style={{ fontSize: 'clamp(11px, 1.67vmin, 9999px)', color: TEXT2, lineHeight: 1.9, margin: 0 }}>
             Como oficial al mando, deberá valorar cada situación y emitir sus órdenes. Sus decisiones serán evaluadas conforme a la doctrina OTAN y los procedimientos normalizados vigentes.
           </p>
         </div>
 
         {/* Structure */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          <div style={{ ...CARD, borderLeft: `2px solid ${AMBER}44`, padding: '16px 20px' }}>
-            <div style={{ fontSize: '12px', color: TEXT2, letterSpacing: '4px', marginBottom: '10px' }}>// ESTRUCTURA DEL EJERCICIO</div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.93vmin' }}>
+          <div style={{ ...CARD, borderLeft: `2px solid ${AMBER}44`, padding: '1.48vmin 1.85vmin' }}>
+            <div style={{ fontSize: 'clamp(10px, 1.11vmin, 9999px)', color: TEXT2, letterSpacing: '0.37vmin', marginBottom: '0.93vmin' }}>// ESTRUCTURA DEL EJERCICIO</div>
             {[
               ['4 FASES', 'Incidentes de naturaleza diversa con escalada progresiva'],
               ['DECISIÓN AUTÓNOMA', '4 líneas de acción posibles por incidente'],
               ['EVALUACIÓN DOCTRINAL', 'Cada decisión se analiza conforme a los procedimientos vigentes'],
               ['CLASIFICACIÓN FINAL', 'Resultado expresado en escala de mando operacional'],
             ].map(([label, desc]) => (
-              <div key={label} style={{ display: 'flex', gap: '14px', marginBottom: '9px', alignItems: 'flex-start' }}>
-                <div style={{ fontSize: '14px', color: ACCENT, minWidth: '190px', letterSpacing: '1px' }}>{label}</div>
-                <div style={{ fontSize: '14px', color: TEXT2 }}>{desc}</div>
+              <div key={label} style={{ display: 'flex', gap: '1.3vmin', marginBottom: '0.83vmin', alignItems: 'flex-start' }}>
+                <div style={{ fontSize: 'clamp(10px, 1.3vmin, 9999px)', color: ACCENT, minWidth: '190px', letterSpacing: '0.09vmin' }}>{label}</div>
+                <div style={{ fontSize: 'clamp(10px, 1.3vmin, 9999px)', color: TEXT2 }}>{desc}</div>
               </div>
             ))}
           </div>
           {/* Classification scale */}
-          <div style={{ ...CARD, padding: '14px 20px' }}>
-            <div style={{ fontSize: '12px', color: TEXT2, letterSpacing: '4px', marginBottom: '10px' }}>// ESCALA DE CLASIFICACIÓN DE MANDO</div>
+          <div style={{ ...CARD, padding: '1.3vmin 1.85vmin' }}>
+            <div style={{ fontSize: 'clamp(10px, 1.11vmin, 9999px)', color: TEXT2, letterSpacing: '0.37vmin', marginBottom: '0.93vmin' }}>// ESCALA DE CLASIFICACIÓN DE MANDO</div>
             {[
               ['350–400', 'GENERAL DE BRIGADA', ACCENT],
               ['260–349', 'CORONEL', AMBER],
               ['160–259', 'TENIENTE CORONEL', '#00AAFF'],
               ['0–159',   'COMANDANTE', RED],
             ].map(([range, label, col]) => (
-              <div key={label} style={{ display: 'flex', gap: '16px', alignItems: 'center', marginBottom: '6px' }}>
-                <span style={{ fontSize: '13px', color: 'rgba(0,255,65,0.35)', minWidth: '72px', fontFamily: FONT }}>{range}</span>
-                <span style={{ fontSize: '15px', color: col, letterSpacing: '2px' }}>{label}</span>
+              <div key={label} style={{ display: 'flex', gap: '1.48vmin', alignItems: 'center', marginBottom: '0.56vmin' }}>
+                <span style={{ fontSize: 'clamp(10px, 1.2vmin, 9999px)', color: 'rgba(0,255,65,0.35)', minWidth: '72px', fontFamily: FONT }}>{range}</span>
+                <span style={{ fontSize: 'clamp(10px, 1.39vmin, 9999px)', color: col, letterSpacing: '0.19vmin' }}>{label}</span>
               </div>
             ))}
           </div>
         </div>
       </div>
 
-      <button onClick={() => setScreen('game')} style={{ ...S.btnPrimary, fontSize: '20px', padding: '18px 42px', gap: '12px' }}>
+      <button onClick={() => setScreen('game')} style={{ ...S.btnPrimary, fontSize: 'clamp(12px, 1.85vmin, 9999px)', padding: '1.67vmin 3.89vmin', gap: '1.11vmin' }}>
         ASUMIR EL MANDO <ChevronRight size={20} />
       </button>
     </div>
@@ -500,38 +500,38 @@ export default function TacticalMap({ onComplete }) {
   /* ══════════════════════════════ RESULT ═════════════════════════════════════ */
   if (screen === 'result') return (
     <div style={{ maxWidth: '1920px', width: '100%', margin: '0 auto', fontFamily: FONT }}>
-      <div style={{ fontSize: '14px', color: TEXT2, letterSpacing: '4px', marginBottom: '18px' }}>// EVALUACIÓN FINAL — EJERCICIO SIERRA-26</div>
+      <div style={{ fontSize: 'clamp(10px, 1.3vmin, 9999px)', color: TEXT2, letterSpacing: '0.37vmin', marginBottom: '1.67vmin' }}>// EVALUACIÓN FINAL — EJERCICIO SIERRA-26</div>
 
       {/* Classification header */}
-      <div style={{ ...CARD, borderLeft: `3px solid ${clasifCol}`, padding: '28px 32px', marginBottom: '20px', display: 'grid', gridTemplateColumns: '1fr auto', alignItems: 'center', gap: '24px' }}>
+      <div style={{ ...CARD, borderLeft: `3px solid ${clasifCol}`, padding: '2.59vmin 2.96vmin', marginBottom: '1.85vmin', display: 'grid', gridTemplateColumns: '1fr auto', alignItems: 'center', gap: '2.22vmin' }}>
         <div>
-          <div style={{ fontSize: '13px', color: TEXT2, letterSpacing: '4px', marginBottom: '8px' }}>CLASIFICACIÓN DE MANDO OPERACIONAL</div>
-          <div style={{ fontSize: 'clamp(28px, 3vw, 46px)', color: clasifCol, letterSpacing: '5px', textShadow: `0 0 30px ${clasifCol}33` }}>{clasif}</div>
+          <div style={{ fontSize: 'clamp(10px, 1.2vmin, 9999px)', color: TEXT2, letterSpacing: '0.37vmin', marginBottom: '0.74vmin' }}>CLASIFICACIÓN DE MANDO OPERACIONAL</div>
+          <div style={{ fontSize: 'clamp(28px, 3vw, 46px)', color: clasifCol, letterSpacing: '0.46vmin', textShadow: `0 0 30px ${clasifCol}33` }}>{clasif}</div>
         </div>
         <div style={{ textAlign: 'right' }}>
-          <div style={{ fontSize: '13px', color: TEXT2, letterSpacing: '3px', marginBottom: '6px' }}>PUNTUACIÓN GLOBAL</div>
-          <div style={{ fontSize: '64px', color: clasifCol, lineHeight: 1, letterSpacing: '2px' }}>{totalPts}</div>
-          <div style={{ fontSize: '13px', color: 'rgba(0,255,65,0.3)', marginTop: '4px' }}>DE {maxPts} PUNTOS POSIBLES ({pct}%)</div>
+          <div style={{ fontSize: 'clamp(10px, 1.2vmin, 9999px)', color: TEXT2, letterSpacing: '0.28vmin', marginBottom: '0.56vmin' }}>PUNTUACIÓN GLOBAL</div>
+          <div style={{ fontSize: 'clamp(38px, 5.93vmin, 9999px)', color: clasifCol, lineHeight: 1, letterSpacing: '0.19vmin' }}>{totalPts}</div>
+          <div style={{ fontSize: 'clamp(10px, 1.2vmin, 9999px)', color: 'rgba(0,255,65,0.3)', marginTop: '0.37vmin' }}>DE {maxPts} PUNTOS POSIBLES ({pct}%)</div>
         </div>
       </div>
 
       {/* Phase breakdown */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px', marginBottom: '20px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.93vmin', marginBottom: '1.85vmin' }}>
         {PHASES.map((p, i) => {
           const ans = answers[i]
           if (!ans) return null
           const col = LEVEL_COLOR[ans.level]
           const selOpt = p.opts.find(o => o.id === ans.opt)
           return (
-            <div key={i} style={{ ...CARD, borderTop: `2px solid ${col}55`, padding: '16px' }}>
-              <div style={{ fontSize: '11px', color: TEXT2, letterSpacing: '3px', marginBottom: '4px' }}>{p.code}</div>
-              <div style={{ fontSize: '13px', color: TEXT2, marginBottom: '10px', lineHeight: 1.4 }}>{p.title}</div>
-              <div style={{ fontSize: '18px', color: col, letterSpacing: '2px', marginBottom: '4px' }}>
+            <div key={i} style={{ ...CARD, borderTop: `2px solid ${col}55`, padding: '1.48vmin' }}>
+              <div style={{ fontSize: 'clamp(10px, 1.02vmin, 9999px)', color: TEXT2, letterSpacing: '0.28vmin', marginBottom: '0.37vmin' }}>{p.code}</div>
+              <div style={{ fontSize: 'clamp(10px, 1.2vmin, 9999px)', color: TEXT2, marginBottom: '0.93vmin', lineHeight: 1.4 }}>{p.title}</div>
+              <div style={{ fontSize: 'clamp(11px, 1.67vmin, 9999px)', color: col, letterSpacing: '0.19vmin', marginBottom: '0.37vmin' }}>
                 {selOpt?.label}
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px' }}>
-                <span style={{ fontSize: '11px', color: col, letterSpacing: '2px' }}>{LEVEL_LABEL[ans.level]}</span>
-                <span style={{ fontSize: '20px', color: col, letterSpacing: '1px' }}>{ans.pts}/100</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.74vmin' }}>
+                <span style={{ fontSize: 'clamp(10px, 1.02vmin, 9999px)', color: col, letterSpacing: '0.19vmin' }}>{LEVEL_LABEL[ans.level]}</span>
+                <span style={{ fontSize: 'clamp(12px, 1.85vmin, 9999px)', color: col, letterSpacing: '0.09vmin' }}>{ans.pts}/100</span>
               </div>
             </div>
           )
@@ -539,9 +539,9 @@ export default function TacticalMap({ onComplete }) {
       </div>
 
       {/* Doctrinal note */}
-      <div style={{ ...CARD, borderLeft: `2px solid ${ACCENT}33`, padding: '18px 22px', marginBottom: '20px' }}>
-        <div style={{ fontSize: '12px', color: TEXT2, letterSpacing: '4px', marginBottom: '10px' }}>// ANÁLISIS DOCTRINAL</div>
-        <p style={{ fontSize: '16px', color: TEXT2, lineHeight: 1.8, margin: 0 }}>
+      <div style={{ ...CARD, borderLeft: `2px solid ${ACCENT}33`, padding: '1.67vmin 2.04vmin', marginBottom: '1.85vmin' }}>
+        <div style={{ fontSize: 'clamp(10px, 1.11vmin, 9999px)', color: TEXT2, letterSpacing: '0.37vmin', marginBottom: '0.93vmin' }}>// ANÁLISIS DOCTRINAL</div>
+        <p style={{ fontSize: 'clamp(10px, 1.48vmin, 9999px)', color: TEXT2, lineHeight: 1.8, margin: 0 }}>
           {totalPts >= 350
             ? 'Ejercicio completado con criterio de mando sobresaliente. Las decisiones adoptadas demuestran dominio de la doctrina OTAN, sentido de la proporcionalidad y capacidad de liderazgo en entornos de crisis compleja.'
             : totalPts >= 260
@@ -553,7 +553,7 @@ export default function TacticalMap({ onComplete }) {
         </p>
       </div>
 
-      <button onClick={() => onComplete({ type: 'tactical-map', score: totalPts, clasif })} style={{ ...S.btnPrimary, fontSize: '20px', padding: '18px 42px', gap: '12px' }}>
+      <button onClick={() => onComplete({ type: 'tactical-map', score: totalPts, clasif })} style={{ ...S.btnPrimary, fontSize: 'clamp(12px, 1.85vmin, 9999px)', padding: '1.67vmin 3.89vmin', gap: '1.11vmin' }}>
         CONTINUAR AL INFORME <ChevronRight size={20} />
       </button>
     </div>
@@ -564,12 +564,12 @@ export default function TacticalMap({ onComplete }) {
     <div style={{ maxWidth: '1920px', width: '100%', margin: '0 auto', fontFamily: FONT }}>
 
       {/* Phase bar */}
-      <div style={{ ...CARD, padding: '18px 28px', marginBottom: '14px' }}>
+      <div style={{ ...CARD, padding: '1.67vmin 2.59vmin', marginBottom: '1.3vmin' }}>
         <PhaseBar phaseIdx={phaseIdx} answers={answers} />
       </div>
 
       {/* Map */}
-      <div style={{ position: 'relative', marginBottom: '14px' }}>
+      <div style={{ position: 'relative', marginBottom: '1.3vmin' }}>
         <TheaterMap phaseIdx={phaseIdx} answers={answers} pulse={pulse} />
 
         {/* SITREP overlay */}
@@ -577,24 +577,24 @@ export default function TacticalMap({ onComplete }) {
           position: 'absolute', top: '12px', left: '12px',
           background: 'rgba(4,4,4,0.90)',
           border: `1px solid ${AMBER}44`,
-          padding: '14px 20px', maxWidth: '440px',
+          padding: '1.3vmin 1.85vmin', maxWidth: '440px',
           backdropFilter: 'blur(2px)',
         }}>
-          <div style={{ fontSize: '11px', color: AMBER, letterSpacing: '3px', marginBottom: '10px' }}>
+          <div style={{ fontSize: 'clamp(10px, 1.02vmin, 9999px)', color: AMBER, letterSpacing: '0.28vmin', marginBottom: '0.93vmin' }}>
             {phase.code} — {phase.title}
           </div>
           {phase.sitrep.slice(0, sitrepLine).map((line, i) => (
             <div key={i} style={{
-              fontSize: '13px', color: i === 0 ? TEXT2 : 'rgba(0,255,65,0.55)',
-              letterSpacing: '0.5px', lineHeight: 1.75,
+              fontSize: 'clamp(10px, 1.2vmin, 9999px)', color: i === 0 ? TEXT2 : 'rgba(0,255,65,0.55)',
+              letterSpacing: '0.05vmin', lineHeight: 1.75,
               borderLeft: i === 0 ? `2px solid ${AMBER}55` : 'none',
-              paddingLeft: i === 0 ? '8px' : '10px',
+              paddingLeft: i === 0 ? '0.74vmin' : '0.93vmin',
             }}>
               {line}
             </div>
           ))}
           {sitrepLine < phase.sitrep.length && (
-            <span style={{ color: ACCENT, fontSize: '12px' }}>█</span>
+            <span style={{ color: ACCENT, fontSize: 'clamp(10px, 1.11vmin, 9999px)' }}>█</span>
           )}
         </div>
 
@@ -602,15 +602,15 @@ export default function TacticalMap({ onComplete }) {
         <div style={{
           position: 'absolute', top: '12px', right: '12px',
           background: 'rgba(4,4,4,0.88)', border: `1px solid ${BORDER}`,
-          padding: '10px 16px', textAlign: 'center',
+          padding: '0.93vmin 1.48vmin', textAlign: 'center',
         }}>
-          <div style={{ fontSize: '10px', color: TEXT2, letterSpacing: '3px' }}>FASE</div>
-          <div style={{ fontSize: '24px', color: ACCENT }}>{phaseIdx + 1}/{PHASES.length}</div>
+          <div style={{ fontSize: 'clamp(10px, 0.93vmin, 9999px)', color: TEXT2, letterSpacing: '0.28vmin' }}>FASE</div>
+          <div style={{ fontSize: 'clamp(14px, 2.22vmin, 9999px)', color: ACCENT }}>{phaseIdx + 1}/{PHASES.length}</div>
         </div>
       </div>
 
       {/* Order of the day */}
-      <div style={{ fontSize: '15px', color: TEXT2, letterSpacing: '2px', marginBottom: '14px', padding: '0 2px' }}>
+      <div style={{ fontSize: 'clamp(10px, 1.39vmin, 9999px)', color: TEXT2, letterSpacing: '0.19vmin', marginBottom: '1.3vmin', padding: '0 2px' }}>
         ▸ {phase.order}
       </div>
 
@@ -620,7 +620,7 @@ export default function TacticalMap({ onComplete }) {
       )}
 
       {/* Option cards 2×2 */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.93vmin' }}>
         {phase.opts.map(opt => (
           <OptionCard
             key={opt.id}
