@@ -1,6 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, lazy, Suspense } from 'react'
 import { Send, Mail } from 'lucide-react'
-import { QRCodeSVG as QRCode } from 'qrcode.react'
+
+// qrcode.react arrastra ~250KB — se carga solo cuando el usuario llega aquí
+const QRCode = lazy(() => import('qrcode.react').then(m => ({ default: m.QRCodeSVG })))
 import { jsPDF } from 'jspdf'
 import Panel from '../components/Panel'
 import { ACCENT, BORDER, TEXT2, FONT, S } from '../theme'
@@ -429,7 +431,9 @@ export default function EmailScreen({ sessionId, moduleResult, onReset, qrToken,
               CÓDIGO QR — ACCESO AL PORTAL
             </div>
             <div style={{ background: '#fff', padding: 'clamp(12px, 2vw, 24px)', display: 'inline-block', marginBottom: 'clamp(8px, 1.5vw, 16px)' }}>
-              <QRCode value={qrValue} size={Math.min(192, window.innerWidth * 0.35)} level="H" style={{ width: 'clamp(120px, 25vw, 192px)', height: 'clamp(120px, 25vw, 192px)' }} />
+              <Suspense fallback={<div style={{ width: 'clamp(120px,25vw,192px)', height: 'clamp(120px,25vw,192px)', background: '#eee' }} />}>
+                <QRCode value={qrValue} size={Math.min(192, window.innerWidth * 0.35)} level="H" style={{ width: 'clamp(120px, 25vw, 192px)', height: 'clamp(120px, 25vw, 192px)' }} />
+              </Suspense>
             </div>
             <div style={{ fontFamily: FONT, fontSize: 'clamp(10px, 1.2vw, 14px)', color: TEXT2, marginBottom: 'clamp(12px, 2vw, 20px)' }}>
               Escanea para acceder a tu informe en innovadef.es

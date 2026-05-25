@@ -28,6 +28,8 @@ export default defineConfig(({ mode }) => ({
     ],
   },
   build: {
+    target: 'es2022',           // output moderno — sin transpilación innecesaria
+    modulePreload: { polyfill: false }, // quiosco = browsers modernos, no necesita polyfill
     rollupOptions: {
       output: {
         // Explicit vendor chunks so shared libs end up in one file regardless of
