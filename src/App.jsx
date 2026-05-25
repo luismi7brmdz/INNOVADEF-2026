@@ -279,7 +279,7 @@ export default function App() {
       <div style={{
         position: 'relative', zIndex: 2, minHeight: '100vh',
         display: 'flex', alignItems: 'flex-start', justifyContent: 'center',
-        padding: 'clamp(100px, 12vw, 160px) clamp(24px, 4vw, 60px) clamp(52px, 7vw, 80px)',
+        padding: 'clamp(64px, 10vw, 160px) clamp(16px, 4vw, 60px) clamp(40px, 6vw, 80px)',
       }}>
         <Suspense fallback={null}>
           {screen === 'selector' && (
