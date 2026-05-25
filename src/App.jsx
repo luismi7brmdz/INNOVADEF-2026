@@ -190,7 +190,7 @@ export default function App() {
       {/* Header */}
       <header className="app-header" style={{
         position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50,
-        height: 'clamp(48px, 8vw, 90px)',
+        height: '8vh',
         background: 'rgba(5,5,5,0.96)',
         borderBottom: `1.5px solid ${BORDER}`,
         display: 'flex', alignItems: 'stretch',
@@ -205,7 +205,7 @@ export default function App() {
           padding: '0 clamp(10px, 2vw, 32px)', cursor: 'pointer',
           display: 'flex', alignItems: 'center', gap: 'clamp(6px, 1vw, 18px)',
         }}>
-          <img src="/logoinnovadef.png" alt="INNOVADEF" style={{ height: 'clamp(32px, 6vw, 80px)' }} />
+          <img src="/logoinnovadef.png" alt="INNOVADEF" style={{ height: '5.5vh' }} />
         </button>
 
         {/* Nav items */}
@@ -279,7 +279,7 @@ export default function App() {
       <div style={{
         position: 'relative', zIndex: 2, minHeight: '100vh',
         display: 'flex', alignItems: 'flex-start', justifyContent: 'center',
-        padding: 'clamp(64px, 10vw, 160px) clamp(16px, 4vw, 60px) clamp(40px, 6vw, 80px)',
+        padding: '9vh clamp(16px, 3vw, 60px) 5vh',
       }}>
         <Suspense fallback={null}>
           {screen === 'selector' && (
@@ -307,7 +307,7 @@ export default function App() {
       {/* Module screen — fills space between header and status bar */}
       {screen === 'module' && (
         <div key={`mod-${activeModule}`} style={{
-          position: 'fixed', top: 'clamp(54px, 6.5vw, 90px)', left: 0, right: 0, bottom: 'clamp(32px, 4vw, 48px)',
+          position: 'fixed', top: '8vh', left: 0, right: 0, bottom: '4vh',
           zIndex: 2, overflowY: 'auto', overflowX: 'hidden',
           scrollbarWidth: 'thin', scrollbarColor: 'rgba(0,255,65,0.3) transparent',
           padding: 'clamp(10px, 2vw, 30px)',

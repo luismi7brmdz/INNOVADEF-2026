@@ -37,12 +37,12 @@ export default function StatusBar({ module, bootStage = 4 }) {
       `}</style>
       <div style={{
         position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100,
-        height: 'clamp(28px, 4vw, 48px)',
+        height: '4vh',
         background: '#050505',
         borderTop: `1.5px solid ${BORDER}`,
         display: 'flex', alignItems: 'center',
         padding: '0 clamp(10px, 2vw, 36px)',
-        fontFamily: FONT, fontSize: 'clamp(9px, 1.2vw, 14px)',
+        fontFamily: FONT, fontSize: 'clamp(10px, 1.5vmin, 14px)',
         transform: bootStage < 2 ? 'translateY(100%)' : 'translateY(0)',
         opacity: bootStage < 2 ? 0 : 1,
         transition: 'transform 0.45s cubic-bezier(0.22,1,0.36,1), opacity 0.35s ease',
