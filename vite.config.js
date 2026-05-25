@@ -18,9 +18,30 @@ export default defineConfig(({ mode }) => ({
       // No changes needed here.
       ...getExternalAliases(import.meta.dirname),
     },
-    // Force a single React instance even though plugins have their own.
-    // Without this, Zustand hooks and React context break across the boundary.
-    dedupe: ['react', 'react-dom', 'react/jsx-runtime'],
+    // Force a single copy of shared packages across the main project and all
+    // plugin submodules (each has its own node_modules). Without this, Rolldown
+    // sees them as different modules and may bundle them multiple times.
+    dedupe: [
+      'react', 'react-dom', 'react/jsx-runtime',
+      'three', '@react-three/fiber', '@react-three/drei',
+      'zustand', 'zod', 'lucide-react',
+    ],
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        // Explicit vendor chunks so shared libs end up in one file regardless of
+        // which node_modules they resolve from (main project vs plugin submodules).
+        // This also gives stable filenames → better CDN/browser caching.
+        manualChunks(id) {
+          if (id.includes('/node_modules/three/'))          return 'vendor-three'
+          if (id.includes('/node_modules/@react-three/'))   return 'vendor-r3f'
+          if (id.includes('/node_modules/zustand/'))        return 'vendor-store'
+          if (id.includes('/node_modules/zod/'))            return 'vendor-store'
+          if (id.includes('/node_modules/lucide-react/'))   return 'vendor-ui'
+        },
+      },
+    },
   },
   server: {
     historyApiFallback: true,
