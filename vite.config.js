@@ -14,6 +14,15 @@ export default defineConfig(({ mode }) => ({
     react(),
     pluginRegistryPlugin(),
   ],
+  optimizeDeps: {
+    // Scan all plugin source files so Vite auto-discovers and pre-bundles their
+    // CJS deps (scheduler, use-sync-external-store, etc.) before serving them.
+    // Without this Vite serves those CJS files raw via @fs/ and they fail in ESM.
+    entries: [
+      'src/**/*.{js,jsx}',
+      '../demo-*/src/**/*.{js,jsx}',
+    ],
+  },
   resolve: {
     alias: {
       // Auto-discovers all demo-* siblings with a plugin.json.
@@ -21,13 +30,10 @@ export default defineConfig(({ mode }) => ({
       // No changes needed here.
       ...getExternalAliases(import.meta.dirname),
     },
-    // Force a single copy of shared packages across the main project and all
-    // plugin submodules (each has its own node_modules). Without this, Rolldown
-    // sees them as different modules and may bundle them multiple times.
+    // Only dedupe packages actually installed in root node_modules.
     dedupe: [
       'react', 'react-dom', 'react/jsx-runtime',
-      'three', '@react-three/fiber',
-      'zustand', 'zod', 'lucide-react',
+      'three',
     ],
   },
   build: {
