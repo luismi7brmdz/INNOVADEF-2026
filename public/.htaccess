@@ -1,4 +1,33 @@
 # ── Compresión ────────────────────────────────────────────────────────────────
+# Prioridad: servir archivos pre-comprimidos (.br / .gz) generados por Vite.
+# Solo aplica a /assets/ (hashed filenames) — no interfiere con SPA ni proxy.
+<IfModule mod_rewrite.c>
+  RewriteCond %{HTTP:Accept-Encoding} br
+  RewriteCond %{REQUEST_URI}          ^/assets/
+  RewriteCond %{REQUEST_FILENAME}.br  -f
+  RewriteRule ^ %{REQUEST_FILENAME}.br [L]
+
+  RewriteCond %{HTTP:Accept-Encoding} gzip
+  RewriteCond %{REQUEST_URI}          ^/assets/
+  RewriteCond %{REQUEST_FILENAME}.gz  -f
+  RewriteRule ^ %{REQUEST_FILENAME}.gz [L]
+</IfModule>
+
+# Content-Type y Content-Encoding correctos para los archivos comprimidos
+<FilesMatch "\.js\.br$">  ForceType application/javascript </FilesMatch>
+<FilesMatch "\.css\.br$"> ForceType text/css               </FilesMatch>
+<FilesMatch "\.js\.gz$">  ForceType application/javascript </FilesMatch>
+<FilesMatch "\.css\.gz$"> ForceType text/css               </FilesMatch>
+<FilesMatch "\.(gz)$">
+  Header set   Content-Encoding "gzip"
+  Header append Vary             "Accept-Encoding"
+</FilesMatch>
+<FilesMatch "\.(br)$">
+  Header set   Content-Encoding "br"
+  Header append Vary             "Accept-Encoding"
+</FilesMatch>
+
+# Fallback: compresión en vuelo para lo que no tenga versión pre-comprimida
 <IfModule mod_brotli.c>
   AddOutputFilterByType BROTLI_COMPRESS text/html text/css application/javascript application/json image/svg+xml
 </IfModule>

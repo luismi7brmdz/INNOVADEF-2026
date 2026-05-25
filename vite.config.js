@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import pluginRegistryPlugin, { getExternalAliases } from './vite-plugin-registry.js'
+import viteCompression from 'vite-plugin-compression'
 import { config as loadDotenv } from 'dotenv'
 import { resolve } from 'path'
 
@@ -10,7 +11,14 @@ loadDotenv({ path: resolve(import.meta.dirname, 'server/.env') })
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => ({
-  plugins: [react(), pluginRegistryPlugin()],
+  plugins: [
+    react(),
+    pluginRegistryPlugin(),
+    // Pre-genera .gz y .br junto a cada asset — Apache los sirve directamente
+    // sin CPU de compresión en vuelo (mod_rewrite en .htaccess los selecciona).
+    viteCompression({ algorithm: 'gzip',          ext: '.gz', threshold: 1024 }),
+    viteCompression({ algorithm: 'brotliCompress', ext: '.br', threshold: 1024 }),
+  ],
   resolve: {
     alias: {
       // Auto-discovers all demo-* siblings with a plugin.json.
@@ -23,7 +31,7 @@ export default defineConfig(({ mode }) => ({
     // sees them as different modules and may bundle them multiple times.
     dedupe: [
       'react', 'react-dom', 'react/jsx-runtime',
-      'three', '@react-three/fiber', '@react-three/drei',
+      'three', '@react-three/fiber',
       'zustand', 'zod', 'lucide-react',
     ],
   },
