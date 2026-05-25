@@ -1,7 +1,6 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import pluginRegistryPlugin, { getExternalAliases } from './vite-plugin-registry.js'
-import viteCompression from 'vite-plugin-compression'
 import { config as loadDotenv } from 'dotenv'
 import { resolve } from 'path'
 
@@ -14,10 +13,6 @@ export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
     pluginRegistryPlugin(),
-    // Pre-genera .gz y .br junto a cada asset — Apache los sirve directamente
-    // sin CPU de compresión en vuelo (mod_rewrite en .htaccess los selecciona).
-    viteCompression({ algorithm: 'gzip',          ext: '.gz', threshold: 1024 }),
-    viteCompression({ algorithm: 'brotliCompress', ext: '.br', threshold: 1024 }),
   ],
   resolve: {
     alias: {
