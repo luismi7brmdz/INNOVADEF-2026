@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, lazy, Suspense } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import MilitaryBackground from './MilitaryBackground'
 import IntroScreen, { MilitaryCursor } from './IntroScreen'
@@ -10,8 +10,10 @@ import { sfxIntroWipe, sfxReset, sfxBootReady, markUserInteracted } from './sfx'
 import LiveClock from './components/LiveClock'
 import StatusBar from './components/StatusBar'
 import ModuleTransition from './components/ModuleTransition'
-import ModuleSelector from './screens/ModuleSelector'
-import EmailScreen from './screens/EmailScreen'
+
+// Lazy: solo cargan cuando el usuario llega a esas pantallas
+const ModuleSelector = lazy(() => import('./screens/ModuleSelector'))
+const EmailScreen    = lazy(() => import('./screens/EmailScreen'))
 
 const MODULES = PLUGIN_REGISTRY
 
@@ -279,25 +281,27 @@ export default function App() {
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         padding: 'clamp(100px, 12vw, 160px) clamp(24px, 4vw, 60px) clamp(52px, 7vw, 80px)',
       }}>
-        {screen === 'selector' && (
-          <div key="selector" style={{
-            width: '100%',
-            animation: transitioning ? 'contentFadeOut 0.75s ease-in 0.67s forwards' : 'contentFadeIn 0.9s ease-out both',
-          }}>
-            <ModuleSelector onSelect={selectModule} bootStage={bootStage} />
-          </div>
-        )}
-        {screen === 'email' && moduleResult && (
-          <div key="email" style={{ width: '100%', animation: 'contentFadeIn 0.6s ease-out both' }}>
-            <EmailScreen
-              sessionId={reportId || sessionId}
-              moduleResult={moduleResult}
-              onReset={reset}
-              qrToken={qrToken}
-              emailToken={emailToken}
-            />
-          </div>
-        )}
+        <Suspense fallback={null}>
+          {screen === 'selector' && (
+            <div key="selector" style={{
+              width: '100%',
+              animation: transitioning ? 'contentFadeOut 0.75s ease-in 0.67s forwards' : 'contentFadeIn 0.9s ease-out both',
+            }}>
+              <ModuleSelector onSelect={selectModule} bootStage={bootStage} />
+            </div>
+          )}
+          {screen === 'email' && moduleResult && (
+            <div key="email" style={{ width: '100%', animation: 'contentFadeIn 0.6s ease-out both' }}>
+              <EmailScreen
+                sessionId={reportId || sessionId}
+                moduleResult={moduleResult}
+                onReset={reset}
+                qrToken={qrToken}
+                emailToken={emailToken}
+              />
+            </div>
+          )}
+        </Suspense>
       </div>
 
       {/* Module screen — fills space between header and status bar */}
