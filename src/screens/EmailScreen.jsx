@@ -375,9 +375,10 @@ function buildPdf(moduleResult, sessionId) {
 // ─── COMPONENT ────────────────────────────────────────────────────────────────
 
 export default function EmailScreen({ sessionId, moduleResult, onReset, qrToken, emailToken }) {
-  const [email, setEmail]   = useState('')
-  const [pdfUrl, setPdfUrl] = useState(null)
-  const [sent, setSent]     = useState(false)
+  const [email, setEmail]     = useState('')
+  const [pdfUrl, setPdfUrl]   = useState(null)
+  const [sent, setSent]       = useState(false)
+  const [sending, setSending] = useState(false)
 
   useEffect(() => {
     const doc = buildPdf(moduleResult, sessionId)
@@ -397,19 +398,17 @@ export default function EmailScreen({ sessionId, moduleResult, onReset, qrToken,
     link.click()
   }
 
-  const handleSendEmail = () => {
-    if (!email.includes('@')) return
-    fetch(`/api/session/${sessionId}/email`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, emailToken }),
-    }).catch(() => {})
-    const reportUrl = emailToken
-      ? `${window.location.origin}/report/${emailToken}`
-      : `${window.location.origin}/report/${sessionId}`
-    const subject = encodeURIComponent(`INNOVADEF 2026 - Informe ${sessionId}`)
-    const body = encodeURIComponent(`Informe de evaluación INNOVADEF 2026\n\nSesión: ${sessionId}\n\nAccede a tu informe aquí:\n${reportUrl}\n\nEste enlace es permanente.`)
-    window.location.href = `mailto:${email}?subject=${subject}&body=${body}`
+  const handleSendEmail = async () => {
+    if (!email.includes('@') || sending) return
+    setSending(true)
+    try {
+      await fetch(`/api/session/${sessionId}/email`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, emailToken }),
+      })
+    } catch (_) {}
+    setSending(false)
     setSent(true)
   }
 
@@ -470,25 +469,25 @@ export default function EmailScreen({ sessionId, moduleResult, onReset, qrToken,
                 />
                 <button
                   onClick={handleSendEmail}
-                  disabled={!email.includes('@')}
-                  style={{ ...S.btnPrimary, width: '100%', justifyContent: 'center', opacity: !email.includes('@') ? 0.35 : 1, gap: 'clamp(6px, 1vw, 12px)', fontSize: 'clamp(12px, 1.6vw, 18px)', padding: 'clamp(12px, 1.8vw, 20px)' }}
+                  disabled={!email.includes('@') || sending}
+                  style={{ ...S.btnPrimary, width: '100%', justifyContent: 'center', opacity: (!email.includes('@') || sending) ? 0.35 : 1, gap: 'clamp(6px, 1vw, 12px)', fontSize: 'clamp(12px, 1.6vw, 18px)', padding: 'clamp(12px, 1.8vw, 20px)' }}
                 >
-                  <Send size={16} /> ENVIAR INFORME
+                  <Send size={16} /> {sending ? 'ENVIANDO...' : 'ENVIAR INFORME'}
                 </button>
                 <div style={{ fontFamily: FONT, fontSize: 'clamp(10px, 1.2vw, 14px)', color: TEXT2, marginTop: 'clamp(12px, 2vw, 20px)', lineHeight: 1.8 }}>
-                  Se abrirá tu cliente de correo. Adjunta el PDF descargado.
+                  Recibirás el informe con el PDF adjunto y el QR de acceso permanente.
                 </div>
               </>
             ) : (
               <div style={{ border: `1.5px solid ${ACCENT}44`, padding: 'clamp(16px, 3vw, 32px)', background: 'rgba(0,255,65,0.04)' }}>
                 <div style={{ fontFamily: FONT, fontSize: 'clamp(14px, 2vw, 20px)', color: ACCENT, letterSpacing: 'clamp(2px, 0.4vw, 4px)', marginBottom: 'clamp(8px, 1.5vw, 16px)' }}>
-                  CLIENTE DE CORREO ABIERTO
+                  EMAIL ENVIADO
                 </div>
                 <div style={{ fontFamily: FONT, fontSize: 'clamp(14px, 2vw, 22px)', color: TEXT2, marginBottom: 'clamp(6px, 1vw, 12px)', wordBreak: 'break-all' }}>
                   DEST: {email.toUpperCase()}
                 </div>
                 <div style={{ fontFamily: FONT, fontSize: 'clamp(10px, 1.2vw, 14px)', color: TEXT2 }}>
-                  Adjunta el PDF descargado antes de enviar.
+                  Recibirás el informe en breve con el PDF adjunto y el QR de acceso.
                 </div>
               </div>
             )}

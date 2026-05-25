@@ -2,11 +2,10 @@
   RewriteEngine On
   RewriteBase /
 
-  # Pass /report/* and /api/* directly to the Node server (not SPA)
-  RewriteRule ^report/ - [L]
-  RewriteRule ^api/ - [L]
-  RewriteRule ^reports/ - [L]
+  # Proxy /api/*, /report/*, /reports/* to Node server on port 3002
+  RewriteRule ^(api|report|reports)(/.*)?$ http://localhost:3002/$1$2 [P,L]
 
+  # SPA fallback
   RewriteRule ^index\.html$ - [L]
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d

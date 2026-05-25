@@ -37,26 +37,24 @@ export default function App() {
   const navigate = useNavigate()
   const location = useLocation()
 
-  const getInitialScreen = () => {
-    const path = location.pathname
-    if (path === '/')              return 'sleep'
-    if (path === '/intro')         return 'intro'
-    if (path === '/selector')      return 'selector'
-    if (path === '/email')         return 'email'
-    if (path.startsWith('/module/')) return 'module'
+  // URL is the single source of truth — screen and activeModule are derived, not state
+  const screen = (() => {
+    const p = location.pathname
+    if (p === '/')                    return 'sleep'
+    if (p === '/intro')               return 'intro'
+    if (p === '/selector')            return 'selector'
+    if (p === '/email')               return 'email'
+    if (p.startsWith('/module/'))     return 'module'
     return 'sleep'
-  }
+  })()
 
-  const getInitialActiveModule = () => {
-    const path = location.pathname
-    return path.startsWith('/module/') ? path.split('/')[2] || null : null
-  }
+  const activeModule = location.pathname.startsWith('/module/')
+    ? location.pathname.split('/')[2] || null
+    : null
 
-  const [screen, setScreen]             = useState(getInitialScreen)
-  const [activeModule, setActiveModule] = useState(getInitialActiveModule)
   const [moduleResult, setModuleResult] = useState(null)
   const [sessionId]                     = useState(() => `FOCO-${Date.now().toString(36).toUpperCase()}`)
-  const [bootStage, setBootStage]       = useState(() => ['selector', 'module', 'email'].includes(getInitialScreen()) ? 4 : 0)
+  const [bootStage, setBootStage]       = useState(() => ['selector', 'module', 'email'].includes(screen) ? 4 : 0)
   const [qrToken, setQrToken]           = useState(null)
   const [emailToken, setEmailToken]     = useState(null)
   const [reportId, setReportId]         = useState(null)
@@ -64,35 +62,12 @@ export default function App() {
   const [pendingModule, setPendingModule] = useState(null)
   const { overlay, go }                 = useScreenTransition(750)
 
-  // Screen → URL
+  // Guard: /email is only valid when we have a moduleResult
   useEffect(() => {
-    const expected =
-      screen === 'sleep'                    ? '/' :
-      screen === 'intro'                    ? '/intro' :
-      screen === 'selector'                 ? '/selector' :
-      screen === 'module' && activeModule   ? `/module/${activeModule}` :
-      screen === 'email'                    ? '/email' :
-      null
-    if (!expected) return
-    if (screen === 'email' && !moduleResult) { setScreen('selector'); return }
-    if (location.pathname === expected) return
-    if (screen === 'sleep') navigate('/', { replace: true })
-    else navigate(expected)
-  }, [screen, activeModule, moduleResult, navigate]) // eslint-disable-line react-hooks/exhaustive-deps
-
-  // URL → screen
-  useEffect(() => {
-    const path = location.pathname
-    if (path === '/')              { setScreen('sleep') }
-    else if (path === '/intro')    { setScreen('intro') }
-    else if (path === '/selector') { setScreen('selector') }
-    else if (path === '/email')    { if (moduleResult) setScreen('email'); else setScreen('selector') }
-    else if (path.startsWith('/module/')) {
-      const moduleId = path.split('/')[2]
-      setActiveModule(moduleId)
-      setScreen('module')
+    if (location.pathname === '/email' && !moduleResult) {
+      navigate('/selector', { replace: true })
     }
-  }, [location.pathname]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [location.pathname, moduleResult, navigate])
 
   // Inactivity timeout — return to sleep after 60s
   useEffect(() => {
@@ -101,8 +76,11 @@ export default function App() {
       clearTimeout(timeoutId)
       if (screen !== 'sleep') {
         timeoutId = setTimeout(() => {
-          setScreen('sleep')
-          setActiveModule(null)
+          setModuleResult(null)
+          setQrToken(null)
+          setEmailToken(null)
+          setReportId(null)
+          navigate('/', { replace: true })
         }, 60000)
       }
     }
@@ -110,6 +88,7 @@ export default function App() {
     window.addEventListener('keydown', reset)
     window.addEventListener('click', reset)
     window.addEventListener('touchstart', reset)
+    window.addEventListener('popstate', reset)
     reset()
     return () => {
       clearTimeout(timeoutId)
@@ -117,6 +96,7 @@ export default function App() {
       window.removeEventListener('keydown', reset)
       window.removeEventListener('click', reset)
       window.removeEventListener('touchstart', reset)
+      window.removeEventListener('popstate', reset)
     }
   }, [screen, navigate])
 
@@ -126,7 +106,7 @@ export default function App() {
     markUserInteracted()
     sfxIntroWipe()
     go(() => {
-      setScreen('selector')
+      navigate('/selector')
       setBootStage(0)
       setTimeout(() => setBootStage(1), 120)
       setTimeout(() => setBootStage(2), 570)
@@ -144,8 +124,7 @@ export default function App() {
     setReportId(`FOCO-${Date.now().toString(36).toUpperCase()}`)
     setQrToken(null)
     setEmailToken(null)
-    setActiveModule(pendingModule)
-    setScreen('module')
+    navigate(`/module/${pendingModule}`)
     setTransitioning(false)
     setPendingModule(null)
     sfxBootReady()
@@ -153,7 +132,7 @@ export default function App() {
 
   const handleComplete = async (result) => {
     if (!result) {
-      go(() => { setScreen('selector'); setActiveModule(null); setModuleResult(null) })
+      go(() => { navigate('/selector'); setModuleResult(null) })
       return
     }
     const mod = MODULES.find(m => m.id === activeModule)
@@ -169,19 +148,18 @@ export default function App() {
         if (data?.emailToken) setEmailToken(data.emailToken)
       })
       .catch(() => {})
-    go(() => { setModuleResult(fullResult); setScreen('email') })
+    go(() => { setModuleResult(fullResult); navigate('/email') })
   }
 
   const reset = () => {
     markUserInteracted()
     sfxReset()
     go(() => {
-      setScreen('selector')
-      setActiveModule(null)
       setModuleResult(null)
       setQrToken(null)
       setEmailToken(null)
       setReportId(null)
+      navigate('/selector')
     })
   }
 
@@ -193,7 +171,7 @@ export default function App() {
     <div style={{ fontFamily: FONT, background: '#070707', minHeight: '100vh', color: ACCENT, overflowX: 'hidden', fontSize: FS.sm }}>
       <MilitaryCursor />
 
-      {screen === 'sleep' && <SleepScreen onWake={() => go(() => setScreen('intro'))} />}
+      {screen === 'sleep' && <SleepScreen onWake={() => go(() => navigate('/intro'))} />}
       {screen === 'intro' && <IntroScreen onEnter={enterDashboard} />}
 
       <ModuleTransition active={transitioning} onDone={commitModule} />
@@ -362,16 +340,16 @@ export default function App() {
         @keyframes ringExpand     { 0%{width:0;height:0;opacity:0.8} 100%{width:150vmax;height:150vmax;opacity:0} }
         @keyframes glitchFlicker  { 0%,100%{opacity:0} 10%{opacity:0.4} 20%{opacity:0} 30%{opacity:0.3} 40%{opacity:0} 50%{opacity:0.5} 60%{opacity:0} 70%{opacity:0.2} 80%{opacity:0} 90%{opacity:0.1} }
         button:focus { outline: 1.5px solid rgba(0,255,65,0.3); outline-offset: 3px; }
-        
+
         /* Responsive header - default: show full labels */
         .nav-short, .back-short { display: none; }
         .nav-full, .back-full { display: inline; }
-        
+
         /* Tablet landscape and smaller laptops (< 1024px) */
         @media (max-width: 1024px) {
           .header-indicator:nth-child(3) { display: none; }
         }
-        
+
         /* Tablet portrait (< 768px) */
         @media (max-width: 768px) {
           .nav-short, .back-short { display: inline; }
@@ -379,7 +357,7 @@ export default function App() {
           .header-indicator:nth-child(2),
           .header-indicator:nth-child(3) { display: none; }
         }
-        
+
         /* Mobile (< 480px) */
         @media (max-width: 480px) {
           .header-indicators { display: none !important; }

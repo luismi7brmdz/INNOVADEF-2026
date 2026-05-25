@@ -18,6 +18,8 @@ function SleepBackground({ wakeProgress }) {
     const resize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight }
     resize()
     window.addEventListener('resize', resize)
+    const onBeforeUnload = () => cancelAnimationFrame(raf)
+    window.addEventListener('beforeunload', onBeforeUnload)
 
     function randChar() {
       return Math.random() > 0.5
@@ -167,7 +169,7 @@ function SleepBackground({ wakeProgress }) {
       raf = requestAnimationFrame(draw)
     }
     draw()
-    return () => { cancelAnimationFrame(raf); window.removeEventListener('resize', resize) }
+    return () => { cancelAnimationFrame(raf); window.removeEventListener('resize', resize); window.removeEventListener('beforeunload', onBeforeUnload) }
   }, [])
 
   return <canvas ref={canvasRef} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} />
@@ -195,6 +197,7 @@ let globalWakeProgress = 0
 
 function cleanupWebGL() {
   if (globalRafId) cancelAnimationFrame(globalRafId)
+  globalRafId = null
   if (globalRenderer) {
     if (globalScene) {
       globalScene.traverse(obj => {
@@ -206,6 +209,7 @@ function cleanupWebGL() {
       })
       globalScene.clear()
     }
+    try { globalRenderer.forceContextLoss() } catch (_) {}
     globalRenderer.dispose()
     globalRenderer = null
   }
@@ -251,6 +255,15 @@ function PlasmaSphere({ exploding = false, wakeProgress = 0 }) {
   useEffect(() => {
     globalWakeProgress = wakeProgress
   }, [wakeProgress])
+
+  // Limpia el contexto WebGL antes de que el navegador descargue la página
+  // (botón atrás sin historial previo). Sin esto, Firefox y Chrome se cuelgan
+  // porque el RAF loop sigue activo durante el unload.
+  useEffect(() => {
+    const onBeforeUnload = () => cleanupWebGL()
+    window.addEventListener('beforeunload', onBeforeUnload)
+    return () => window.removeEventListener('beforeunload', onBeforeUnload)
+  }, [])
 
   useEffect(() => {
     const container = containerRef.current

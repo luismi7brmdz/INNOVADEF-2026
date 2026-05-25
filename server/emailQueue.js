@@ -9,6 +9,7 @@
  */
 
 import nodemailer from 'nodemailer'
+import QRCode from 'qrcode'
 import { createConnection } from 'net'
 import { db } from './db.js'
 import 'dotenv/config'
@@ -54,8 +55,13 @@ async function sendItem (transport, item) {
   const from    = process.env.SMTP_FROM || process.env.SMTP_USER || 'noreply@innovadef.es'
   const subject = `Tu informe de INNOVADEF FOCO 2026 — ${item.module_title}`
 
+  const qrBuffer = item.report_url
+    ? await QRCode.toBuffer(item.report_url, { width: 200, margin: 2, color: { dark: '#000000', light: '#ffffff' } }).catch(() => null)
+    : null
+
   const reportLinkBlock = item.report_url
-    ? `<div style="margin:24px 0;">
+    ? `<div style="margin:24px 0;text-align:center;">
+        ${qrBuffer ? '<table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:12px;"><tr><td align="center"><img src="cid:qrcode" width="160" alt="QR informe"></td></tr></table>' : ''}
         <a href="${item.report_url}"
            style="display:inline-block;padding:12px 24px;background:#00FF41;color:#070707;font-weight:bold;font-size:14px;text-decoration:none;border-radius:4px;letter-spacing:1px;">
           VER INFORME ONLINE
@@ -99,6 +105,12 @@ async function sendItem (transport, item) {
         path:        item.pdf_path,
         contentType: 'application/pdf',
       },
+      ...(qrBuffer ? [{
+        filename:    'qr-informe.png',
+        content:     qrBuffer,
+        contentType: 'image/png',
+        cid:         'qrcode',
+      }] : []),
     ],
   })
 }
