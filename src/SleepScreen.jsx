@@ -28,7 +28,7 @@ function SleepBackground({ wakeProgress }) {
     }
 
     // ── Particles — neural network web
-    const NUM = 240
+    const NUM = 120
     const particles = Array.from({ length: NUM }, () => ({
       x: Math.random() * window.innerWidth,
       y: Math.random() * window.innerHeight,
@@ -136,7 +136,7 @@ function SleepBackground({ wakeProgress }) {
       })
 
       // ── Connection lines (appear more on wake)
-      const connDist = 120 + wp * 90
+      const connDist = 90 + wp * 60
       const connAlpha = 0.05 + wp * 0.12
       for (let i = 0; i < particles.length; i++) {
         for (let j = i + 1; j < particles.length; j++) {
@@ -461,7 +461,7 @@ function PlasmaSphere({ exploding = false, wakeProgress = 0 }) {
       transparent: true, depthWrite: false,
       blending: THREE.AdditiveBlending, side: THREE.DoubleSide
     })
-    globalScene.add(new THREE.Mesh(new THREE.IcosahedronGeometry(1, 80), globalMat))
+    globalScene.add(new THREE.Mesh(new THREE.IcosahedronGeometry(1, 32), globalMat))
 
     // Halo effects
     const mkHalo = (r, falloff, a) => {
