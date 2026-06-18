@@ -289,6 +289,16 @@ app.post('/api/answers', async (req, res) => {
 app.post('/api/session', async (req, res) => {
   const { id, moduleId, moduleTitle, result } = req.body
   if (!id || !moduleId) return res.status(400).json({ error: 'id and moduleId required' })
+  // id / moduleId are reflected into the report page and used to build the PDF
+  // path, so constrain them to a safe charset. moduleTitle is free text but
+  // bounded and always HTML-escaped on render (see esc() in the report route).
+  const idRe = /^[A-Za-z0-9_-]{1,64}$/
+  if (!idRe.test(id) || !idRe.test(moduleId)) {
+    return res.status(400).json({ error: 'invalid id or moduleId format' })
+  }
+  if (moduleTitle != null && (typeof moduleTitle !== 'string' || moduleTitle.length > 200)) {
+    return res.status(400).json({ error: 'invalid moduleTitle' })
+  }
   try {
     await db('sessions')
       .insert({ id, module_id: moduleId, module_title: moduleTitle, result: JSON.stringify(result), created_at: Date.now() })
@@ -459,6 +469,12 @@ app.get('/report/:token/pdf', async (req, res) => {
 
 // ─── Report page (QR target) ──────────────────────────────────────────────────
 
+// HTML-escape untrusted values before interpolating them into a server-rendered
+// template string. Session fields (id, module_title, …) come from the public,
+// unauthenticated POST /api/session body, so they MUST be escaped here.
+const esc = s => String(s ?? '').replace(/[&<>"']/g,
+  c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]))
+
 function reportErrorPage(msg) {
   return `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <title>INNOVADEF FOCO 2026</title>
@@ -493,7 +509,7 @@ app.get('/report/:token', async (req, res) => {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>INNOVADEF FOCO 2026 — Informe ${req.params.id}</title>
+  <title>INNOVADEF FOCO 2026 — Informe ${esc(session.id)}</title>
   <style>
     body { background:#070707; color:#00FF41; font-family:'Courier New',monospace; padding:2rem; max-width:960px; margin:0 auto; }
     h1 { font-size:1.1rem; letter-spacing:4px; border-bottom:1px solid #00FF4133; padding-bottom:1rem; }
@@ -507,16 +523,16 @@ app.get('/report/:token', async (req, res) => {
 <body>
   <h1>// INFORME DE EVALUACIÓN — INNOVADEF FOCO 2026</h1>
   <div class="label">SESIÓN</div>
-  <div class="value">${session.id}</div>
+  <div class="value">${esc(session.id)}</div>
   <div class="label">MÓDULO</div>
-  <div class="value">${session.module_title || session.module_id}</div>
+  <div class="value">${esc(session.module_title || session.module_id)}</div>
   <div class="label">FECHA</div>
   <div class="value">${new Date(Number(session.created_at)).toLocaleString('es-ES', { day:'2-digit', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit', timeZone:'Europe/Madrid' })}</div>
   ${hasPdf ? `
   <a class="btn" href="/report/${req.params.token}/pdf">[ DESCARGAR PDF ]</a>
   <div style="margin-top:1.5rem;">
     <div style="color:#4B5563;font-size:.7rem;letter-spacing:2px;margin-bottom:.5rem;">VISTA PREVIA</div>
-    <iframe src="/reports/${session.id}.pdf" title="Informe PDF"
+    <iframe src="/reports/${encodeURIComponent(session.id)}.pdf" title="Informe PDF"
       style="width:100%;height:80vh;border:1px solid #1f2937;display:block;background:#fff;"></iframe>
   </div>` : '<p style="color:#4B5563;margin-top:2rem;font-size:.85rem;">PDF no disponible para esta sesión.</p>'}
   <footer>Pumpún Dixital S.L. · pumpun.cloud · INNOVADEF FOCO 2026</footer>
