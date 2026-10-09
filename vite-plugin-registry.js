@@ -1,14 +1,16 @@
 /**
  * vite-plugin-registry.js
  *
- * Auto-discovers external plugins from sibling demo-* directories in innovadef-demos.
+ * Auto-discovers external plugins from sibling directories in innovadef-demos
+ * (any sibling with a plugin.json at its root, regardless of the directory name).
  * Each external plugin must have:
  *   - plugin.json  at the repo root (see PLUGIN_GUIDE.md for fields)
  *   - src/plugin.jsx  exporting a default React component
  *
  * Provides:
  *   - pluginRegistryPlugin()   — Vite plugin that exposes virtual:external-plugins
- *   - getExternalAliases(root) — generates @{id} → ../demo-{dir}/src aliases for vite.config.js
+ *   - getExternalAliases(root) — generates @{id} → ../{dir}/src aliases for vite.config.js
+ *   - getExternalSourceGlobs(root) — globs over each plugin's src/ for optimizeDeps.entries
  */
 
 import fs from 'fs'
@@ -17,7 +19,7 @@ import path from 'path'
 const VIRTUAL_ID = 'virtual:external-plugins'
 const RESOLVED_ID = '\0' + VIRTUAL_ID
 
-/** Read all plugin.json files from sibling demo-* directories */
+/** Read all plugin.json files from sibling directories (except this app itself) */
 function discoverPlugins(root) {
   const parent = path.resolve(root, '..')
   const results = []
@@ -30,7 +32,8 @@ function discoverPlugins(root) {
   }
 
   for (const dir of dirs) {
-    if (!dir.startsWith('demo-')) continue
+    if (dir.startsWith('.') || dir === 'node_modules') continue
+    if (path.join(parent, dir) === path.resolve(root)) continue
     const manifestPath = path.join(parent, dir, 'plugin.json')
     if (!fs.existsSync(manifestPath)) continue
     try {
@@ -132,4 +135,14 @@ export function getExternalAliases(root) {
     aliases[`@${manifest.id}`] = path.resolve(root, '..', dir, 'src')
   }
   return aliases
+}
+
+/**
+ * Call this in vite.config.js optimizeDeps.entries so Vite scans plugin sources.
+ *
+ * Usage:
+ *   entries: [...getExternalSourceGlobs(import.meta.dirname)]
+ */
+export function getExternalSourceGlobs(root) {
+  return discoverPlugins(root).map(({ dir }) => `../${dir}/src/**/*.{js,jsx}`)
 }

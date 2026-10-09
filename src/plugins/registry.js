@@ -8,14 +8,14 @@ import { EXTERNAL_PLUGINS } from 'virtual:external-plugins'
  *
  * Internal modules live in src/modules/ and are registered here.
  * External plugins (separate repos) are auto-discovered from sibling
- * demo-* directories via vite-plugin-registry.js — no changes needed here.
+ * directories with a plugin.json via vite-plugin-registry.js — no changes needed here.
  *
  * To add an internal module:
  *   1. Create src/modules/MiModulo.jsx (export default, receives onComplete prop)
  *   2. Add an entry below
  *
  * To add an external plugin:
- *   1. git submodule add <url> demo-<name>  (in innovadef-demos root)
+ *   1. git submodule add <url> <name>  (in innovadef-demos root)
  *   2. Ensure the repo has plugin.json + src/plugin.jsx
  *   Done — it appears automatically on next build/dev restart.
  *

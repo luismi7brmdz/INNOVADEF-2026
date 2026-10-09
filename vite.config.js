@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import pluginRegistryPlugin, { getExternalAliases } from './vite-plugin-registry.js'
+import pluginRegistryPlugin, { getExternalAliases, getExternalSourceGlobs } from './vite-plugin-registry.js'
 import { config as loadDotenv } from 'dotenv'
 import { resolve } from 'path'
 
@@ -20,13 +20,13 @@ export default defineConfig(({ mode }) => ({
     // Without this Vite serves those CJS files raw via @fs/ and they fail in ESM.
     entries: [
       'src/**/*.{js,jsx}',
-      '../demo-*/src/**/*.{js,jsx}',
+      ...getExternalSourceGlobs(import.meta.dirname),
     ],
   },
   resolve: {
     alias: {
-      // Auto-discovers all demo-* siblings with a plugin.json.
-      // To add a new external plugin: git submodule add <url> demo-<name>
+      // Auto-discovers all siblings with a plugin.json.
+      // To add a new external plugin: git submodule add <url> <name>
       // No changes needed here.
       ...getExternalAliases(import.meta.dirname),
     },

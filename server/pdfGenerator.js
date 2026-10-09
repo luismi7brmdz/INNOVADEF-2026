@@ -590,7 +590,7 @@ const MODULE_META = {
   },
 }
 
-// Fallback for external plugins (demo-aerocognitio, demo-recruitment, etc.)
+// Fallback for external plugins (demo-aerocognitio, cloudminerva-captacion, etc.)
 function getMeta (moduleId, moduleTitle) {
   return MODULE_META[moduleId] || {
     code:       'MOD-EXT',
