@@ -19,6 +19,9 @@ import path from 'path'
 const VIRTUAL_ID = 'virtual:external-plugins'
 const RESOLVED_ID = '\0' + VIRTUAL_ID
 
+// discoverPlugins() runs several times per build — warn about each duplicate only once
+const warnedDuplicates = new Set()
+
 /** Read all plugin.json files from sibling directories (except this app itself) */
 function discoverPlugins(root) {
   const parent = path.resolve(root, '..')
@@ -31,7 +34,10 @@ function discoverPlugins(root) {
     return results
   }
 
-  for (const dir of dirs) {
+  const seenIds = new Map()  // id → dir that registered it first
+
+  // Sorted so the winner of a duplicate id is deterministic across filesystems
+  for (const dir of dirs.sort()) {
     if (dir.startsWith('.') || dir === 'node_modules') continue
     if (path.join(parent, dir) === path.resolve(root)) continue
     const manifestPath = path.join(parent, dir, 'plugin.json')
@@ -42,6 +48,18 @@ function discoverPlugins(root) {
         console.warn(`[plugin-registry] ${dir}/plugin.json missing "id" field — skipped`)
         continue
       }
+      if (seenIds.has(manifest.id)) {
+        const key = `${manifest.id}:${dir}`
+        if (!warnedDuplicates.has(key)) {
+          warnedDuplicates.add(key)
+          console.warn(
+            `[plugin-registry] Duplicate plugin id "${manifest.id}" in ${dir}/plugin.json ` +
+            `(already registered by ${seenIds.get(manifest.id)}) — skipped`
+          )
+        }
+        continue
+      }
+      seenIds.set(manifest.id, dir)
       results.push({ dir, manifest })
     } catch (e) {
       console.warn(`[plugin-registry] Failed to parse ${manifestPath}:`, e.message)
