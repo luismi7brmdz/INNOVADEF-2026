@@ -69,14 +69,11 @@ export default defineConfig(({ mode }) => ({
         target: `http://localhost:${process.env.PORT ?? 3001}`,
         changeOrigin: true,
       },
-      // WebSocket TTS — browsers can't set Authorization on WS upgrades,
-      // so the dev server proxies it and injects the key server-side.
+      // WebSocket TTS — goes through the Node server, which checks the AI
+      // token and injects the xAI key, same as in production.
       '/ws-tts': {
-        target: 'wss://api.x.ai',
+        target: `ws://localhost:${process.env.PORT ?? 3001}`,
         ws: true,
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/ws-tts/, '/v1/tts'),
-        headers: { Authorization: `Bearer ${process.env.XAI_API_KEY}` },
       },
     },
   },
